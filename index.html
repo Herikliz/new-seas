@@ -50,11 +50,12 @@ header {
 .container { max-width: 1400px; margin: 20px auto; padding: 0 15px; }
 .btn { padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin: 3px; color: white; transition: 0.2s; font-family: 'Segoe UI', sans-serif;}
 .btn-outline { background: transparent; border: 1px solid currentColor; color: inherit; }
-.btn-outline:hover { background: rgba(255,255,255,0.1); }
+.btn-outline:hover:not(:disabled) { background: rgba(255,255,255,0.1); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-success { background-color: var(--success); }
 input, textarea, select { background-color: #2a2a2a; color: var(--text); border: 1px solid #444; font-family: 'Lora', serif; border-radius: 4px; padding: 6px; width: 100%; font-size: 13px;}
-input:focus, textarea:focus, select:focus { outline: none; border-color: var(--warning); background-color: #333; }
-input:disabled { background-color: #1a1a1a; color: #666; cursor: not-allowed; border-color: #333; }
+input:focus:not(:disabled), textarea:focus:not(:disabled), select:focus:not(:disabled) { outline: none; border-color: var(--warning); background-color: #333; }
+input:disabled, textarea:disabled, select:disabled { background-color: #1a1a1a; color: #666; cursor: not-allowed; border-color: #333; }
 .currency-input { display: flex; align-items: center; background-color: #2a2a2a; border: 1px solid #444; border-radius: 4px; overflow: hidden; transition: 0.2s;}
 .currency-input:focus-within { border-color: var(--warning); background-color: #333; }
 .currency-input span { padding-left: 10px; padding-right: 5px; color: #b3b3b3; font-weight: bold; font-family: 'Lora', serif; }
@@ -83,7 +84,6 @@ pre#resBox { background: #111; padding: 20px; border-radius: 6px; border: 1px so
 }
 optgroup { color: var(--info); font-family: 'Cinzel', serif; font-weight: bold; }
 option { color: var(--text); font-family: 'Lora', serif; font-weight: normal; }
-.locked-el { opacity: 0.5 !important; cursor: not-allowed !important; pointer-events: none !important; }
 </style>
 </head>
 <body>
@@ -92,6 +92,7 @@ option { color: var(--text); font-family: 'Lora', serif; font-weight: normal; }
   <div class="cloud-controls">
     <input type="text" id="doc-id" placeholder="ID da Ficha na Nuvem" title="Digite para salvar/puxar na nuvem" onchange="changeDocId(this.value)">
     <button class="btn btn-outline" style="font-size: 0.8rem; padding: 6px;" onclick="loadFromCloud()" title="Puxar dados">⬇️ Puxar</button>
+    <button id="btn-senha" class="btn btn-outline" style="font-size: 0.8rem; padding: 6px; color: var(--warning); border-color: var(--warning);" onclick="managePassword()" title="Definir ou remover senha">🔑 Senha</button>
   </div>
   <span style="display:flex; align-items:center; gap:10px;">
     🏴‍☠️ New Seas Ficha & Atributos
@@ -100,9 +101,6 @@ option { color: var(--text); font-family: 'Lora', serif; font-weight: normal; }
 </header>
 
 <div class="container">
-
-  <div class="action-buttons" id="char-action-buttons" style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;"></div>
-
   <div class="three-col-grid">
       <div class="box">
           <div class="box-title" style="color: var(--info);">Identidade</div>
@@ -376,11 +374,14 @@ const firebaseConfig = {
 
 let db = null;
 let isFirebaseReady = false;
-let currentDocId = localStorage.getItem('op_doc_id') || ''; 
-document.getElementById('doc-id').value = currentDocId;
 
-let unlockedChars = new Set();
+// Estado de Segurança
+let isReadOnly = false;
 const MASTER_PASSWORD = "Ben10";
+
+// Inicializa a variável vazia para sempre abrir o código em branco
+let currentDocId = ''; 
+document.getElementById('doc-id').value = currentDocId;
 
 const baseClassesList = ["Arqueólogo", "Artista", "Atirador", "Carpinteiro", "Cientista", "Combatente", "Cozinheiro", "Ferreiro", "Inventor", "Médico", "Musicista", "Navegador"];
 const racas = { "Braços Longos":{f:.40}, "Bucaneiro":{f:.40,r:.40}, "Gigante":{f:.30,r:.30,v:-.20}, "Humano":{}, "Kuja":{}, "Kumate":{d:.40}, "Lunariano":{v:.35,r:.45}, "Meio-Gigante":{f:.25,r:.25}, "Mink":{v:.15,r:.15}, "Oni":{f:.35,r:.45}, "Pernas Longas":{v:.40}, "Povo do Céu: Birkan":{d:.20,v:.20}, "Povo do Céu: Shandia":{d:.20,v:.20}, "Povo do Céu: Skypieano":{d:.20,v:.20}, "Sereiano":{v:.40}, "Tontatta":{f:.20,v:.20}, "Três-Olhos":{v:.15,r:.15}, "Tritão":{f:.20,r:.20,v:.30}, "Wotan":{f:.25,r:.25} };
@@ -418,10 +419,12 @@ let charData = {
 
 function init() {
   populateSelects();
-  const savedData = localStorage.getItem('op_sheet_single_v1');
-  if (savedData && currentDocId !== '') { charData = JSON.parse(savedData); runFallbackChecks(); }
+  // Como o currentDocId inicializa vazio agora, ele carrega a ficha limpa sempre na primeira abertura
+  runFallbackChecks(); 
+  renderTecnicas();
   updateUI();
   initFirebase();
+  toggleEditability();
 }
 
 function initFirebase() {
@@ -434,7 +437,6 @@ function initFirebase() {
 
 function changeDocId(newId) {
   currentDocId = newId ? newId.trim() : '';
-  localStorage.setItem('op_doc_id', currentDocId);
   if(currentDocId !== '') { loadFromCloud(); }
 }
 
@@ -443,14 +445,38 @@ async function loadFromCloud() {
   document.getElementById('db-status').classList.add('syncing');
   try {
       const doc = await db.collection("fichas_op").doc(currentDocId).get();
-      if (doc.exists) { charData = doc.data(); runFallbackChecks(); updateUI(); } 
-      else { saveData(); }
+      if (doc.exists) { 
+          let data = doc.data(); 
+          isReadOnly = false; // Reseta antes de checar
+
+          if (data.password && data.password.trim() !== '') {
+              let entered = prompt("Esta ficha é protegida por senha. Digite a senha para editar (ou cancele para apenas visualizar a ficha):");
+              if (entered !== data.password && entered !== MASTER_PASSWORD) {
+                  isReadOnly = true;
+                  if(entered !== null) alert("Senha incorreta. A ficha foi aberta no Modo de Leitura.");
+              } else {
+                  alert("Acesso concedido!");
+              }
+          }
+
+          charData = data; 
+          runFallbackChecks(); 
+          renderTecnicas(); 
+          updateUI(); 
+          toggleEditability();
+      } 
+      else { 
+          isReadOnly = false;
+          saveData(); 
+          toggleEditability();
+      }
   } catch(e) {}
   setTimeout(() => document.getElementById('db-status').classList.remove('syncing'), 500);
 }
 
 function saveData() {
-  localStorage.setItem('op_sheet_single_v1', JSON.stringify(charData));
+  if (isReadOnly) return; // Impede o salvamento se estiver bloqueado
+
   if (isFirebaseReady && db && currentDocId !== '') {
       document.getElementById('db-status').classList.add('syncing');
       db.collection('fichas_op').doc(currentDocId).set(charData)
@@ -459,7 +485,66 @@ function saveData() {
   }
 }
 
+// Controla o gerenciamento de Senha pelo Botão
+function managePassword() {
+    if (currentDocId === '') {
+        alert("Digite um ID na nuvem e puxe ou crie uma ficha primeiro!");
+        return;
+    }
+    if (isReadOnly) {
+        alert("Você está no modo de leitura. Recarregue a ficha e insira a senha correta antes de tentar modificar a segurança.");
+        return;
+    }
+
+    if (charData.password && charData.password.trim() !== "") {
+        let oldPass = prompt("Digite a senha atual para autorizar a mudança:");
+        if (oldPass === charData.password || oldPass === MASTER_PASSWORD) {
+            let newPass = prompt("Digite a nova senha (ou deixe totalmente em branco para REMOVER a proteção atual):");
+            if (newPass !== null) {
+                charData.password = newPass.trim();
+                saveData();
+                alert(charData.password === "" ? "A senha foi removida com sucesso!" : "Senha redefinida com sucesso!");
+                toggleEditability();
+            }
+        } else {
+            if (oldPass !== null) alert("Senha incorreta!");
+        }
+    } else {
+        let newPass = prompt("Defina uma senha para proteger a edição desta ficha:");
+        if (newPass && newPass.trim() !== "") {
+            charData.password = newPass.trim();
+            saveData();
+            alert("Senha definida com sucesso!");
+            toggleEditability();
+        }
+    }
+}
+
+// Desativa todos os campos de input/select se isReadOnly for true
+function toggleEditability() {
+    const elements = document.querySelectorAll('.container input, .container select, .container textarea, .container button');
+    elements.forEach(el => {
+        // Ignorar a trava no botão de copiar a ficha, queremos que possam copiar mesmo lendo
+        if(el.innerText && el.innerText.includes("Copiar Ficha")) {
+            el.disabled = false;
+            return;
+        }
+        el.disabled = isReadOnly;
+    });
+
+    let pwdBtn = document.getElementById('btn-senha');
+    if (pwdBtn) {
+        if (isReadOnly) {
+            pwdBtn.style.display = 'none'; // Esconde botão de senha se for leitura
+        } else {
+            pwdBtn.style.display = 'inline-block';
+            pwdBtn.innerText = (charData.password && charData.password !== "") ? "🔑 Redefinir Senha" : "🔑 Definir Senha";
+        }
+    }
+}
+
 function runFallbackChecks() {
+  if (typeof charData.password === 'undefined') charData.password = "";
   if (!charData.info) charData.info = {};
   if (typeof charData.info.recompensa === 'string') charData.info.recompensa = parseInt(charData.info.recompensa.replace(/\D/g, "")) || "";
   if (typeof charData.info.berries === 'string') charData.info.berries = parseInt(charData.info.berries.replace(/\D/g, "")) || "";
@@ -477,103 +562,20 @@ function runFallbackChecks() {
   }
 }
 
-function getActiveChar() {
-    return charData;
-}
-
-function getCharId() {
-    return currentDocId || "local_char";
-}
-
-function handlePasswordAction() {
-    const char = getActiveChar();
-    const cId = getCharId();
-    if (!char.password) {
-        let newPass = prompt("Defina uma senha para proteger esta ficha de edições acidentais:");
-        if (newPass && newPass.trim() !== "") {
-            char.password = newPass.trim();
-            unlockedChars.add(cId);
-            saveData();
-            applyLockState();
-            alert("Senha definida! Sua ficha está segura (feche ou recarregue a aba para trancá-la).");
-        }
-    } else if (!unlockedChars.has(cId)) {
-        let pass = prompt("Ficha trancada. Digite a senha para editar:");
-        if (pass === char.password || pass === MASTER_PASSWORD) {
-            unlockedChars.add(cId);
-            applyLockState();
-        } else if (pass !== null) {
-            alert("Senha Incorreta!");
-        }
-    }
-}
-
-function changePassword() {
-    const char = getActiveChar();
-    if (!char.password) return;
-    let pass = prompt("Para redefinir, digite a senha ATUAL (ou a Senha Mestre):");
-    if (pass === char.password || pass === MASTER_PASSWORD) {
-        let newPass = prompt("Digite a NOVA senha (ou deixe em branco para remover a proteção):");
-        if (newPass !== null) {
-            char.password = newPass.trim(); 
-            saveData();
-            applyLockState();
-            alert("Sua senha foi atualizada com sucesso!");
-        }
-    } else if (pass !== null) {
-        alert("Senha Incorreta!");
-    }
-}
-
-function lockCurrentChar() {
-    unlockedChars.delete(getCharId());
-    applyLockState();
-}
-
-function applyLockState() {
-    const char = getActiveChar();
-    if (!char) return;
-    
-    const isLocked = char.password && !unlockedChars.has(getCharId());
-    const actionContainer = document.getElementById('char-action-buttons');
-    let lockHtml = "";
-    
-    if (!char.password) {
-        lockHtml = `<button class="btn btn-outline" style="color:var(--info); border-color:var(--info); font-size:11px; padding: 4px 8px;" onclick="handlePasswordAction()">🔑 Definir Senha</button>`;
-    } else if (isLocked) {
-        lockHtml = `<button class="btn btn-outline" style="color:var(--danger); border-color:var(--danger); font-size:11px; padding: 4px 8px;" onclick="handlePasswordAction()">🔒 Desbloquear</button>`;
-    } else {
-        lockHtml = `
-            <button class="btn btn-outline" style="color:var(--warning); border-color:var(--warning); font-size:11px; padding: 4px 8px;" onclick="changePassword()">🔑 Mudar Senha</button>
-            <button class="btn btn-outline" style="color:var(--success); border-color:var(--success); font-size:11px; padding: 4px 8px;" onclick="lockCurrentChar()">🔓 Trancar Ficha</button>`;
-    }
-    
-    actionContainer.innerHTML = lockHtml;
-
-    const editableElements = document.querySelectorAll('.container input, .container select, .container textarea, .container button');
-    
-    editableElements.forEach(el => {
-        if(!el.closest('#char-action-buttons') && el.getAttribute('onclick') !== 'copyFicha()') {
-            el.disabled = isLocked;
-            if (isLocked) { 
-                el.classList.add('locked-el'); 
-            } else { 
-                el.classList.remove('locked-el'); 
-            }
-        }
-    });
-}
-
 function addTecnica() {
     charData.tecnicasList.push({nome: "", desc: "", efeito: ""});
     saveData();
+    renderTecnicas();
     updateUI();
+    toggleEditability();
 }
 
 function removeTecnica(idx) {
     charData.tecnicasList.splice(idx, 1);
     saveData();
+    renderTecnicas();
     updateUI();
+    toggleEditability();
 }
 
 function updateTecnica(idx, field, val) {
@@ -662,7 +664,7 @@ function updateUI() {
     let totalBase = D + F + R + V;
 
     let avisoBase = document.getElementById('avisoBase');
-    if(totalBase > 1000) { avisoBase.style.display = "block"; avisoBase.textContent = `Atenção: Você ultrapassou o limite inicial! Total: ${totalBase.toLocaleString("pt-BR")}`; } else { avisoBase.style.display = "none"; }
+    if(totalBase > 1000) { avisoBase.style.display = "block"; avisoBase.textContent = `Atenção: Você ultrapassou o limite inicial de 1.000 pontos! Total: ${totalBase.toLocaleString("pt-BR")}`; } else { avisoBase.style.display = "none"; }
 
     let html1 = "";
     baseClassesList.forEach(c => html1 += `<option value="${c} 1">${c} 1</option>`);
@@ -681,7 +683,7 @@ function updateUI() {
     classSlots.forEach(slot => {
         let el = document.getElementById('info-' + slot.id);
         if (totalBase >= slot.req) {
-            el.disabled = false;
+            el.disabled = isReadOnly ? true : false; // Respeita modo leitura
             let counts = {};
             baseClassesList.forEach(c => counts[c] = 1);
             slot.prev.forEach(p => {
@@ -776,8 +778,8 @@ function updateUI() {
         }
     });
 
-    document.getElementById('info-estilo3').disabled = totalBase < 5000;
-    document.getElementById('info-estilo4').disabled = totalBase < 10000;
+    document.getElementById('info-estilo3').disabled = totalBase < 5000 || isReadOnly;
+    document.getElementById('info-estilo4').disabled = totalBase < 10000 || isReadOnly;
 
     [1, 2, 3, 4].forEach(n => {
         let elFree = document.getElementById('info-freestyle'+n);
@@ -789,7 +791,11 @@ function updateUI() {
 
     let reqEsp = (rc === "Kuja" || ln === "Silvers") ? 12000 : 15000;
     let espEl = document.getElementById('stat-esp');
-    if(totalBase >= reqEsp) { espEl.disabled = false; espEl.placeholder = "0"; document.getElementById('box-haki').style.display = "block"; } else {
+    if(totalBase >= reqEsp) { 
+        espEl.disabled = isReadOnly ? true : false; 
+        espEl.placeholder = "0"; 
+        document.getElementById('box-haki').style.display = "block"; 
+    } else {
         espEl.disabled = true; espEl.placeholder = `🔒 Requer ${reqEsp.toLocaleString("pt-BR")}`;
         charData.stats.esp = 0; charData.substats.hArm = 0; charData.substats.hObs = 0; charData.substats.hRei = 0;
         document.getElementById('box-haki').style.display = "none";
@@ -799,7 +805,10 @@ function updateUI() {
     if(ln === "Silvers") {
         amiEl.disabled = true; amiEl.placeholder = "🔒 Indisponível";
         charData.stats.ami = 0; charData.substats.amiAlc = 0; charData.substats.amiDur = 0; charData.substats.amiPot = 0; charData.substats.amiVel = 0;
-    } else { amiEl.disabled = false; amiEl.placeholder = "0"; }
+    } else { 
+        amiEl.disabled = isReadOnly ? true : false; 
+        amiEl.placeholder = "0"; 
+    }
 
     let bonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0};
 
@@ -970,8 +979,6 @@ function updateUI() {
     let outNpcsC = formatNpc(i.npcsC, "");
     let outNpcsE = formatNpc(i.npcsE, "🔒");
 
-    renderTecnicas();
-
     let tecnicasOut = "";
     if (charData.tecnicasList && charData.tecnicasList.length > 0) {
         tecnicasOut += "▬▬▬▬  [ 𝐓ᴇ́ᴄɴɪᴄᴀs ]  ▬▬▬▬\n\n";
@@ -1058,8 +1065,8 @@ function updateUI() {
               *Nᴇᴡ sᴇᴀs*
 — ロールプレイングゲーム - 𝚁𝙿𝙶 [𝙾𝙽𝙴 𝙿𝙸𝙴𝙲𝙴]
      — 新しい海 - 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 ~*ɴꜱ*~
-                         ᖴIᑕᕼᗩ
-Iີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊
+                          ᖴIᑕᕼᗩ
+Iີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊
   : ᓩ _𝐍ᴏᴍᴇ:_
 > ${charData.name}
 
@@ -1130,7 +1137,6 @@ HP: ${totalHP.toLocaleString("pt-BR")}
 ${attrOut}${tecnicasOut}`;
 
     document.getElementById('resBox').textContent = out.trim();
-    applyLockState();
 }
 
 function copyFicha() {
