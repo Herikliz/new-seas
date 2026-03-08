@@ -1,0 +1,787 @@
+const firebaseConfig = {
+  apiKey: "AIzaSyDG9zDcphqyTfXXZBWc0-uRV74eeie_tEE",
+  authDomain: "new-seas.firebaseapp.com",
+  projectId: "new-seas",
+  storageBucket: "new-seas.firebasestorage.app",
+  messagingSenderId: "551983006255",
+  appId: "1:551983006255:web:29dae15ad04dabff7afcda"
+};
+
+let db = null;
+let isFirebaseReady = false;
+
+// Estado de Segurança
+let isReadOnly = false;
+const MASTER_PASSWORD = "Ben10";
+
+// Inicializa a variável vazia para sempre abrir o código em branco
+let currentDocId = ''; 
+document.getElementById('doc-id').value = currentDocId;
+
+const baseClassesList = ["Arqueólogo", "Artista", "Atirador", "Carpinteiro", "Cientista", "Combatente", "Cozinheiro", "Ferreiro", "Inventor", "Médico", "Musicista", "Navegador"];
+const racas = { "Braços Longos":{f:.40}, "Bucaneiro":{f:.40,r:.40}, "Gigante":{f:.30,r:.30,v:-.20}, "Humano":{}, "Kuja":{}, "Kumate":{d:.40}, "Lunariano":{v:.35,r:.45}, "Meio-Gigante":{f:.25,r:.25}, "Mink":{v:.15,r:.15}, "Oni":{f:.35,r:.45}, "Pernas Longas":{v:.40}, "Povo do Céu: Birkan":{d:.20,v:.20}, "Povo do Céu: Shandia":{d:.20,v:.20}, "Povo do Céu: Skypieano":{d:.20,v:.20}, "Sereiano":{v:.40}, "Tontatta":{f:.20,v:.20}, "Três-Olhos":{v:.15,r:.15}, "Tritão":{f:.20,r:.20,v:.30}, "Wotan":{f:.25,r:.25} };
+const linhagens = { "Nenhuma":{}, "Augur":{v:.10,d:.20,req:["Humano"]}, "Barnum":{req:["Braços Longos","Pernas Longas","Kumate","Três-Olhos"]}, "Boa":{f:.15,ha:.15,req:["Kuja"]}, "Capone":{v:.10,d:.15,req:["Humano"]}, "Charlotte":{charlotte:true}, "Chinjao":{f:.15,r:.15,req:["Humano"]}, "D.":{}, "Dracule":{d:.20,ho:.10,req:["Humano"]}, "Drole":{f:.20,r:.10,v:.10,req:["Gigante","Meio-Gigante","Wotan"]}, "Família do Sol":{f:.15,r:.15,req:["Tritão","Sereiano","Wotan"]}, "Gan":{esp:.15,req:["Povo do Céu: Birkan","Povo do Céu: Shandia","Povo do Céu: Skypieano"]}, "Kong":{req:["Humano"]}, "Kozuki":{v:.10,d:.10,esp:.10,req:["Humano"]}, "Kurozumi":{v:.10,d:.20,req:["Humano"]}, "Laufey":{r:.20,f:.10,v:-.20,req:["Gigante"]}, "Mokomo":{v:.10,req:["Mink"]}, "Nefertari":{d:.15,v:.15,req:["Humano"]}, "Neptune":{v:.25,req:["Sereiano"]}, "Newgate":{f:.10,r:.20,req:["Humano","Meio-Gigante"]}, "Sakazuki":{r:.10,f:.20,req:["Humano"]}, "Silvers":{esp:.15,req:["Humano"]}, "Tenryūbito: Família Donquixote":{d:.15,ami:.15,req:["Humano"]}, "Tenryūbito: Família Figarland":{d:.15,esp:.15,req:["Humano"]} };
+
+const locais = {
+  "East Blue": ["Base da Marinha G-03", "Clockwork", "Conomi", "Vila Cocoyasi", "Vila Gosa", "Cozia", "Dawn", "Reino Goa", "Terminal Cinza", "Vila Foosha", "Gecko", "Vila Syrup", "Goat", "Ilha dos Animais Raros", "Ilha Navio de Guerra", "Ilha \"Shimotsuki\"", "Kumate", "Mirrorball", "Organ", "Polestar", "Tequila Wolf", "Yotsuba", "Shells Town"],
+  "South Blue": ["Base da Marinha G-10", "Baterilla", "Briss", "Centaurea", "Karate", "\"Reino Negro de Drum\"", "Torino"],
+  "West Blue": ["Ballywood", "Base da Marinha G-12", "God Valley", "Ilusia", "Kano", "Las Camp", "Ohara", "Thriller Bark", "Toroa"],
+  "North Blue": ["Base da Marinha G-11", "Deul", "Downs", "Flevance", "Ilha da Andorinha", "Lvneel", "Minion", "Polo Norte", "Rakesh", "Rubeck", "Spider Miles", "Whiteland"],
+  "Paraíso": ["Baltigo", "Banaro", "Base da Marinha G-02", "Base da Marinha G-08", "Boin", "Cactus", "Corrente Tarai", "Base da Marinha G-01", "Enies Lobby", "Impel Down", "Drum", "Foolshout", "Ilha Spa", "Jaya", "Skypiea", "Karakuri", "Kenzan", "Kuraigana", "Kyuka", "Little Garden", "Long Ring Long Land", "Reino Lulusia", "Mar do Triângulo Florian"],
+  "Novo Mundo": ["Applenine", "Base da Marinha G-09", "Base da Marinha G-13", "Base da Marinha G-14", "Base da Marinha G-15", "Dressrosa", "Green Bit", "Egghead", "Elbaf", "Foodvalten", "Hachinosu", "Mystoria", "Prodence", "Punk Hazard", "Raijin", "Risky Red", "Wano", "Whole Cake", "Yukiryu"],
+  "Calm Belt": ["Amazon Lily", "Base da Marinha G-04", "Base da Marinha G-05", "Base da Marinha G-06", "Base da Marinha G-07", "Impel Down", "Rusukaina", "Shitsurakujima"]
+};
+
+const allStyles = ["Nenhum", "Armadilha de Cores", "Arsenal", "Arte do Tempo", "Artista Marcial", "Atirador", "Black Cat", "Boujutsu", "Boxe", "Combate Gigante", "Combate Tontatta", "Cortes Precisos", "Electro", "Escultura de Forma", "Fencing", "Freestyle", "Fúria das Marés", "Galaxy Combat", "Hasshoken", "Impacto Estrutural", "Instinto Animal", "Jao Kun Dō", "Karatê Homem-Peixe", "Kitsunebi-ryū", "Kozuki-Nitōryū", "Kung Fu", "Melodia Impactante", "Mutōryū", "Ninjutsu", "Okama Kenpō", "Paladino", "Perna Negra", "Punchstyle", "Punho Suave", "Ranger", "Rokushiki", "Rope Action", "Seimei Kikan", "Sinfonia Ilusória", "Stinstyle", "Sumô", "Swordstyle", "Tōryū", "Yaristyle"];
+const classStyles = {"Arqueólogo":["Instinto Animal"],"Artista":["Armadilha de Cores","Escultura de Forma"],"Atirador":["Atirador"],"Carpinteiro":["Impacto Estrutural","Rope Action"],"Cientista":["Punho Suave"],"Combatente":["Freestyle"],"Cozinheiro":["Cortes Precisos","Perna Negra"],"Ferreiro":["Impacto Estrutural","Rope Action"],"Inventor":["Impacto Estrutural","Rope Action"],"Médico":["Punho Suave"],"Musicista":["Melodia Impactante","Sinfonia Ilusória"],"Navegador":["Arte do Tempo","Fúria das Marés"]};
+
+let charData = {
+  name: "",
+  password: "",
+  info: { 
+      classe: "Arqueólogo 1", classe2: "", classe3: "", classe4: "", classe5: "",
+      raca: "Humano", linhagem: "Nenhuma", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp",
+      alcunha: "", recompensa: "", altura: "", idade: "", sexo: "Masculino", sangue: "A+", nacionalidade: "", localizacao: "",
+      orgTipo: "Pirata", tripulacao: "", patente: "", salario: "",
+      estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", estilo3: "", freestyle3: "", estilo4: "", freestyle4: "",
+      berries: 5000000, npcsC: "", npcsE: "", akumaNome: "",
+      personalidade: "", historia: "", aparencia: "", inventario: ""
+  },
+  tecnicasList: [],
+  stats: { f: 0, d: 0, r: 0, v: 0, esp: 0, ami: 0 },
+  substats: { refl: 0, vcorp: 0, hArm: 0, hObs: 0, hRei: 0, amiAlc: 0, amiDur: 0, amiPot: 0, amiVel: 0 }
+};
+
+function init() {
+  populateSelects();
+  runFallbackChecks(); 
+  renderTecnicas();
+  updateUI();
+  initFirebase();
+  toggleEditability();
+}
+
+function initFirebase() {
+  try {
+      firebase.initializeApp(firebaseConfig); db = firebase.firestore(); isFirebaseReady = true;
+      document.getElementById('db-status').classList.add('online');
+      if(currentDocId !== '') { loadFromCloud(); }
+  } catch(e) {}
+}
+
+function changeDocId(newId) {
+  currentDocId = newId ? newId.trim() : '';
+  if(currentDocId !== '') { loadFromCloud(); }
+}
+
+async function loadFromCloud() {
+  if (!isFirebaseReady || !db || currentDocId === '') return;
+  document.getElementById('db-status').classList.add('syncing');
+  try {
+      const doc = await db.collection("fichas_op").doc(currentDocId).get();
+      if (doc.exists) { 
+          let data = doc.data(); 
+          isReadOnly = false; // Reseta antes de checar
+
+          if (data.password && data.password.trim() !== '') {
+              let entered = prompt("Esta ficha é protegida por senha. Digite a senha para editar (ou cancele para apenas visualizar a ficha):");
+              if (entered !== data.password && entered !== MASTER_PASSWORD) {
+                  isReadOnly = true;
+                  if(entered !== null) alert("Senha incorreta. A ficha foi aberta no Modo de Leitura.");
+              } else {
+                  alert("Acesso concedido!");
+              }
+          }
+
+          charData = data; 
+          runFallbackChecks(); 
+          renderTecnicas(); 
+          updateUI(); 
+          toggleEditability();
+      } 
+      else { 
+          isReadOnly = false;
+          saveData(); 
+          toggleEditability();
+      }
+  } catch(e) {}
+  setTimeout(() => document.getElementById('db-status').classList.remove('syncing'), 500);
+}
+
+function saveData() {
+  if (isReadOnly) return; // Impede o salvamento se estiver bloqueado
+
+  if (isFirebaseReady && db && currentDocId !== '') {
+      document.getElementById('db-status').classList.add('syncing');
+      db.collection('fichas_op').doc(currentDocId).set(charData)
+        .then(() => { setTimeout(() => document.getElementById('db-status').classList.remove('syncing'), 300); })
+        .catch(error => { document.getElementById('db-status').classList.remove('syncing'); document.getElementById('db-status').classList.remove('online'); });
+  }
+}
+
+// Controla o gerenciamento de Senha pelo Botão
+function managePassword() {
+    if (currentDocId === '') {
+        alert("Digite um ID na nuvem e puxe ou crie uma ficha primeiro!");
+        return;
+    }
+    if (isReadOnly) {
+        alert("Você está no modo de leitura. Recarregue a ficha e insira a senha correta antes de tentar modificar a segurança.");
+        return;
+    }
+
+    if (charData.password && charData.password.trim() !== "") {
+        let oldPass = prompt("Digite a senha atual (ou a senha mestra) para autorizar a mudança:");
+        if (oldPass === charData.password || oldPass === MASTER_PASSWORD) {
+            let newPass = prompt("Digite a nova senha (ou deixe totalmente em branco para REMOVER a proteção atual):");
+            if (newPass !== null) {
+                charData.password = newPass.trim();
+                saveData();
+                alert(charData.password === "" ? "A senha foi removida com sucesso!" : "Senha redefinida com sucesso!");
+                toggleEditability();
+            }
+        } else {
+            if (oldPass !== null) alert("Senha incorreta!");
+        }
+    } else {
+        let newPass = prompt("Defina uma senha para proteger a edição desta ficha:");
+        if (newPass && newPass.trim() !== "") {
+            charData.password = newPass.trim();
+            saveData();
+            alert("Senha definida com sucesso!");
+            toggleEditability();
+        }
+    }
+}
+
+// Desativa todos os campos de input/select se isReadOnly for true
+function toggleEditability() {
+    const elements = document.querySelectorAll('.container input, .container select, .container textarea, .container button');
+    elements.forEach(el => {
+        // Ignorar a trava no botão de copiar a ficha, queremos que possam copiar mesmo lendo
+        if(el.innerText && el.innerText.includes("Copiar Ficha")) {
+            el.disabled = false;
+            return;
+        }
+        el.disabled = isReadOnly;
+    });
+
+    let pwdBtn = document.getElementById('btn-senha');
+    if (pwdBtn) {
+        if (isReadOnly) {
+            pwdBtn.style.display = 'none'; // Esconde botão de senha se for leitura
+        } else {
+            pwdBtn.style.display = 'inline-block';
+            pwdBtn.innerText = (charData.password && charData.password !== "") ? "🔑 Redefinir Senha" : "🔑 Definir Senha";
+        }
+    }
+}
+
+function runFallbackChecks() {
+  if (typeof charData.password === 'undefined') charData.password = "";
+  if (!charData.info) charData.info = {};
+  if (typeof charData.info.recompensa === 'string') charData.info.recompensa = parseInt(charData.info.recompensa.replace(/\D/g, "")) || "";
+  if (typeof charData.info.berries === 'string') charData.info.berries = parseInt(charData.info.berries.replace(/\D/g, "")) || "";
+
+  const defInfo = { classe: "Arqueólogo 1", classe2: "", classe3: "", classe4: "", classe5: "", raca: "Humano", linhagem: "Nenhuma", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp", alcunha: "", recompensa: "", altura: "", idade: "", sexo: "Masculino", sangue: "A+", nacionalidade: "", localizacao: "", orgTipo: "Pirata", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", personalidade: "", historia: "", aparencia: "", inventario: "" };
+  for(let k in defInfo) if (typeof charData.info[k] === 'undefined') charData.info[k] = defInfo[k];
+  if (!charData.stats) charData.stats = { f: 0, d: 0, r: 0, v: 0, esp: 0, ami: 0 };
+  if (!charData.substats) charData.substats = { refl: 0, vcorp: 0, hArm: 0, hObs: 0, hRei: 0, amiAlc: 0, amiDur: 0, amiPot: 0, amiVel: 0 };
+
+  if (!charData.tecnicasList) {
+      charData.tecnicasList = [];
+      if (charData.info && typeof charData.info.tecnicas === 'string' && charData.info.tecnicas.trim() !== '') {
+          charData.tecnicasList.push({ nome: "Técnica Antiga (Migrada)", desc: charData.info.tecnicas, efeito: "" });
+      }
+  }
+}
+
+function addTecnica() {
+    charData.tecnicasList.push({nome: "", desc: "", efeito: ""});
+    saveData();
+    renderTecnicas();
+    updateUI();
+    toggleEditability();
+}
+
+function removeTecnica(idx) {
+    charData.tecnicasList.splice(idx, 1);
+    saveData();
+    renderTecnicas();
+    updateUI();
+    toggleEditability();
+}
+
+function updateTecnica(idx, field, val) {
+    charData.tecnicasList[idx][field] = val;
+    saveData();
+    updateUI();
+}
+
+function renderTecnicas() {
+    const container = document.getElementById('tecnicas-container');
+    container.innerHTML = '';
+    charData.tecnicasList.forEach((t, idx) => {
+        container.innerHTML += `
+            <div style="background: rgba(0,0,0,0.3); padding: 10px; border: 1px dashed #555; border-radius: 6px; margin-bottom: 10px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
+                    <label style="color:var(--info);">Técnica ${idx + 1}</label>
+                    <button type="button" class="btn btn-outline" style="color:var(--danger); border-color:var(--danger); font-size:10px; padding:2px 6px;" onclick="removeTecnica(${idx})">Remover</button>
+                </div>
+                <input type="text" placeholder="Nome da Técnica (Ex: Golpe Rápido)" value="${t.nome}" oninput="updateTecnica(${idx}, 'nome', this.value)" style="margin-bottom:5px;">
+                <textarea placeholder="Descrição da Técnica" oninput="updateTecnica(${idx}, 'desc', this.value)" style="min-height:50px; margin-bottom:5px;">${t.desc}</textarea>
+                <input type="text" placeholder="Efeito / Buff (Ex: Perde 10% de Res)" value="${t.efeito}" oninput="updateTecnica(${idx}, 'efeito', this.value)">
+            </div>
+        `;
+    });
+}
+
+function populateSelects() {
+    const selRaca = document.getElementById('info-raca');
+    for(let r in racas) selRaca.innerHTML += `<option value="${r}">${r}</option>`;
+
+    let locationHtml = `<option value="">-- Selecione --</option>`;
+    for(let region in locais) {
+        locationHtml += `<optgroup label="${region}">`;
+        locais[region].forEach(loc => {
+            locationHtml += `<option value="${loc}">${loc}</option>`;
+        });
+        locationHtml += `</optgroup>`;
+    }
+    document.getElementById('info-nacionalidade').innerHTML = locationHtml;
+    document.getElementById('info-localizacao').innerHTML = locationHtml;
+}
+
+function updateField(category, field, value) { 
+    if (category === 'name') { charData.name = value || ""; } else { charData[category][field] = value; } 
+    saveData(); updateUI(); 
+}
+
+function formatAndSave(category, field, el) {
+    let cleanVal = el.value.replace(/\D/g, ""); let num = cleanVal ? parseInt(cleanVal, 10) : 0;
+    charData[category][field] = num;
+    let cursor = el.selectionStart; let oldLength = el.value.length; el.value = num ? num.toLocaleString("pt-BR") : "";
+    let newLength = el.value.length; el.setSelectionRange(cursor + (newLength - oldLength), cursor + (newLength - oldLength));
+    saveData(); updateUI();
+}
+
+function formatCurrency(category, field, el) {
+    let cleanVal = el.value.replace(/\D/g, "");
+    let num = cleanVal ? parseInt(cleanVal, 10) : "";
+    charData[category][field] = num;
+    let cursor = el.selectionStart; 
+    let oldLength = el.value.length; 
+    el.value = cleanVal ? num.toLocaleString("pt-BR") : "";
+    let newLength = el.value.length; 
+    try { el.setSelectionRange(cursor + (newLength - oldLength), cursor + (newLength - oldLength)); } catch(e){}
+    saveData(); updateUI();
+}
+
+function strCalc(base, bonus) {
+    if(bonus === 0) return base.toLocaleString("pt-BR");
+    let total = Math.round(base * (1 + bonus)); let sinal = bonus >= 0 ? "+" : ""; let pct = (bonus * 100).toFixed(0) + "%";
+    return `${base.toLocaleString("pt-BR")}${sinal}${pct} = ${total.toLocaleString("pt-BR")}`;
+}
+
+function updateUI() {
+    document.getElementById('pc-name').value = charData.name;
+    const textFields = ['raca', 'selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'alcunha', 'altura', 'idade', 'sexo', 'sangue', 'nacionalidade', 'localizacao', 'tripulacao', 'patente', 'salario', 'npcsC', 'npcsE', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario'];
+    textFields.forEach(f => { let el = document.getElementById('info-'+f); if(el) el.value = charData.info[f] || ""; });
+
+    let recEl = document.getElementById('info-recompensa');
+    if(recEl) recEl.value = charData.info.recompensa ? charData.info.recompensa.toLocaleString("pt-BR") : "";
+    
+    let berEl = document.getElementById('info-berries');
+    if(berEl) berEl.value = charData.info.berries ? charData.info.berries.toLocaleString("pt-BR") : "";
+
+    let D = charData.stats.d, F = charData.stats.f, R = charData.stats.r, V = charData.stats.v;
+    let totalBase = D + F + R + V;
+
+    let avisoBase = document.getElementById('avisoBase');
+    if(totalBase > 1000) { avisoBase.style.display = "block"; avisoBase.textContent = `Atenção: Você ultrapassou o limite inicial! Total: ${totalBase.toLocaleString("pt-BR")}`; } else { avisoBase.style.display = "none"; }
+
+    let html1 = "";
+    baseClassesList.forEach(c => html1 += `<option value="${c} 1">${c} 1</option>`);
+    let el1 = document.getElementById('info-classe');
+    if(el1.innerHTML !== html1) el1.innerHTML = html1;
+    el1.value = charData.info.classe || "Arqueólogo 1";
+    charData.info.classe = el1.value;
+
+    const classSlots = [
+        {id: 'classe2', req: 5000, prev: [charData.info.classe]},
+        {id: 'classe3', req: 10000, prev: [charData.info.classe, charData.info.classe2]},
+        {id: 'classe4', req: 20000, prev: [charData.info.classe, charData.info.classe2, charData.info.classe3]},
+        {id: 'classe5', req: 35000, prev: [charData.info.classe, charData.info.classe2, charData.info.classe3, charData.info.classe4]}
+    ];
+
+    classSlots.forEach(slot => {
+        let el = document.getElementById('info-' + slot.id);
+        if (totalBase >= slot.req) {
+            el.disabled = isReadOnly ? true : false; // Respeita modo leitura
+            let counts = {};
+            baseClassesList.forEach(c => counts[c] = 1);
+            slot.prev.forEach(p => {
+                if(p) {
+                    let match = p.match(/(.+) (\d+)/);
+                    if(match) counts[match[1]] = Math.max(counts[match[1]], parseInt(match[2]) + 1);
+                }
+            });
+            let html = `<option value="">-- Selecione --</option>`;
+            baseClassesList.forEach(c => {
+                if(counts[c] <= 5) html += `<option value="${c} ${counts[c]}">${c} ${counts[c]}</option>`;
+            });
+            if(el.innerHTML !== html) el.innerHTML = html;
+            
+            let currentVal = charData.info[slot.id];
+            let optionExists = Array.from(el.options).some(o => o.value === currentVal);
+            if(optionExists && currentVal !== "") { el.value = currentVal; } else { el.value = ""; charData.info[slot.id] = ""; }
+        } else {
+            el.innerHTML = `<option value="">🔒 Requer ${slot.req.toLocaleString('pt-BR')}</option>`;
+            el.disabled = true;
+            charData.info[slot.id] = "";
+        }
+    });
+
+    let combatenteLevel = 0;
+    [charData.info.classe, charData.info.classe2, charData.info.classe3, charData.info.classe4, charData.info.classe5].forEach(c => {
+        if(c && c.startsWith("Combatente")) {
+            let match = c.match(/Combatente (\d+)/);
+            if(match) combatenteLevel = Math.max(combatenteLevel, parseInt(match[1]));
+        }
+    });
+    
+    document.getElementById('box-selClasseDF').style.display = (combatenteLevel > 0) ? "block" : "none";
+
+    let orgTipo = charData.info.orgTipo || "Pirata";
+    document.getElementById('info-orgTipo').value = orgTipo;
+    if(orgTipo === "Pirata") {
+        document.getElementById('box-tripulacao').style.display = "block";
+        document.getElementById('box-patente-salario').style.display = "none";
+    } else {
+        document.getElementById('box-tripulacao').style.display = "none";
+        document.getElementById('box-patente-salario').style.display = "flex";
+    }
+
+    const selLin = document.getElementById('info-linhagem');
+    let currentLin = charData.info.linhagem; selLin.innerHTML = "";
+    for(let l in linhagens) { if(!linhagens[l].req || linhagens[l].req.includes(charData.info.raca)) { selLin.innerHTML += `<option value="${l}">${l}</option>`; } }
+    if(Array.from(selLin.options).some(o => o.value === currentLin)) { selLin.value = currentLin; } else { charData.info.linhagem = "Nenhuma"; selLin.value = "Nenhuma"; currentLin = "Nenhuma"; }
+
+    let rc = charData.info.raca; let ln = currentLin;
+    let isLinhagemVisible = (rc && !["Bucaneiro","Oni","Lunariano"].includes(rc));
+    document.getElementById('container-linhagem').style.display = isLinhagemVisible ? "block" : "none"; 
+    
+    document.getElementById('box-extraRaca').style.display = ["Humano","Kuja","Três-Olhos","Mink"].includes(rc) ? "flex" : "none";
+    document.getElementById('info-selDF').style.display = ["Humano","Kuja","Três-Olhos","Mink"].includes(rc) ? "block" : "none";
+    document.getElementById('info-selRV').style.display = ["Humano","Kuja"].includes(rc) ? "block" : "none";
+
+    let showExtraLin = isLinhagemVisible && ["Barnum","Charlotte","D.","Gan","Kong","Silvers"].includes(ln);
+    document.getElementById('box-extraLin').style.display = showExtraLin ? "flex" : "none";
+    document.getElementById('info-selLinDF').style.display = ["Barnum","Charlotte","Gan"].includes(ln) ? "block" : "none";
+    document.getElementById('info-selLinRV').style.display = ["Barnum","Charlotte"].includes(ln) ? "block" : "none";
+    document.getElementById('info-selLin4').style.display = ["D.","Kong","Silvers"].includes(ln) ? "block" : "none";
+    document.getElementById('info-selLinEspAmi').style.display = ["D."].includes(ln) ? "block" : "none";
+
+    document.getElementById('box-estilo-mink').style.display = rc === "Mink" ? "flex" : "none";
+
+    let baseClass = (charData.info.classe || "Arqueólogo 1").split(" ")[0];
+    let allowedEstilo1 = classStyles[baseClass] || ["Freestyle"];
+    let elEst1 = document.getElementById('info-estilo1');
+    if (elEst1) {
+        let htmlE1 = "";
+        allowedEstilo1.forEach(e => htmlE1 += `<option value="${e}">${e}</option>`);
+        if (elEst1.innerHTML !== htmlE1) elEst1.innerHTML = htmlE1;
+        if (!allowedEstilo1.includes(charData.info.estilo1)) {
+            charData.info.estilo1 = allowedEstilo1[0];
+        }
+        elEst1.value = charData.info.estilo1;
+    }
+
+    [2, 3, 4].forEach(n => {
+        let elEst = document.getElementById('info-estilo'+n);
+        if (elEst) {
+            if (elEst.options.length === 0 || elEst.options[0].value !== "Nenhum") {
+                let htmlE = "";
+                allStyles.forEach(e => htmlE += `<option value="${e}">${e}</option>`);
+                elEst.innerHTML = htmlE;
+            }
+            if (!allStyles.includes(charData.info['estilo'+n])) {
+                charData.info['estilo'+n] = "Nenhum";
+            }
+            elEst.value = charData.info['estilo'+n];
+        }
+    });
+
+    document.getElementById('info-estilo3').disabled = totalBase < 5000 || isReadOnly;
+    document.getElementById('info-estilo4').disabled = totalBase < 10000 || isReadOnly;
+
+    [1, 2, 3, 4].forEach(n => {
+        let elFree = document.getElementById('info-freestyle'+n);
+        if (elFree) {
+            elFree.style.display = charData.info['estilo'+n] === 'Freestyle' ? 'block' : 'none';
+            elFree.value = charData.info['freestyle'+n] || "";
+        }
+    });
+
+    let reqEsp = (rc === "Kuja" || ln === "Silvers") ? 12000 : 15000;
+    let espEl = document.getElementById('stat-esp');
+    if(totalBase >= reqEsp) { 
+        espEl.disabled = isReadOnly ? true : false; 
+        espEl.placeholder = "0"; 
+        document.getElementById('box-haki').style.display = "block"; 
+    } else {
+        espEl.disabled = true; espEl.placeholder = `🔒 Requer ${reqEsp.toLocaleString("pt-BR")}`;
+        charData.stats.esp = 0; charData.substats.hArm = 0; charData.substats.hObs = 0; charData.substats.hRei = 0;
+        document.getElementById('box-haki').style.display = "none";
+    }
+
+    let amiEl = document.getElementById('stat-ami');
+    if(ln === "Silvers") {
+        amiEl.disabled = true; amiEl.placeholder = "🔒 Indisponível";
+        charData.stats.ami = 0; charData.substats.amiAlc = 0; charData.substats.amiDur = 0; charData.substats.amiPot = 0; charData.substats.amiVel = 0;
+    } else { 
+        amiEl.disabled = isReadOnly ? true : false; 
+        amiEl.placeholder = "0"; 
+    }
+
+    let bonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0};
+
+    if(combatenteLevel > 0) { bonus[charData.info.selClasseDF] += combatenteLevel * 0.05; }
+
+    if(racas[rc]) { bonus.d += racas[rc].d || 0; bonus.f += racas[rc].f || 0; bonus.r += racas[rc].r || 0; bonus.v += racas[rc].v || 0; }
+    if(rc === "Humano") { bonus[charData.info.selDF] += 0.20; bonus[charData.info.selRV] += 0.20; } else if(rc === "Kuja") { bonus[charData.info.selDF] += 0.30; bonus[charData.info.selRV] += 0.20; } else if(rc === "Três-Olhos" || rc === "Mink") { bonus[charData.info.selDF] += 0.15; }
+
+    if(document.getElementById('container-linhagem').style.display === "block" && linhagens[ln]) {
+        if(linhagens[ln].charlotte) bonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0};
+        bonus.d += linhagens[ln].d || 0; bonus.f += linhagens[ln].f || 0; bonus.r += linhagens[ln].r || 0; bonus.v += linhagens[ln].v || 0; bonus.esp += linhagens[ln].esp || 0; bonus.ha += linhagens[ln].ha || 0; bonus.ho += linhagens[ln].ho || 0; bonus.hr += linhagens[ln].hr || 0; bonus.ami += linhagens[ln].ami || 0;
+        
+        if(ln === "Barnum") { bonus[charData.info.selLinDF] += 0.15; bonus[charData.info.selLinRV] += 0.15; } else if(ln === "Charlotte") { bonus[charData.info.selLinDF] += 0.20; bonus[charData.info.selLinRV] += 0.20; } else if(ln === "D.") { bonus[charData.info.selLin4] += 0.15; bonus[charData.info.selLinEspAmi] += 0.15; } else if(ln === "Gan") { bonus[charData.info.selLinDF] += 0.15; } else if(ln === "Kong") { bonus[charData.info.selLin4] += 0.10; } else if(ln === "Silvers") { bonus[charData.info.selLin4] += 0.15; }
+        
+        if(ln === "Dracule") { if(totalBase >= 15000) bonus.d += 0.20; else if(totalBase >= 10000) bonus.d += 0.15; else if(totalBase >= 5000) bonus.d += 0.10; } else if(ln === "Capone") { if(totalBase >= 15000) bonus.d += 0.25; else if(totalBase >= 10000) bonus.d += 0.20; else if(totalBase >= 5000) bonus.d += 0.15; } else if(ln === "Augur") { if(totalBase >= 20000) bonus.d += 0.15; else if(totalBase >= 10000) bonus.d += 0.10; else if(totalBase >= 5000) bonus.d += 0.05; } else if(ln === "Newgate") { if(totalBase >= 10000) { bonus.f += 0.20; bonus.r += 0.20; } else if(totalBase >= 5000) { bonus.f += 0.10; bonus.r += 0.10; } } else if(ln === "Boa" || ln === "Neptune") { if(totalBase >= 10000) bonus.v += 0.20; else if(totalBase >= 5000) bonus.v += 0.10; } else if(ln === "Silvers") { if(totalBase >= 20000) { bonus.ha += 0.15; bonus.ho += 0.15; bonus.hr += 0.15; } else if(totalBase >= 10000) { bonus.ha += 0.10; bonus.ho += 0.10; bonus.hr += 0.10; } else if(totalBase >= 5000) { bonus.ha += 0.05; bonus.ho += 0.05; bonus.hr += 0.05; } }
+        
+        if(ln === "Drole" || ln === "Laufey" || ln === "Mokomo") { bonus.f += 0.10; bonus.r += 0.15; }
+    }
+
+    const statFields = ['f', 'd', 'r', 'v', 'esp', 'ami'];
+    statFields.forEach(f => { let el = document.getElementById('stat-'+f); if(el) el.value = charData.stats[f] ? charData.stats[f].toLocaleString("pt-BR") : ""; });
+
+    let totalD = Math.round(D * (1 + bonus.d)); document.getElementById('total-d').innerText = "Total: " + totalD.toLocaleString("pt-BR");
+    let totalF = Math.round(F * (1 + bonus.f)); document.getElementById('total-f').innerText = "Total: " + totalF.toLocaleString("pt-BR");
+    let totalR = Math.round(R * (1 + bonus.r)); document.getElementById('total-r').innerText = "Total: " + totalR.toLocaleString("pt-BR");
+    
+    let totalV = Math.round(V * (1 + bonus.v)); document.getElementById('total-v').innerText = "Total: " + totalV.toLocaleString("pt-BR");
+    document.getElementById('box-velocidade').style.display = totalV > 0 ? "flex" : "none";
+    
+    if(totalV === 0) { charData.substats.refl = 0; charData.substats.vcorp = 0; }
+    
+    let REF = charData.substats.refl || 0, VCORP = charData.substats.vcorp || 0;
+    let totalVelSub = REF + VCORP;
+    
+    if(totalVelSub > totalV) {
+        let diff = totalVelSub - totalV;
+        let active = document.activeElement;
+        
+        if(active && active.id === 'sub-refl') { REF -= diff; charData.substats.refl = REF; }
+        else if(active && active.id === 'sub-vcorp') { VCORP -= diff; charData.substats.vcorp = VCORP; }
+        else {
+            if(VCORP >= diff) { VCORP -= diff; charData.substats.vcorp = VCORP; }
+            else if(REF >= diff) { REF -= diff; charData.substats.refl = REF; }
+        }
+        
+        document.getElementById('avisoVel').style.display = "block"; 
+        document.getElementById('avisoVel').textContent = `Limite atingido! Máx: ${totalV.toLocaleString("pt-BR")}`;
+    } else {
+        document.getElementById('avisoVel').style.display = "none";
+    }
+    
+    document.getElementById('sub-refl').value = charData.substats.refl ? charData.substats.refl.toLocaleString("pt-BR") : "";
+    document.getElementById('sub-vcorp').value = charData.substats.vcorp ? charData.substats.vcorp.toLocaleString("pt-BR") : "";
+
+    let ESP = charData.stats.esp; let totalEsp = Math.round(ESP * (1 + bonus.esp)); document.getElementById('total-esp').innerText = "Total: " + totalEsp.toLocaleString("pt-BR");
+    
+    let HA = charData.substats.hArm || 0, HO = charData.substats.hObs || 0, HR = charData.substats.hRei || 0;
+    let totalHaki = HA + HO + HR;
+    
+    if(totalHaki > totalEsp) {
+        let diff = totalHaki - totalEsp;
+        let active = document.activeElement;
+        
+        if(active && active.id === 'sub-hArm') { HA -= diff; charData.substats.hArm = HA; }
+        else if(active && active.id === 'sub-hObs') { HO -= diff; charData.substats.hObs = HO; }
+        else if(active && active.id === 'sub-hRei') { HR -= diff; charData.substats.hRei = HR; }
+        else {
+            if(HR >= diff) { HR -= diff; charData.substats.hRei = HR; }
+            else if(HO >= diff) { HO -= diff; charData.substats.hObs = HO; }
+            else if(HA >= diff) { HA -= diff; charData.substats.hArm = HA; }
+        }
+        
+        document.getElementById('avisoEsp').style.display = "block"; 
+        document.getElementById('avisoEsp').textContent = `Limite atingido! Máx: ${totalEsp.toLocaleString("pt-BR")}`;
+    } else {
+        document.getElementById('avisoEsp').style.display = "none";
+    }
+    
+    document.getElementById('sub-hArm').value = charData.substats.hArm ? charData.substats.hArm.toLocaleString("pt-BR") : "";
+    document.getElementById('sub-hObs').value = charData.substats.hObs ? charData.substats.hObs.toLocaleString("pt-BR") : "";
+    document.getElementById('sub-hRei').value = charData.substats.hRei ? charData.substats.hRei.toLocaleString("pt-BR") : "";
+
+    let AMI = charData.stats.ami; let totalAmi = Math.round(AMI * (1 + bonus.ami)); document.getElementById('total-ami').innerText = "Total: " + totalAmi.toLocaleString("pt-BR");
+    document.getElementById('box-amiSub').style.display = AMI > 0 ? "block" : "none";
+    
+    if(AMI === 0) { charData.substats.amiAlc = 0; charData.substats.amiDur = 0; charData.substats.amiPot = 0; charData.substats.amiVel = 0; }
+    
+    let aAlc = charData.substats.amiAlc || 0, aDur = charData.substats.amiDur || 0, aPot = charData.substats.amiPot || 0, aVel = charData.substats.amiVel || 0;
+    let totalAmiSub = aAlc + aDur + aPot + aVel;
+    
+    if(totalAmiSub > totalAmi) {
+        let diff = totalAmiSub - totalAmi;
+        let active = document.activeElement;
+        
+        if(active && active.id === 'sub-amiAlc') { aAlc -= diff; charData.substats.amiAlc = aAlc; }
+        else if(active && active.id === 'sub-amiDur') { aDur -= diff; charData.substats.amiDur = aDur; }
+        else if(active && active.id === 'sub-amiPot') { aPot -= diff; charData.substats.amiPot = aPot; }
+        else if(active && active.id === 'sub-amiVel') { aVel -= diff; charData.substats.amiVel = aVel; }
+        else {
+            if(aVel >= diff) { aVel -= diff; charData.substats.amiVel = aVel; }
+            else if(aPot >= diff) { aPot -= diff; charData.substats.amiPot = aPot; }
+            else if(aDur >= diff) { aDur -= diff; charData.substats.amiDur = aDur; }
+            else if(aAlc >= diff) { aAlc -= diff; charData.substats.amiAlc = aAlc; }
+        }
+        
+        document.getElementById('avisoAmi').style.display = "block"; 
+        document.getElementById('avisoAmi').textContent = `Limite atingido! Máx: ${totalAmi.toLocaleString("pt-BR")}`;
+    } else {
+        document.getElementById('avisoAmi').style.display = "none";
+    }
+    
+    document.getElementById('sub-amiAlc').value = charData.substats.amiAlc ? charData.substats.amiAlc.toLocaleString("pt-BR") : "";
+    document.getElementById('sub-amiDur').value = charData.substats.amiDur ? charData.substats.amiDur.toLocaleString("pt-BR") : "";
+    document.getElementById('sub-amiPot').value = charData.substats.amiPot ? charData.substats.amiPot.toLocaleString("pt-BR") : "";
+    document.getElementById('sub-amiVel').value = charData.substats.amiVel ? charData.substats.amiVel.toLocaleString("pt-BR") : "";
+
+    let inWater = (rc === "Sereiano" || rc === "Tritão" || ln === "Neptune");
+    let totalHP = 10000 + Math.round(R * (1 + bonus.r));
+
+    let i = charData.info;
+
+    let histPersOut = "";
+    if(i.personalidade && i.personalidade.trim() !== "") {
+        histPersOut += `\n  : ᓩ _𝐏ᴇʀsᴏɴᴀʟɪᴅᴀᴅᴇ:_\n> ${i.personalidade}\n`;
+    }
+    if(i.historia && i.historia.trim() !== "") {
+        histPersOut += `\n  : ᓩ _𝐇ɪsᴛᴏ́ʀɪᴀ:_\n> ${i.historia}\n`;
+    }
+
+    let attrOut = "";
+    if (D > 0) attrOut += `↠ *𝙳𝚎𝚜𝚝𝚛𝚎𝚣𝚊:* ${strCalc(D, bonus.d)}\n\n`;
+    if (F > 0) attrOut += `↠ *𝙵𝚘𝚛𝚌̧𝚊:* ${strCalc(F, bonus.f)}\n\n`;
+    if (R > 0) {
+        attrOut += `↠ *𝚁𝚎𝚜𝚒𝚜𝚝𝚎̂𝚗𝚌𝚒𝚊:* ${strCalc(R, bonus.r)}\n> 𝙴𝚜𝚝𝚊𝚖𝚒𝚗𝚊: ${(Math.round(R * (1 + bonus.r)) * 2).toLocaleString("pt-BR")}\n\n`;
+    }
+    if (V > 0) {
+        attrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${strCalc(V, bonus.v) + (inWater ? " (dentro da água)" : "")}\n`;
+        if (REF > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${REF.toLocaleString("pt-BR")}\n`;
+        if (VCORP > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${VCORP.toLocaleString("pt-BR")}\n`;
+        attrOut += `\n`;
+    }
+    
+    if (totalBase >= reqEsp && ESP > 0) {
+        attrOut += `↠ *𝙴𝚜𝚙𝚒́𝚛𝚒𝚝𝚘:* ${strCalc(ESP, bonus.esp)}\n`;
+        if (HA > 0) attrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚘 𝙰𝚛𝚖𝚊𝚖𝚎𝚗𝚝𝚘:_ ${strCalc(HA, bonus.ha)}\n`;
+        if (HO > 0) attrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚊 𝙾𝚋𝚜𝚎𝚛𝚟𝚊𝚌̧𝚊̃𝚘:_ ${strCalc(HO, bonus.ho)}\n`;
+        if (HR > 0) attrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚘 𝚁𝚎𝚒:_ ${strCalc(HR, bonus.hr)}\n`;
+        attrOut += `\n`;
+    }
+    
+    if (AMI > 0) {
+        attrOut += `↠ *𝙰𝚔𝚞𝚖𝚊 𝚗𝚘 𝙼𝚒:* ${strCalc(AMI, bonus.ami)}\n`;
+        if (aAlc > 0) attrOut += `> _𝙰𝚕𝚌𝚊𝚗𝚌𝚎:_ ${aAlc.toLocaleString("pt-BR")}\n`;
+        if (aDur > 0) attrOut += `> _𝙳𝚞𝚛𝚊𝚋𝚒𝚕𝚒𝚍𝚊𝚍𝚎:_ ${aDur.toLocaleString("pt-BR")}\n`;
+        if (aPot > 0) attrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${aPot.toLocaleString("pt-BR")}\n`;
+        if (aVel > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${aVel.toLocaleString("pt-BR")}\n`;
+        attrOut += `\n`;
+    }
+
+    let formatNpc = (text, defaultText) => {
+        if (!text || text.trim() === "") return `> ${defaultText}`;
+        return text.split('\n').map(l => {
+            let trimL = l.trim();
+            if (trimL === "") return "";
+            return '> ' + trimL.replace(/^>\s*/, '');
+        }).join('\n');
+    };
+    let outNpcsC = formatNpc(i.npcsC, "");
+    let outNpcsE = formatNpc(i.npcsE, "🔒");
+
+    let tecnicasOut = "";
+    if (charData.tecnicasList && charData.tecnicasList.length > 0) {
+        tecnicasOut += "▬▬▬▬  [ 𝐓ᴇ́ᴄɴɪᴄᴀs ]  ▬▬▬▬\n\n";
+        
+        let tecnicasOrdenadas = [...charData.tecnicasList].sort((a, b) => {
+            let nA = (a.nome || "").trim().toLowerCase();
+            let nB = (b.nome || "").trim().toLowerCase();
+            return nA.localeCompare(nB);
+        });
+
+        tecnicasOrdenadas.forEach(t => {
+            if(t.nome || t.desc || t.efeito) {
+                if (t.nome) tecnicasOut += `* ${t.nome}\n`;
+                if (t.desc) {
+                    t.desc.split('\n').forEach(line => {
+                        let trimLine = line.trim();
+                        if(trimLine !== "") tecnicasOut += `> ${trimLine.replace(/^>\s*/, '')}\n`;
+                    });
+                }
+                if (t.efeito) {
+                    t.efeito.split('\n').forEach((line, idx) => {
+                        let trimLine = line.trim();
+                        if(trimLine !== "") {
+                            if (idx === 0) tecnicasOut += `> Efeito: ${trimLine.replace(/^>\s*/, '')}\n`;
+                            else tecnicasOut += `> ${trimLine.replace(/^>\s*/, '')}\n`;
+                        }
+                    });
+                }
+                tecnicasOut += `\n`;
+            }
+        });
+        tecnicasOut += `«▬▬▬▬▬▬  [ 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 𝙾𝙿 𝚁𝙿𝙶 ]  ▬▬▬▬▬▬»`;
+    } else {
+        tecnicasOut += `«▬▬▬▬▬▬  [ 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 𝙾𝙿 𝚁𝙿𝙶 ]  ▬▬▬▬▬▬»`;
+    }
+
+    let orgOut = "";
+    if(i.orgTipo === "Pirata") {
+        if(i.tripulacao && i.tripulacao.trim() !== "") {
+            orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ:_\n* Pirata: ${i.tripulacao}\n`;
+        } else {
+            orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ:_\n* Pirata\n`;
+        }
+    } else {
+        orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ | 𝐏ᴀᴛᴇɴᴛᴇ | 𝐒ᴀʟᴀ́ʀɪᴏ:_\n* ${i.orgTipo}\n* ${i.patente || ''}\n* ${i.salario || ''}\n`;
+    }
+
+    let outRecompensa = i.recompensa ? `฿${i.recompensa.toLocaleString("pt-BR")}` : '🔒';
+    let outBerries = i.berries ? `฿${i.berries.toLocaleString("pt-BR")}` : '฿0';
+
+    let estilosText = "";
+    if(rc === "Mink") estilosText += "* Electro\n";
+    
+    let formatStyle = (n) => {
+        let st = i['estilo'+n];
+        if (!st || st === "Nenhum") return null;
+        if (st === "Freestyle") return `Freestyle: ${i['freestyle'+n] || 'Nome'}`;
+        return st;
+    };
+
+    let e1 = formatStyle(1);
+    if (e1) estilosText += `* ${e1}\n`;
+    
+    let e2 = formatStyle(2);
+    if (e2) estilosText += `* ${e2}\n`;
+
+    if (totalBase >= 5000) {
+        let e3 = formatStyle(3);
+        if (e3) estilosText += `* ${e3}\n`;
+        else estilosText += `* (Vazio)\n`;
+    } else {
+        estilosText += `* 🔒 (Libera com 5.000)\n`;
+    }
+
+    if (totalBase >= 10000) {
+        let e4 = formatStyle(4);
+        if (e4) estilosText += `* ${e4}\n`;
+        else estilosText += `* (Vazio)\n`;
+    } else {
+        estilosText += `* 🔒 (Libera com 10.000)\n`;
+    }
+
+    let out = `‎  ‎ ‎  
+              *Nᴇᴡ sᴇᴀs*
+— ロールプレイングゲーム - 𝚁𝙿𝙶 [𝙾𝙽𝙴 𝙿𝙸𝙴𝙲𝙴]
+     — 新しい海 - 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 ~*ɴꜱ*~
+                          ᖴIᑕᕼᗩ
+Iີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊
+  : ᓩ _𝐍ᴏᴍᴇ:_
+> ${charData.name}
+
+  : ᓩ _𝐀ʟᴄᴜɴʜᴀ:_
+> ${i.alcunha || '🔒'}
+
+  : ᓩ _𝐑ᴇᴄᴏᴍᴘᴇɴsᴀ:_
+> ${outRecompensa}
+
+  : ᓩ _𝐀ʟᴛᴜʀᴀ:_
+> ${i.altura}
+
+  : ᓩ _𝐈ᴅᴀᴅᴇ:_
+> ${i.idade || '(Mínimo: 15)'}
+
+  : ᓩ _𝐑ᴀᴄ̧ᴀ | 𝐋ɪɴʜᴀɢᴇᴍ:_
+> ${i.raca} | ${i.linhagem}
+
+  : ᓩ _𝐒ᴇxᴏ:_
+> ${i.sexo}
+
+  : ᓩ _𝐒ᴀɴɢᴜᴇ:_
+> ${i.sangue}
+${histPersOut}
+  : ᓩ _𝐀ᴘᴀʀᴇ̂ɴᴄɪᴀ:_
+> ${i.aparencia}
+
+  : ᓩ _𝐍ᴀᴄɪᴏɴᴀʟɪᴅᴀᴅᴇ:_
+> ${i.nacionalidade}
+
+  : ᓩ _𝐋ᴏᴄᴀʟɪᴢᴀᴄ̧ᴀ̃ᴏ ᴀᴛᴜᴀʟ:_
+> ${i.localizacao || '(Local presente no mapa do RPG)'}
+
+▬▬▬▬▬▬▬▬▬▬▬▬
+
+  : ᓩ _Cʟᴀssᴇ(s):_
+1. *${i.classe || '🔒'}*
+2. *${i.classe2 || '5.000'}*
+3. *${i.classe3 || '10.000'}*
+4. *${i.classe4 || '20.000'}*
+5. *${i.classe5 || '35.000'}*
+
+${orgOut}
+  : ᓩ _𝐄sᴛɪʟᴏs ᴅᴇ ʟᴜᴛᴀ:_
+${estilosText.trim()}
+
+ : ᓩ _𝐁ᴇʀʀɪᴇs:_
+> ${outBerries}
+
+  : ᓩ _𝐍𝐏𝐂s ᴄᴏᴍᴜɴꜱ:_
+${outNpcsC}
+
+  : ᓩ _𝐍𝐏𝐂s ᴇꜱᴘᴇᴄɪᴀɪꜱ:_
+${outNpcsE}
+
+> _𝐈ɴᴠᴇɴᴛᴀ́ʀɪᴏ:_
+${i.inventario}
+
+  : ᓩ _𝐀ᴋᴜᴍᴀ ɴᴏ ᴍɪ:_
+> ${i.akumaNome || '🔒'}
+
+▬▬▬▬  [ 𝐒ᴛᴀᴛᴜs ]  ▬▬▬▬
+HP: ${totalHP.toLocaleString("pt-BR")}
+
+↠  *𝐀ᴛʀɪʙᴜᴛᴏs*
+* ${totalBase.toLocaleString("pt-BR")}
+
+${attrOut}${tecnicasOut}`;
+
+    document.getElementById('resBox').textContent = out.trim();
+}
+
+function copyFicha() {
+    let text = document.getElementById('resBox').textContent;
+    let tempArea = document.createElement("textarea");
+    tempArea.value = text;
+    document.body.appendChild(tempArea);
+    tempArea.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempArea);
+    alert("Ficha copiada para a área de transferência!");
+}
+
+window.onload = init;
