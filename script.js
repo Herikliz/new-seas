@@ -33,6 +33,36 @@ const locais = {
 const allStyles = ["Nenhum", "Armadilha de Cores", "Arsenal", "Arte do Tempo", "Artista Marcial", "Atirador", "Black Cat", "Boujutsu", "Boxe", "Combate Gigante", "Combate Tontatta", "Cortes Precisos", "Electro", "Escultura de Forma", "Fencing", "Freestyle", "Fúria das Marés", "Galaxy Combat", "Hasshoken", "Impacto Estrutural", "Instinto Animal", "Jao Kun Dō", "Karatê Homem-Peixe", "Kitsunebi-ryū", "Kozuki-Nitōryū", "Kung Fu", "Melodia Impactante", "Mutōryū", "Ninjutsu", "Okama Kenpō", "Paladino", "Perna Negra", "Punchstyle", "Punho Suave", "Ranger", "Rokushiki", "Rope Action", "Seimei Kikan", "Sinfonia Ilusória", "Stinstyle", "Sumô", "Swordstyle", "Tōryū", "Yaristyle"];
 const classStyles = {"Arqueólogo":["Instinto Animal"],"Artista":["Armadilha de Cores","Escultura de Forma"],"Atirador":["Atirador"],"Carpinteiro":["Impacto Estrutural","Rope Action"],"Cientista":["Punho Suave"],"Combatente":["Freestyle"],"Cozinheiro":["Cortes Precisos","Perna Negra"],"Ferreiro":["Impacto Estrutural","Rope Action"],"Inventor":["Impacto Estrutural","Rope Action"],"Médico":["Punho Suave"],"Musicista":["Melodia Impactante","Sinfonia Ilusória"],"Navegador":["Arte do Tempo","Fúria das Marés"]};
 
+const baseClassGender = {
+  "Arqueólogo": {m: "Arqueólogo", f: "Arqueóloga"},
+  "Artista": {m: "Artista", f: "Artista"},
+  "Atirador": {m: "Atirador", f: "Atiradora"},
+  "Carpinteiro": {m: "Carpinteiro", f: "Carpinteira"},
+  "Cientista": {m: "Cientista", f: "Cientista"},
+  "Combatente": {m: "Combatente", f: "Combatente"},
+  "Cozinheiro": {m: "Cozinheiro", f: "Cozinheira"},
+  "Ferreiro": {m: "Ferreiro", f: "Ferreira"},
+  "Inventor": {m: "Inventor", f: "Inventora"},
+  "Médico": {m: "Médico", f: "Médica"},
+  "Musicista": {m: "Musicista", f: "Musicista"},
+  "Navegador": {m: "Navegador", f: "Navegadora"}
+};
+
+const classTitles = {
+  "Arqueólogo": [{m:"Aprendiz de Arqueologia",f:"Aprendiz de Arqueologia"},{m:"Historiador",f:"Historiadora"},{m:"Mestre de Artefatos",f:"Mestra de Artefatos"},{m:"Dominante da História",f:"Dominante da História"},{m:"Guru",f:"Guru"}],
+  "Artista": [{m:"Ilustrador",f:"Ilustradora"},{m:"Empresário",f:"Empresária"},{m:"Estilista de Mil Faces",f:"Estilista de Mil Faces"},{m:"Escultor de Símbolos",f:"Escultora de Símbolos"},{m:"Patrono do Mundo",f:"Patrona do Mundo"}],
+  "Atirador": [{m:"Atirador Iniciante",f:"Atiradora Iniciante"},{m:"Atirador de Precisão",f:"Atiradora de Precisão"},{m:"Atirador de Elite",f:"Atiradora de Elite"},{m:"Criador Bélico",f:"Criadora Bélica"},{m:"Rambo",f:"Rambo"}],
+  "Carpinteiro": [{m:"Aprendiz da Madeira",f:"Aprendiz da Madeira"},{m:"Construtor de Bordo",f:"Construtora de Bordo"},{m:"Engenheiro Naval",f:"Engenheira Naval"},{m:"Mestre da Madeira",f:"Mestra da Madeira"},{m:"Irmão à Obra",f:"Irmã à Obra"}],
+  "Cientista": [{m:"Estudioso",f:"Estudiosa"},{m:"Biólogo",f:"Bióloga"},{m:"Bioengenheiro",f:"Bioengenheira"},{m:"Alquimista",f:"Alquimista"},{m:"Gênio Científico",f:"Gênia Científica"}],
+  "Combatente": [{m:"Discípulo do Punho",f:"Discípula do Punho"},{m:"Guerreiro de Aço",f:"Guerreira de Aço"},{m:"Mestre da Guerra",f:"Mestra da Guerra"},{m:"Doutrinador Marcial",f:"Doutrinadora Marcial"},{m:"Colosso",f:"Colosso"}],
+  "Cozinheiro": [{m:"Cozinheiro",f:"Cozinheira"},{m:"Especialista Culinário",f:"Especialista Culinária"},{m:"Nutricionista",f:"Nutricionista"},{m:"Chef",f:"Chef"},{m:"Mestre do Paladar",f:"Mestra do Paladar"}],
+  "Ferreiro": [{m:"Artesão",f:"Artesã"},{m:"Forjador de Imperfeições",f:"Forjadora de Imperfeições"},{m:"Forjador de Lendas Menores",f:"Forjadora de Lendas Menores"},{m:"Mestre das Lâminas",f:"Mestra das Lâminas"},{m:"Forjador Supremo",f:"Forjadora Suprema"}],
+  "Inventor": [{m:"Improvisador",f:"Improvisadora"},{m:"Mecânico",f:"Mecânica"},{m:"Arquitetônico",f:"Arquitetônica"},{m:"Condutor",f:"Condutora"},{m:"Artífice",f:"Artífice"}],
+  "Médico": [{m:"Clínico de Campo",f:"Clínica de Campo"},{m:"Cirurgião",f:"Cirurgiã"},{m:"Biomédico Avançado",f:"Biomédica Avançada"},{m:"Mestre da Vida",f:"Mestra da Vida"},{m:"Apóstolo da Cura",f:"Apóstola da Cura"}],
+  "Musicista": [{m:"Sonante",f:"Sonante"},{m:"Celebridade Local",f:"Celebridade Local"},{m:"Pop Star",f:"Pop Star"},{m:"Ídolo Mundial",f:"Ídolo Mundial"},{m:"Imperador Sonoro",f:"Imperatriz Sonora"}],
+  "Navegador": [{m:"Navegador",f:"Navegadora"},{m:"Cartógrafo",f:"Cartógrafa"},{m:"Timoneiro",f:"Timoneira"},{m:"Capitão dos Ventos",f:"Capitã dos Ventos"},{m:"Semipeixe",f:"Semipeixe"}]
+};
+
 let charData = {
   name: "",
   password: "",
@@ -50,6 +80,24 @@ let charData = {
   stats: { f: 0, d: 0, r: 0, v: 0, esp: 0, ami: 0 },
   substats: { refl: 0, vcorp: 0, hArm: 0, hObs: 0, hRei: 0, amiAlc: 0, amiDur: 0, amiPot: 0, amiVel: 0 }
 };
+
+function getClassDisplayName(baseClassWithLevel, sexo) {
+    if (!baseClassWithLevel) return "";
+    let match = baseClassWithLevel.match(/(.+) (\d+)/);
+    if (!match) return baseClassWithLevel; 
+    let baseClass = match[1];
+    let lvl = parseInt(match[2]);
+    let gender = (sexo === 'Feminino') ? 'f' : 'm';
+    
+    let cName = baseClassGender[baseClass] ? baseClassGender[baseClass][gender] : baseClass;
+    let cTitle = "";
+    if (classTitles[baseClass] && classTitles[baseClass][lvl - 1]) {
+        cTitle = classTitles[baseClass][lvl - 1][gender];
+    } else {
+        cTitle = `Nível ${lvl}`; 
+    }
+    return `${cName}: ${cTitle}`;
+}
 
 function customPrompt(msg) {
     return new Promise((resolve) => {
@@ -341,8 +389,8 @@ function renderLogs() {
                     <label style="color:var(--warning);">Entrada ${idx + 1}</label>
                     <button type="button" class="btn btn-outline" style="color:var(--danger); border-color:var(--danger); font-size:10px; padding:2px 6px;" onclick="removeLog(${idx})">Remover</button>
                 </div>
-                <input type="text" placeholder="Semana 1 (Semana Normal [09/02/2026 – 15/02/2026])" value="${l.titulo}" oninput="updateLog(${idx}, 'titulo', this.value)" style="margin-bottom:5px;">
-                <textarea placeholder="- Auto-narrada [฿50.000.000 | 250 pontos]&#10;- Interação [300 pontos | 2 treinos de técnicas]&#10;- Recrutar NPCs [Humanos: 25 NPCs]&#10;- Trabalho [Tipo 1: ฿30.000.000]&#10;- Treino de Técnicas [150 pontos | 6 treinos de técnicas]&#10;- Treino Padrão [250 pontos]" oninput="updateLog(${idx}, 'conteudo', this.value)" style="min-height:80px;">${l.conteudo}</textarea>
+                <input type="text" placeholder="Ex: Semana 1 (Semana Normal [04/08/2025 – 10/08/2025])" value="${l.titulo}" oninput="updateLog(${idx}, 'titulo', this.value)" style="margin-bottom:5px;">
+                <textarea placeholder="Ex:&#10;- 1 interação 10/10 (300 pontos)&#10;- 1 Trabalho Tipo 1" oninput="updateLog(${idx}, 'conteudo', this.value)" style="min-height:80px;">${l.conteudo}</textarea>
             </div>
         `;
     });
@@ -413,7 +461,10 @@ function updateUI() {
     if(totalBase > 1000) { avisoBase.style.display = "block"; avisoBase.textContent = `Atenção: Você ultrapassou o limite inicial de 1.000 pontos! Total: ${totalBase.toLocaleString("pt-BR")}`; } else { avisoBase.style.display = "none"; }
 
     let html1 = "";
-    baseClassesList.forEach(c => html1 += `<option value="${c} 1">${c} 1</option>`);
+    baseClassesList.forEach(c => {
+        let display = getClassDisplayName(`${c} 1`, charData.info.sexo);
+        html1 += `<option value="${c} 1">${display}</option>`;
+    });
     let el1 = document.getElementById('info-classe');
     if(el1.innerHTML !== html1) el1.innerHTML = html1;
     el1.value = charData.info.classe || "Arqueólogo 1";
@@ -440,7 +491,10 @@ function updateUI() {
             });
             let html = `<option value="">-- Selecione --</option>`;
             baseClassesList.forEach(c => {
-                if(counts[c] <= 5) html += `<option value="${c} ${counts[c]}">${c} ${counts[c]}</option>`;
+                if(counts[c] <= 5) {
+                    let display = getClassDisplayName(`${c} ${counts[c]}`, charData.info.sexo);
+                    html += `<option value="${c} ${counts[c]}">${display}</option>`;
+                }
             });
             if(el.innerHTML !== html) el.innerHTML = html;
             
@@ -708,7 +762,7 @@ function updateUI() {
     if (AMI > 0) {
         attrOut += `↠ *𝙰𝚔𝚞𝚖𝚊 𝚗𝚘 𝙼𝚒:* ${strCalc(AMI, bonus.ami)}\n`;
         if (aAlc > 0) attrOut += `> _𝙰𝚕𝚌𝚊𝚗𝚌𝚎:_ ${aAlc.toLocaleString("pt-BR")}\n`;
-        if (aDur > 0) attrOut += `> _𝙳𝚞𝚛𝚊𝚋𝚒𝚕 grosseirão:_ ${aDur.toLocaleString("pt-BR")}\n`;
+        if (aDur > 0) attrOut += `> _𝙳𝚞𝚛𝚊𝚋𝚒𝚕𝚒𝚍𝚊𝚍𝚎:_ ${aDur.toLocaleString("pt-BR")}\n`;
         if (aPot > 0) attrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${aPot.toLocaleString("pt-BR")}\n`;
         if (aVel > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${aVel.toLocaleString("pt-BR")}\n`;
         attrOut += `\n`;
@@ -807,12 +861,18 @@ function updateUI() {
         estilosText += `* 🔒 (Libera com 10.000)\n`;
     }
 
+    let c1Out = i.classe ? getClassDisplayName(i.classe, i.sexo) : '🔒';
+    let c2Out = i.classe2 ? getClassDisplayName(i.classe2, i.sexo) : '5.000';
+    let c3Out = i.classe3 ? getClassDisplayName(i.classe3, i.sexo) : '10.000';
+    let c4Out = i.classe4 ? getClassDisplayName(i.classe4, i.sexo) : '20.000';
+    let c5Out = i.classe5 ? getClassDisplayName(i.classe5, i.sexo) : '35.000';
+
     let out = `‎  ‎ ‎
               *Nᴇᴡ sᴇᴀs*
 — ロールプレイングゲーム - 𝚁𝙿𝙶 [𝙾𝙽𝙴 𝙿𝙸𝙴𝙲𝙴]
      — 新しい海 - 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 ~*ɴꜱ*~
                           ᖴIᑕᕼᗩ
-Iີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊
+Iີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊
   : ᓩ _𝐍ᴏᴍᴇ:_
 > ${charData.name}
 
@@ -849,11 +909,11 @@ ${histPersOut}
 ▬▬▬▬▬▬▬▬▬▬▬▬
 
   : ᓩ _Cʟᴀssᴇ(s):_
-1. *${i.classe || '🔒'}*
-2. *${i.classe2 || '5.000'}*
-3. *${i.classe3 || '10.000'}*
-4. *${i.classe4 || '20.000'}*
-5. *${i.classe5 || '35.000'}*
+1. *${c1Out}*
+2. *${c2Out}*
+3. *${c3Out}*
+4. *${c4Out}*
+5. *${c5Out}*
 
 ${orgOut}
   : ᓩ _𝐄sᴛɪʟᴏs ᴅᴇ ʟᴜᴛᴀ:_
