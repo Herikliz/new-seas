@@ -341,8 +341,8 @@ function renderLogs() {
                     <label style="color:var(--warning);">Entrada ${idx + 1}</label>
                     <button type="button" class="btn btn-outline" style="color:var(--danger); border-color:var(--danger); font-size:10px; padding:2px 6px;" onclick="removeLog(${idx})">Remover</button>
                 </div>
-                <input type="text" placeholder="Ex: Semana 1 (Semana Normal [04/08/2025 – 10/08/2025])" value="${l.titulo}" oninput="updateLog(${idx}, 'titulo', this.value)" style="margin-bottom:5px;">
-                <textarea placeholder="Ex:&#10;- 1 interação 10/10 (300 pontos)&#10;- 1 Trabalho Tipo 1" oninput="updateLog(${idx}, 'conteudo', this.value)" style="min-height:80px;">${l.conteudo}</textarea>
+                <input type="text" placeholder="Semana 1 (Semana Normal [09/02/2026 – 15/02/2026])" value="${l.titulo}" oninput="updateLog(${idx}, 'titulo', this.value)" style="margin-bottom:5px;">
+                <textarea placeholder="- Auto-narrada [฿50.000.000 | 250 pontos]&#10;- Interação [300 pontos | 2 treinos de técnicas]&#10;- Recrutar NPCs [Humanos: 25 NPCs]&#10;- Trabalho [Tipo 1: ฿30.000.000]&#10;- Treino de Técnicas [150 pontos | 6 treinos de técnicas]&#10;- Treino Padrão [250 pontos]" oninput="updateLog(${idx}, 'conteudo', this.value)" style="min-height:80px;">${l.conteudo}</textarea>
             </div>
         `;
     });
