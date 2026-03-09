@@ -690,7 +690,7 @@ function updateUI() {
         estilosText += `* 🔒 (Libera com 10.000)\n`;
     }
 
-    let out = `‎  ‎ ‎  
+    let out = `‎  ‎ ‎
               *Nᴇᴡ sᴇᴀs*
 — ロールプレイングゲーム - 𝚁𝙿𝙶 [𝙾𝙽𝙴 𝙿𝙸𝙴𝙲𝙴]
      — 新しい海 - 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 ~*ɴꜱ*~
