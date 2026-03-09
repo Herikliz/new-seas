@@ -606,9 +606,9 @@ function updateUI() {
     let isLinhagemVisible = (rc && !["Bucaneiro","Oni","Lunariano"].includes(rc));
     document.getElementById('container-linhagem').style.display = isLinhagemVisible ? "block" : "none"; 
     
-    document.getElementById('box-extraRaca').style.display = ["Humano","Kuja","Três-Olhos","Mink"].includes(rc) ? "flex" : "none";
-    document.getElementById('info-selDF').style.display = ["Humano","Kuja","Três-Olhos","Mink"].includes(rc) ? "block" : "none";
-    document.getElementById('info-selRV').style.display = ["Humano","Kuja"].includes(rc) ? "block" : "none";
+    document.getElementById('box-extraRaca').style.display = (ln !== "Charlotte" && ["Humano","Kuja","Três-Olhos","Mink"].includes(rc)) ? "flex" : "none";
+    document.getElementById('info-selDF').style.display = (ln !== "Charlotte" && ["Humano","Kuja","Três-Olhos","Mink"].includes(rc)) ? "block" : "none";
+    document.getElementById('info-selRV').style.display = (ln !== "Charlotte" && ["Humano","Kuja"].includes(rc)) ? "block" : "none";
 
     let showExtraLin = isLinhagemVisible && ["Barnum","Charlotte","D.","Gan","Kong","Silvers"].includes(ln);
     document.getElementById('box-extraLin').style.display = showExtraLin ? "flex" : "none";
