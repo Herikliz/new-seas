@@ -76,6 +76,10 @@
               <div class="input-group">
                   <label>Raça</label>
                   <select id="info-raca" onchange="updateField('info', 'raca', this.value)"></select>
+                  <input type="text" id="info-animal" placeholder="Qual animal?" style="display:none; margin-top:5px;" oninput="updateField('info', 'animal', this.value)">
+                  <select id="info-raca2" style="display:none; margin-top:5px;" onchange="updateField('info', 'raca2', this.value)"></select>
+                  <input type="text" id="info-animal2" placeholder="Qual animal?" style="display:none; margin-top:5px;" oninput="updateField('info', 'animal2', this.value)">
+                  
                   <div id="box-extraRaca" class="conditional-selects" style="display: none; flex-direction: row; gap: 5px;">
                       <select id="info-selDF" onchange="updateField('info', 'selDF', this.value)" style="flex: 1;"><option value="d">Destreza</option><option value="f">Força</option></select>
                       <select id="info-selRV" onchange="updateField('info', 'selRV', this.value)" style="display:none; flex: 1;"><option value="r">Resistência</option><option value="v">Velocidade</option></select>

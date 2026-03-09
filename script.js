@@ -68,7 +68,7 @@ let charData = {
   password: "",
   info: { 
       classe: "Arqueólogo 1", classe2: "", classe3: "", classe4: "", classe5: "",
-      raca: "Humano", linhagem: "Nenhuma", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp",
+      raca: "Humano", raca2: "Humano", animal: "", animal2: "", linhagem: "Nenhuma", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp",
       alcunha: "", recompensa: "", altura: "", idade: "", sexo: "Masculino", sangue: "A+", nacionalidade: "", localizacao: "",
       orgTipo: "Pirata", tripulacao: "", patente: "", salario: "",
       estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", estilo3: "", freestyle3: "", estilo4: "", freestyle4: "",
@@ -300,7 +300,7 @@ function runFallbackChecks() {
   if (typeof charData.info.recompensa === 'string') charData.info.recompensa = parseInt(charData.info.recompensa.replace(/\D/g, "")) || "";
   if (typeof charData.info.berries === 'string') charData.info.berries = parseInt(charData.info.berries.replace(/\D/g, "")) || "";
 
-  const defInfo = { classe: "Arqueólogo 1", classe2: "", classe3: "", classe4: "", classe5: "", raca: "Humano", linhagem: "Nenhuma", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp", alcunha: "", recompensa: "", altura: "", idade: "", sexo: "Masculino", sangue: "A+", nacionalidade: "", localizacao: "", orgTipo: "Pirata", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", personalidade: "", historia: "", aparencia: "", inventario: "" };
+  const defInfo = { classe: "Arqueólogo 1", classe2: "", classe3: "", classe4: "", classe5: "", raca: "Humano", raca2: "Humano", animal: "", animal2: "", linhagem: "Nenhuma", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp", alcunha: "", recompensa: "", altura: "", idade: "", sexo: "Masculino", sangue: "A+", nacionalidade: "", localizacao: "", orgTipo: "Pirata", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", personalidade: "", historia: "", aparencia: "", inventario: "" };
   for(let k in defInfo) if (typeof charData.info[k] === 'undefined') charData.info[k] = defInfo[k];
   if (!charData.stats) charData.stats = { f: 0, d: 0, r: 0, v: 0, esp: 0, ami: 0 };
   if (!charData.substats) charData.substats = { refl: 0, vcorp: 0, hArm: 0, hObs: 0, hRei: 0, amiAlc: 0, amiDur: 0, amiPot: 0, amiVel: 0 };
@@ -397,9 +397,6 @@ function renderLogs() {
 }
 
 function populateSelects() {
-    const selRaca = document.getElementById('info-raca');
-    for(let r in racas) selRaca.innerHTML += `<option value="${r}">${r}</option>`;
-
     let locationHtml = `<option value="">-- Selecione --</option>`;
     for(let region in locais) {
         locationHtml += `<optgroup label="${region}">`;
@@ -443,9 +440,81 @@ function strCalc(base, bonus) {
     return `${base.toLocaleString("pt-BR")}${sinal}${pct} = ${total.toLocaleString("pt-BR")}`;
 }
 
+function formatRaceStr(rName, aName, isFem) {
+    if (!rName) return "";
+    let res = rName.replace("Povo do Céu: ", "");
+    if (isFem) {
+        if (res === "Bucaneiro") res = "Bucaneira";
+        else if (res === "Humano") res = "Humana";
+        else if (res === "Lunariano") res = "Lunariana";
+        else if (res === "Skypieano") res = "Skypiana";
+        else if (res === "Sereiano") res = "Sereiana";
+    }
+    if (["Tritão", "Wotan", "Mink"].includes(rName)) {
+        let a = aName && aName.trim() !== "" ? aName.trim() : (rName === "Mink" ? "Fuinha" : "Tubarão");
+        res += `: ${a}`;
+    }
+    return res;
+}
+
 function updateUI() {
+    let i = charData.info;
+
+    if (i.raca === "Kuja" && i.sexo !== "Feminino") i.raca = "Humano";
+    if (i.raca2 === "Kuja" && i.sexo !== "Feminino") i.raca2 = "Humano";
+
+    const noCharlotteRaces = ["Bucaneiro", "Lunariano", "Oni", "Meio-Gigante", "Wotan"];
+    if (i.linhagem === "Charlotte") {
+        if (noCharlotteRaces.includes(i.raca)) i.raca = "Humano";
+        if (noCharlotteRaces.includes(i.raca2)) i.raca2 = "Humano";
+    }
+
+    let rHtml = "";
+    for(let r in racas) {
+        if (r === "Kuja" && i.sexo !== "Feminino") continue;
+        if (i.linhagem === "Charlotte" && noCharlotteRaces.includes(r)) continue;
+        rHtml += `<option value="${r}">${r}</option>`;
+    }
+    let sRaca = document.getElementById('info-raca');
+    if (sRaca.innerHTML !== rHtml) sRaca.innerHTML = rHtml;
+    sRaca.value = i.raca;
+
+    let sRaca2 = document.getElementById('info-raca2');
+    if (i.linhagem === "Charlotte") {
+        sRaca2.style.display = "block";
+        let r2Html = "";
+        for(let r in racas) {
+            if (r === "Kuja" && i.sexo !== "Feminino") continue;
+            if (noCharlotteRaces.includes(r)) continue;
+            r2Html += `<option value="${r}">${r}</option>`;
+        }
+        if (sRaca2.innerHTML !== r2Html) sRaca2.innerHTML = r2Html;
+        sRaca2.value = i.raca2;
+    } else {
+        sRaca2.style.display = "none";
+    }
+
+    if (!sRaca.value) { i.raca = "Humano"; sRaca.value = "Humano"; }
+    if (i.linhagem === "Charlotte" && !sRaca2.value) { i.raca2 = "Humano"; sRaca2.value = "Humano"; }
+
+    let anim1 = document.getElementById('info-animal');
+    if (["Tritão", "Wotan", "Mink"].includes(i.raca)) {
+        anim1.style.display = "block";
+        anim1.placeholder = i.raca === "Mink" ? "Mamífero" : "Animal Marinho";
+    } else {
+        anim1.style.display = "none";
+    }
+
+    let anim2 = document.getElementById('info-animal2');
+    if (i.linhagem === "Charlotte" && ["Tritão", "Wotan", "Mink"].includes(i.raca2)) {
+        anim2.style.display = "block";
+        anim2.placeholder = i.raca2 === "Mink" ? "Mamífero" : "Animal Marinho";
+    } else {
+        anim2.style.display = "none";
+    }
+
     document.getElementById('pc-name').value = charData.name;
-    const textFields = ['raca', 'selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'alcunha', 'altura', 'idade', 'sexo', 'sangue', 'nacionalidade', 'localizacao', 'tripulacao', 'patente', 'salario', 'npcsC', 'npcsE', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario'];
+    const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'alcunha', 'altura', 'idade', 'sexo', 'sangue', 'nacionalidade', 'localizacao', 'tripulacao', 'patente', 'salario', 'npcsC', 'npcsE', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2'];
     textFields.forEach(f => { let el = document.getElementById('info-'+f); if(el) el.value = charData.info[f] || ""; });
 
     let recEl = document.getElementById('info-recompensa');
@@ -533,7 +602,7 @@ function updateUI() {
     for(let l in linhagens) { if(!linhagens[l].req || linhagens[l].req.includes(charData.info.raca)) { selLin.innerHTML += `<option value="${l}">${l}</option>`; } }
     if(Array.from(selLin.options).some(o => o.value === currentLin)) { selLin.value = currentLin; } else { charData.info.linhagem = "Nenhuma"; selLin.value = "Nenhuma"; currentLin = "Nenhuma"; }
 
-    let rc = charData.info.raca; let ln = currentLin;
+    let rc = charData.info.raca; let rc2 = charData.info.raca2; let ln = currentLin;
     let isLinhagemVisible = (rc && !["Bucaneiro","Oni","Lunariano"].includes(rc));
     document.getElementById('container-linhagem').style.display = isLinhagemVisible ? "block" : "none"; 
     
@@ -548,7 +617,8 @@ function updateUI() {
     document.getElementById('info-selLin4').style.display = ["D.","Kong","Silvers"].includes(ln) ? "block" : "none";
     document.getElementById('info-selLinEspAmi').style.display = ["D."].includes(ln) ? "block" : "none";
 
-    document.getElementById('box-estilo-mink').style.display = rc === "Mink" ? "flex" : "none";
+    let isMink = (rc === "Mink" || (ln === "Charlotte" && rc2 === "Mink"));
+    document.getElementById('box-estilo-mink').style.display = isMink ? "flex" : "none";
 
     let baseClass = (charData.info.classe || "Arqueólogo 1").split(" ")[0];
     let allowedEstilo1 = classStyles[baseClass] || ["Freestyle"];
@@ -725,10 +795,8 @@ function updateUI() {
     document.getElementById('sub-amiPot').value = charData.substats.amiPot ? charData.substats.amiPot.toLocaleString("pt-BR") : "";
     document.getElementById('sub-amiVel').value = charData.substats.amiVel ? charData.substats.amiVel.toLocaleString("pt-BR") : "";
 
-    let inWater = (rc === "Sereiano" || rc === "Tritão" || ln === "Neptune");
+    let inWater = (rc === "Sereiano" || rc === "Tritão" || ln === "Neptune" || (ln === "Charlotte" && (rc2 === "Sereiano" || rc2 === "Tritão")));
     let totalHP = 10000 + Math.round(R * (1 + bonus.r));
-
-    let i = charData.info;
 
     let histPersOut = "";
     if(i.personalidade && i.personalidade.trim() !== "") {
@@ -830,7 +898,7 @@ function updateUI() {
     let outBerries = i.berries ? `฿${i.berries.toLocaleString("pt-BR")}` : '฿0';
 
     let estilosText = "";
-    if(rc === "Mink") estilosText += "* Electro\n";
+    if(isMink) estilosText += "* Electro\n";
     
     let formatStyle = (n) => {
         let st = i['estilo'+n];
@@ -867,6 +935,12 @@ function updateUI() {
     let c4Out = i.classe4 ? getClassDisplayName(i.classe4, i.sexo) : '20.000';
     let c5Out = i.classe5 ? getClassDisplayName(i.classe5, i.sexo) : '35.000';
 
+    let racaOutput = formatRaceStr(i.raca, i.animal, i.sexo === "Feminino");
+    if (i.linhagem === "Charlotte") {
+        let raca2Output = formatRaceStr(i.raca2, i.animal2, i.sexo === "Feminino");
+        racaOutput += ` / ${raca2Output}`;
+    }
+
     let out = `*Nᴇᴡ sᴇᴀs*
 — ロールプレイングゲーム - 𝚁𝙿𝙶 [𝙾𝙽𝙴 𝙿𝙸𝙴𝙲𝙴]
      — 新しい海 - 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 ~*ɴꜱ*~
@@ -888,7 +962,7 @@ Iີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ�
 > ${i.idade || '(Mínimo: 15)'}
 
   : ᓩ _𝐑ᴀᴄ̧ᴀ | 𝐋ɪɴʜᴀɢᴇᴍ:_
-> ${i.raca} | ${i.linhagem}
+> ${racaOutput} | ${i.linhagem}
 
   : ᓩ _𝐒ᴇxᴏ:_
 > ${i.sexo}
