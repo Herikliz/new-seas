@@ -10,11 +10,9 @@ const firebaseConfig = {
 let db = null;
 let isFirebaseReady = false;
 
-// Estado de Segurança
 let isReadOnly = false;
 const MASTER_PASSWORD = "Ben10";
 
-// Inicializa a variável vazia para sempre abrir o código em branco
 let currentDocId = ''; 
 document.getElementById('doc-id').value = currentDocId;
 
@@ -81,7 +79,7 @@ async function loadFromCloud() {
       const doc = await db.collection("fichas_op").doc(currentDocId).get();
       if (doc.exists) { 
           let data = doc.data(); 
-          isReadOnly = false; // Reseta antes de checar
+          isReadOnly = false;
 
           if (data.password && data.password.trim() !== '') {
               let entered = prompt("Esta ficha é protegida por senha. Digite a senha para editar (ou cancele para apenas visualizar a ficha):");
@@ -109,7 +107,7 @@ async function loadFromCloud() {
 }
 
 function saveData() {
-  if (isReadOnly) return; // Impede o salvamento se estiver bloqueado
+  if (isReadOnly) return;
 
   if (isFirebaseReady && db && currentDocId !== '') {
       document.getElementById('db-status').classList.add('syncing');
@@ -119,7 +117,6 @@ function saveData() {
   }
 }
 
-// Controla o gerenciamento de Senha pelo Botão
 function managePassword() {
     if (currentDocId === '') {
         alert("Digite um ID na nuvem e puxe ou crie uma ficha primeiro!");
@@ -154,11 +151,9 @@ function managePassword() {
     }
 }
 
-// Desativa todos os campos de input/select se isReadOnly for true
 function toggleEditability() {
     const elements = document.querySelectorAll('.container input, .container select, .container textarea, .container button');
     elements.forEach(el => {
-        // Ignorar a trava no botão de copiar a ficha, queremos que possam copiar mesmo lendo
         if(el.innerText && el.innerText.includes("Copiar Ficha")) {
             el.disabled = false;
             return;
@@ -169,7 +164,7 @@ function toggleEditability() {
     let pwdBtn = document.getElementById('btn-senha');
     if (pwdBtn) {
         if (isReadOnly) {
-            pwdBtn.style.display = 'none'; // Esconde botão de senha se for leitura
+            pwdBtn.style.display = 'none';
         } else {
             pwdBtn.style.display = 'inline-block';
             pwdBtn.innerText = (charData.password && charData.password !== "") ? "🔑 Redefinir Senha" : "🔑 Definir Senha";
@@ -298,7 +293,7 @@ function updateUI() {
     let totalBase = D + F + R + V;
 
     let avisoBase = document.getElementById('avisoBase');
-    if(totalBase > 1000) { avisoBase.style.display = "block"; avisoBase.textContent = `Atenção: Você ultrapassou o limite inicial! Total: ${totalBase.toLocaleString("pt-BR")}`; } else { avisoBase.style.display = "none"; }
+    if(totalBase > 1000) { avisoBase.style.display = "block"; avisoBase.textContent = `Atenção: Você ultrapassou o limite inicial de 1.000 pontos!\n Total: ${totalBase.toLocaleString("pt-BR")}`; } else { avisoBase.style.display = "none"; }
 
     let html1 = "";
     baseClassesList.forEach(c => html1 += `<option value="${c} 1">${c} 1</option>`);
@@ -317,7 +312,7 @@ function updateUI() {
     classSlots.forEach(slot => {
         let el = document.getElementById('info-' + slot.id);
         if (totalBase >= slot.req) {
-            el.disabled = isReadOnly ? true : false; // Respeita modo leitura
+            el.disabled = isReadOnly ? true : false;
             let counts = {};
             baseClassesList.forEach(c => counts[c] = 1);
             slot.prev.forEach(p => {
@@ -489,7 +484,7 @@ function updateUI() {
         }
         
         document.getElementById('avisoVel').style.display = "block"; 
-        document.getElementById('avisoVel').textContent = `Limite atingido! Máx: ${totalV.toLocaleString("pt-BR")}`;
+        document.getElementById('avisoVel').textContent = `Limite atingido!\n Máx: ${totalV.toLocaleString("pt-BR")}`;
     } else {
         document.getElementById('avisoVel').style.display = "none";
     }
