@@ -257,6 +257,21 @@
             <div class="input-group"><label>História</label><textarea id="info-historia" style="min-height: 120px;" oninput="updateField('info', 'historia', this.value)"></textarea></div>
             <div class="input-group"><label>Aparência</label><textarea id="info-aparencia" oninput="updateField('info', 'aparencia', this.value)"></textarea></div>
         </div>
+
+        <div class="box">
+            <div class="box-title" style="color: var(--warning);">Log de Atualizações</div>
+            <div class="input-group">
+                <label style="display:flex; justify-content:space-between; align-items:center;">
+                    Entradas
+                    <button type="button" class="btn btn-outline btn-warning" style="font-size: 10px; padding: 2px 6px;" onclick="addLog()">+ Adicionar Entrada</button>
+                </label>
+                <div id="logs-container"></div>
+            </div>
+            <div style="margin-top: 15px; border-top: 1px dashed #444; padding-top: 15px;">
+                <button class="btn btn-outline" style="color:var(--warning); border-color:var(--warning); margin-bottom: 15px;" onclick="copyLog()">📋 Copiar Log</button>
+                <pre id="logBox" style="min-height: 150px;"></pre>
+            </div>
+        </div>
     </div>
 
     <div>
@@ -288,8 +303,25 @@
   </div>
 </div>
 
+<div id="custom-prompt-overlay" class="modal-overlay">
+  <div class="modal-box">
+    <div id="custom-prompt-msg" class="modal-msg"></div>
+    <input type="password" id="custom-prompt-input" style="margin-bottom: 15px; text-align: center; width: 100%;">
+    <div style="display: flex; gap: 10px; justify-content: center;">
+      <button class="btn btn-outline btn-success" id="custom-prompt-ok">Confirmar</button>
+      <button class="btn btn-outline btn-danger" id="custom-prompt-cancel">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div id="custom-alert-overlay" class="modal-overlay">
+  <div class="modal-box" style="border-color: var(--info);">
+    <div id="custom-alert-msg" class="modal-msg"></div>
+    <button class="btn btn-outline btn-info" id="custom-alert-ok">OK</button>
+  </div>
+</div>
+
 <script src="script.js"></script>
 
 </body>
-
 </html>

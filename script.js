@@ -46,14 +46,87 @@ let charData = {
       personalidade: "", historia: "", aparencia: "", inventario: ""
   },
   tecnicasList: [],
+  logList: [],
   stats: { f: 0, d: 0, r: 0, v: 0, esp: 0, ami: 0 },
   substats: { refl: 0, vcorp: 0, hArm: 0, hObs: 0, hRei: 0, amiAlc: 0, amiDur: 0, amiPot: 0, amiVel: 0 }
 };
+
+function customPrompt(msg) {
+    return new Promise((resolve) => {
+        const overlay = document.getElementById('custom-prompt-overlay');
+        const msgEl = document.getElementById('custom-prompt-msg');
+        const inputEl = document.getElementById('custom-prompt-input');
+        const btnOk = document.getElementById('custom-prompt-ok');
+        const btnCancel = document.getElementById('custom-prompt-cancel');
+
+        msgEl.textContent = msg;
+        inputEl.value = '';
+        overlay.style.display = 'flex';
+        inputEl.focus();
+
+        const cleanup = () => {
+            overlay.style.display = 'none';
+            btnOk.onclick = null;
+            btnCancel.onclick = null;
+            inputEl.onkeydown = null;
+        };
+
+        btnOk.onclick = () => {
+            let val = inputEl.value;
+            cleanup();
+            resolve(val);
+        };
+
+        btnCancel.onclick = () => {
+            cleanup();
+            resolve(null);
+        };
+
+        inputEl.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                btnOk.click();
+            } else if (e.key === 'Escape') {
+                btnCancel.click();
+            }
+        };
+    });
+}
+
+function customAlert(msg) {
+    return new Promise((resolve) => {
+        const overlay = document.getElementById('custom-alert-overlay');
+        const msgEl = document.getElementById('custom-alert-msg');
+        const btnOk = document.getElementById('custom-alert-ok');
+
+        msgEl.textContent = msg;
+        overlay.style.display = 'flex';
+        btnOk.focus();
+
+        const cleanup = () => {
+            overlay.style.display = 'none';
+            btnOk.onclick = null;
+            btnOk.onkeydown = null;
+        };
+
+        btnOk.onclick = () => {
+            cleanup();
+            resolve();
+        };
+
+        btnOk.onkeydown = (e) => {
+            if (e.key === 'Enter' || e.key === 'Escape') {
+                cleanup();
+                resolve();
+            }
+        };
+    });
+}
 
 function init() {
   populateSelects();
   runFallbackChecks(); 
   renderTecnicas();
+  renderLogs();
   updateUI();
   initFirebase();
   toggleEditability();
@@ -82,18 +155,19 @@ async function loadFromCloud() {
           isReadOnly = false;
 
           if (data.password && data.password.trim() !== '') {
-              let entered = prompt("Esta ficha é protegida por senha. Digite a senha para editar (ou cancele para apenas visualizar a ficha):");
+              let entered = await customPrompt("Esta ficha é protegida por senha. Digite a senha para editar (ou cancele para apenas visualizar a ficha):");
               if (entered !== data.password && entered !== MASTER_PASSWORD) {
                   isReadOnly = true;
-                  if(entered !== null) alert("Senha incorreta. A ficha foi aberta no Modo de Leitura.");
+                  if(entered !== null) await customAlert("Senha incorreta. A ficha foi aberta no Modo de Leitura.");
               } else {
-                  alert("Acesso concedido!");
+                  await customAlert("Acesso concedido!");
               }
           }
 
           charData = data; 
           runFallbackChecks(); 
           renderTecnicas(); 
+          renderLogs();
           updateUI(); 
           toggleEditability();
       } 
@@ -117,35 +191,35 @@ function saveData() {
   }
 }
 
-function managePassword() {
+async function managePassword() {
     if (currentDocId === '') {
-        alert("Digite um ID na nuvem e puxe ou crie uma ficha primeiro!");
+        await customAlert("Digite um ID na nuvem e puxe ou crie uma ficha primeiro!");
         return;
     }
     if (isReadOnly) {
-        alert("Você está no modo de leitura. Recarregue a ficha e insira a senha correta antes de tentar modificar a segurança.");
+        await customAlert("Você está no modo de leitura. Recarregue a ficha e insira a senha correta antes de tentar modificar a segurança.");
         return;
     }
 
     if (charData.password && charData.password.trim() !== "") {
-        let oldPass = prompt("Digite a senha atual para autorizar a mudança:");
+        let oldPass = await customPrompt("Digite a senha atual para autorizar a mudança:");
         if (oldPass === charData.password || oldPass === MASTER_PASSWORD) {
-            let newPass = prompt("Digite a nova senha (ou deixe totalmente em branco para REMOVER a proteção atual):");
+            let newPass = await customPrompt("Digite a nova senha (ou deixe totalmente em branco para REMOVER a proteção atual):");
             if (newPass !== null) {
                 charData.password = newPass.trim();
                 saveData();
-                alert(charData.password === "" ? "A senha foi removida com sucesso!" : "Senha redefinida com sucesso!");
+                await customAlert(charData.password === "" ? "A senha foi removida com sucesso!" : "Senha redefinida com sucesso!");
                 toggleEditability();
             }
         } else {
-            if (oldPass !== null) alert("Senha incorreta!");
+            if (oldPass !== null) await customAlert("Senha incorreta!");
         }
     } else {
-        let newPass = prompt("Defina uma senha para proteger a edição desta ficha:");
-        if (newPass && newPass.trim() !== "") {
+        let newPass = await customPrompt("Defina uma senha para proteger a edição desta ficha:");
+        if (newPass !== null && newPass.trim() !== "") {
             charData.password = newPass.trim();
             saveData();
-            alert("Senha definida com sucesso!");
+            await customAlert("Senha definida com sucesso!");
             toggleEditability();
         }
     }
@@ -154,7 +228,7 @@ function managePassword() {
 function toggleEditability() {
     const elements = document.querySelectorAll('.container input, .container select, .container textarea, .container button');
     elements.forEach(el => {
-        if(el.innerText && el.innerText.includes("Copiar Ficha")) {
+        if(el.innerText && (el.innerText.includes("Copiar Ficha") || el.innerText.includes("Copiar Log"))) {
             el.disabled = false;
             return;
         }
@@ -188,6 +262,10 @@ function runFallbackChecks() {
       if (charData.info && typeof charData.info.tecnicas === 'string' && charData.info.tecnicas.trim() !== '') {
           charData.tecnicasList.push({ nome: "Técnica Antiga (Migrada)", desc: charData.info.tecnicas, efeito: "" });
       }
+  }
+
+  if (!charData.logList) {
+      charData.logList = [];
   }
 }
 
@@ -226,6 +304,45 @@ function renderTecnicas() {
                 <input type="text" placeholder="Nome da Técnica (Ex: Golpe Rápido)" value="${t.nome}" oninput="updateTecnica(${idx}, 'nome', this.value)" style="margin-bottom:5px;">
                 <textarea placeholder="Descrição da Técnica" oninput="updateTecnica(${idx}, 'desc', this.value)" style="min-height:50px; margin-bottom:5px;">${t.desc}</textarea>
                 <input type="text" placeholder="Efeito / Buff (Ex: Perde 10% de Res)" value="${t.efeito}" oninput="updateTecnica(${idx}, 'efeito', this.value)">
+            </div>
+        `;
+    });
+}
+
+function addLog() {
+    charData.logList.push({titulo: "", conteudo: ""});
+    saveData();
+    renderLogs();
+    updateUI();
+    toggleEditability();
+}
+
+function removeLog(idx) {
+    charData.logList.splice(idx, 1);
+    saveData();
+    renderLogs();
+    updateUI();
+    toggleEditability();
+}
+
+function updateLog(idx, field, val) {
+    charData.logList[idx][field] = val;
+    saveData();
+    updateUI();
+}
+
+function renderLogs() {
+    const container = document.getElementById('logs-container');
+    container.innerHTML = '';
+    charData.logList.forEach((l, idx) => {
+        container.innerHTML += `
+            <div style="background: rgba(0,0,0,0.3); padding: 10px; border: 1px dashed #555; border-radius: 6px; margin-bottom: 10px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
+                    <label style="color:var(--warning);">Entrada ${idx + 1}</label>
+                    <button type="button" class="btn btn-outline" style="color:var(--danger); border-color:var(--danger); font-size:10px; padding:2px 6px;" onclick="removeLog(${idx})">Remover</button>
+                </div>
+                <input type="text" placeholder="Ex: Semana 1 (Semana Normal [04/08/2025 – 10/08/2025])" value="${l.titulo}" oninput="updateLog(${idx}, 'titulo', this.value)" style="margin-bottom:5px;">
+                <textarea placeholder="Ex:&#10;- 1 interação 10/10 (300 pontos)&#10;- 1 Trabalho Tipo 1" oninput="updateLog(${idx}, 'conteudo', this.value)" style="min-height:80px;">${l.conteudo}</textarea>
             </div>
         `;
     });
@@ -591,7 +708,7 @@ function updateUI() {
     if (AMI > 0) {
         attrOut += `↠ *𝙰𝚔𝚞𝚖𝚊 𝚗𝚘 𝙼𝚒:* ${strCalc(AMI, bonus.ami)}\n`;
         if (aAlc > 0) attrOut += `> _𝙰𝚕𝚌𝚊𝚗𝚌𝚎:_ ${aAlc.toLocaleString("pt-BR")}\n`;
-        if (aDur > 0) attrOut += `> _𝙳𝚞𝚛𝚊𝚋𝚒𝚕𝚒𝚍𝚊𝚍𝚎:_ ${aDur.toLocaleString("pt-BR")}\n`;
+        if (aDur > 0) attrOut += `> _𝙳𝚞𝚛𝚊𝚋𝚒𝚕 grosseirão:_ ${aDur.toLocaleString("pt-BR")}\n`;
         if (aPot > 0) attrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${aPot.toLocaleString("pt-BR")}\n`;
         if (aVel > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${aVel.toLocaleString("pt-BR")}\n`;
         attrOut += `\n`;
@@ -766,9 +883,23 @@ HP: ${totalHP.toLocaleString("pt-BR")}
 ${attrOut}${tecnicasOut}`;
 
     document.getElementById('resBox').textContent = out.trim();
+
+    let logOut = "*Log de Atualizações:*\n";
+    if (charData.logList && charData.logList.length > 0) {
+        charData.logList.forEach(l => {
+            if (l.titulo || l.conteudo) {
+                if (l.titulo) logOut += `> ${l.titulo}\n`;
+                if (l.conteudo) {
+                    logOut += `${l.conteudo}\n`;
+                }
+                logOut += `\n`;
+            }
+        });
+    }
+    document.getElementById('logBox').textContent = logOut.trim();
 }
 
-function copyFicha() {
+async function copyFicha() {
     let text = document.getElementById('resBox').textContent;
     let tempArea = document.createElement("textarea");
     tempArea.value = text;
@@ -776,7 +907,18 @@ function copyFicha() {
     tempArea.select();
     document.execCommand("copy");
     document.body.removeChild(tempArea);
-    alert("Ficha copiada para a área de transferência!");
+    await customAlert("Ficha copiada para a área de transferência!");
+}
+
+async function copyLog() {
+    let text = document.getElementById('logBox').textContent;
+    let tempArea = document.createElement("textarea");
+    tempArea.value = text;
+    document.body.appendChild(tempArea);
+    tempArea.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempArea);
+    await customAlert("Log copiado para a área de transferência!");
 }
 
 window.onload = init;
