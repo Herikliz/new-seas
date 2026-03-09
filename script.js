@@ -867,8 +867,7 @@ function updateUI() {
     let c4Out = i.classe4 ? getClassDisplayName(i.classe4, i.sexo) : '20.000';
     let c5Out = i.classe5 ? getClassDisplayName(i.classe5, i.sexo) : '35.000';
 
-    let out = `‎  ‎ ‎
-              *Nᴇᴡ sᴇᴀs*
+    let out = `*Nᴇᴡ sᴇᴀs*
 — ロールプレイングゲーム - 𝚁𝙿𝙶 [𝙾𝙽𝙴 𝙿𝙸𝙴𝙲𝙴]
      — 新しい海 - 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 ~*ɴꜱ*~
                           ᖴIᑕᕼᗩ
