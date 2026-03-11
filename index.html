@@ -246,10 +246,10 @@
             </div>
             <div id="box-amiSub" style="display:none; padding-top:10px; border-top: 1px dashed #444;">
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div><label style="font-size: 10px;">Alcance</label><input type="text" id="sub-amiAlc" placeholder="0" oninput="formatAndSave('substats', 'amiAlc', this)"></div>
-                    <div><label style="font-size: 10px;">Durabilidade</label><input type="text" id="sub-amiDur" placeholder="0" oninput="formatAndSave('substats', 'amiDur', this)"></div>
-                    <div><label style="font-size: 10px;">Potência</label><input type="text" id="sub-amiPot" placeholder="0" oninput="formatAndSave('substats', 'amiPot', this)"></div>
-                    <div><label style="font-size: 10px;">Velocidade (Fruta)</label><input type="text" id="sub-amiVel" placeholder="0" oninput="formatAndSave('substats', 'amiVel', this)"></div>
+                    <div><label style="font-size: 10px; display:flex; align-items:center; gap:3px;"><input type="checkbox" id="chk-amiAlc" onchange="toggleAmi('amiAlc', this.checked)"> Alcance</label><input type="text" id="sub-amiAlc" placeholder="0" oninput="formatAndSave('substats', 'amiAlc', this)"></div>
+                    <div><label style="font-size: 10px; display:flex; align-items:center; gap:3px;"><input type="checkbox" id="chk-amiDur" onchange="toggleAmi('amiDur', this.checked)"> Durabilidade</label><input type="text" id="sub-amiDur" placeholder="0" oninput="formatAndSave('substats', 'amiDur', this)"></div>
+                    <div><label style="font-size: 10px; display:flex; align-items:center; gap:3px;"><input type="checkbox" id="chk-amiPot" onchange="toggleAmi('amiPot', this.checked)"> Potência</label><input type="text" id="sub-amiPot" placeholder="0" oninput="formatAndSave('substats', 'amiPot', this)"></div>
+                    <div><label style="font-size: 10px; display:flex; align-items:center; gap:3px;"><input type="checkbox" id="chk-amiVel" onchange="toggleAmi('amiVel', this.checked)"> Velocidade (Fruta)</label><input type="text" id="sub-amiVel" placeholder="0" oninput="formatAndSave('substats', 'amiVel', this)"></div>
                 </div>
                 <div id="avisoAmi" class="avisoErro"></div>
             </div>

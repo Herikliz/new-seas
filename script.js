@@ -73,7 +73,8 @@ let charData = {
       orgTipo: "Pirata", tripulacao: "", patente: "", salario: "",
       estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", estilo3: "", freestyle3: "", estilo4: "", freestyle4: "",
       berries: 5000000, npcsC: "", npcsE: "", akumaNome: "",
-      personalidade: "", historia: "", aparencia: "", inventario: ""
+      personalidade: "", historia: "", aparencia: "", inventario: "",
+      hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true
   },
   tecnicasList: [],
   logList: [],
@@ -280,7 +281,11 @@ function toggleEditability() {
             el.disabled = false;
             return;
         }
-        el.disabled = isReadOnly;
+        if(el.type === 'checkbox') {
+            el.disabled = isReadOnly;
+        } else {
+            el.disabled = isReadOnly;
+        }
     });
 
     let pwdBtn = document.getElementById('btn-senha');
@@ -300,7 +305,7 @@ function runFallbackChecks() {
   if (typeof charData.info.recompensa === 'string') charData.info.recompensa = parseInt(charData.info.recompensa.replace(/\D/g, "")) || "";
   if (typeof charData.info.berries === 'string') charData.info.berries = parseInt(charData.info.berries.replace(/\D/g, "")) || "";
 
-  const defInfo = { classe: "Arqueólogo 1", classe2: "", classe3: "", classe4: "", classe5: "", raca: "Humano", raca2: "Humano", animal: "", animal2: "", linhagem: "Nenhuma", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp", alcunha: "", recompensa: "", altura: "", idade: "", sexo: "Masculino", sangue: "A+", nacionalidade: "", localizacao: "", orgTipo: "Pirata", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", personalidade: "", historia: "", aparencia: "", inventario: "" };
+  const defInfo = { classe: "Arqueólogo 1", classe2: "", classe3: "", classe4: "", classe5: "", raca: "Humano", raca2: "Humano", animal: "", animal2: "", linhagem: "Nenhuma", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp", alcunha: "", recompensa: "", altura: "", idade: "", sexo: "Masculino", sangue: "A+", nacionalidade: "", localizacao: "", orgTipo: "Pirata", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true };
   for(let k in defInfo) if (typeof charData.info[k] === 'undefined') charData.info[k] = defInfo[k];
   if (!charData.stats) charData.stats = { f: 0, d: 0, r: 0, v: 0, esp: 0, ami: 0 };
   if (!charData.substats) charData.substats = { refl: 0, vcorp: 0, hArm: 0, hObs: 0, hRei: 0, amiAlc: 0, amiDur: 0, amiPot: 0, amiVel: 0 };
@@ -455,6 +460,18 @@ function formatRaceStr(rName, aName, isFem) {
         res += `: ${a}`;
     }
     return res;
+}
+
+function toggleAmi(field, isChecked) {
+    let key = 'has' + field.charAt(0).toUpperCase() + field.slice(1);
+    charData.info[key] = isChecked;
+    if (!isChecked) {
+        charData.substats[field] = 0;
+        let el = document.getElementById('sub-' + field);
+        if(el) el.value = "";
+    }
+    saveData();
+    updateUI();
 }
 
 function updateUI() {
@@ -680,7 +697,7 @@ function updateUI() {
         amiEl.placeholder = "0"; 
     }
 
-    let bonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0};
+    let bonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0, refl:0, vcorp:0};
 
     if(combatenteLevel > 0) { bonus[charData.info.selClasseDF] += combatenteLevel * 0.05; }
 
@@ -688,12 +705,12 @@ function updateUI() {
     if(rc === "Humano") { bonus[charData.info.selDF] += 0.20; bonus[charData.info.selRV] += 0.20; } else if(rc === "Kuja") { bonus[charData.info.selDF] += 0.30; bonus[charData.info.selRV] += 0.20; } else if(rc === "Três-Olhos" || rc === "Mink") { bonus[charData.info.selDF] += 0.15; }
 
     if(document.getElementById('container-linhagem').style.display === "block" && linhagens[ln]) {
-        if(linhagens[ln].charlotte) bonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0};
+        if(linhagens[ln].charlotte) bonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0, refl:0, vcorp:0};
         bonus.d += linhagens[ln].d || 0; bonus.f += linhagens[ln].f || 0; bonus.r += linhagens[ln].r || 0; bonus.v += linhagens[ln].v || 0; bonus.esp += linhagens[ln].esp || 0; bonus.ha += linhagens[ln].ha || 0; bonus.ho += linhagens[ln].ho || 0; bonus.hr += linhagens[ln].hr || 0; bonus.ami += linhagens[ln].ami || 0;
         
         if(ln === "Barnum") { bonus[charData.info.selLinDF] += 0.15; bonus[charData.info.selLinRV] += 0.15; } else if(ln === "Charlotte") { bonus[charData.info.selLinDF] += 0.20; bonus[charData.info.selLinRV] += 0.20; } else if(ln === "D.") { bonus[charData.info.selLin4] += 0.15; bonus[charData.info.selLinEspAmi] += 0.15; } else if(ln === "Gan") { bonus[charData.info.selLinDF] += 0.15; } else if(ln === "Kong") { bonus[charData.info.selLin4] += 0.10; } else if(ln === "Silvers") { bonus[charData.info.selLin4] += 0.15; }
         
-        if(ln === "Dracule") { if(totalBase >= 15000) bonus.d += 0.20; else if(totalBase >= 10000) bonus.d += 0.15; else if(totalBase >= 5000) bonus.d += 0.10; } else if(ln === "Capone") { if(totalBase >= 15000) bonus.d += 0.25; else if(totalBase >= 10000) bonus.d += 0.20; else if(totalBase >= 5000) bonus.d += 0.15; } else if(ln === "Augur") { if(totalBase >= 20000) bonus.d += 0.15; else if(totalBase >= 10000) bonus.d += 0.10; else if(totalBase >= 5000) bonus.d += 0.05; } else if(ln === "Newgate") { if(totalBase >= 10000) { bonus.f += 0.20; bonus.r += 0.20; } else if(totalBase >= 5000) { bonus.f += 0.10; bonus.r += 0.10; } } else if(ln === "Boa" || ln === "Neptune") { if(totalBase >= 10000) bonus.v += 0.20; else if(totalBase >= 5000) bonus.v += 0.10; } else if(ln === "Silvers") { if(totalBase >= 20000) { bonus.ha += 0.15; bonus.ho += 0.15; bonus.hr += 0.15; } else if(totalBase >= 10000) { bonus.ha += 0.10; bonus.ho += 0.10; bonus.hr += 0.10; } else if(totalBase >= 5000) { bonus.ha += 0.05; bonus.ho += 0.05; bonus.hr += 0.05; } }
+        if(ln === "Dracule") { if(totalBase >= 15000) bonus.d += 0.20; else if(totalBase >= 10000) bonus.d += 0.15; else if(totalBase >= 5000) bonus.d += 0.10; } else if(ln === "Capone") { if(totalBase >= 15000) bonus.d += 0.25; else if(totalBase >= 10000) bonus.d += 0.20; else if(totalBase >= 5000) bonus.d += 0.15; } else if(ln === "Augur") { if(totalBase >= 20000) bonus.d += 0.15; else if(totalBase >= 10000) bonus.d += 0.10; else if(totalBase >= 5000) bonus.d += 0.05; } else if(ln === "Newgate") { if(totalBase >= 10000) { bonus.f += 0.20; bonus.r += 0.20; } else if(totalBase >= 5000) { bonus.f += 0.10; bonus.r += 0.10; } } else if(ln === "Boa") { if(totalBase >= 10000) bonus.v += 0.20; else if(totalBase >= 5000) bonus.v += 0.10; } else if(ln === "Neptune") { if(totalBase >= 15000) { bonus.v += 0.20; bonus.refl += 0.15; bonus.r += 0.15; } else if(totalBase >= 10000) { bonus.v += 0.20; bonus.refl += 0.10; bonus.r += 0.10; } else if(totalBase >= 5000) { bonus.v += 0.10; bonus.refl += 0.05; bonus.r += 0.05; } } else if(ln === "Sakazuki") { if(totalBase >= 15000) { bonus.f += 0.15; } else if(totalBase >= 10000) { bonus.f += 0.10; } else if(totalBase >= 5000) { bonus.f += 0.05; } } else if(ln === "Silvers") { if(totalBase >= 20000) { bonus.ha += 0.15; bonus.ho += 0.15; bonus.hr += 0.15; } else if(totalBase >= 10000) { bonus.ha += 0.10; bonus.ho += 0.10; bonus.hr += 0.10; } else if(totalBase >= 5000) { bonus.ha += 0.05; bonus.ho += 0.05; bonus.hr += 0.05; } }
         
         if(ln === "Drole" || ln === "Laufey" || ln === "Mokomo") { bonus.f += 0.10; bonus.r += 0.15; }
     }
@@ -761,12 +778,28 @@ function updateUI() {
     document.getElementById('sub-hObs').value = charData.substats.hObs ? charData.substats.hObs.toLocaleString("pt-BR") : "";
     document.getElementById('sub-hRei').value = charData.substats.hRei ? charData.substats.hRei.toLocaleString("pt-BR") : "";
 
+    ['amiAlc', 'amiDur', 'amiPot', 'amiVel'].forEach(f => {
+        let chk = document.getElementById('chk-' + f);
+        let inp = document.getElementById('sub-' + f);
+        let key = 'has' + f.charAt(0).toUpperCase() + f.slice(1);
+        let has = charData.info[key];
+        if (chk) chk.checked = has;
+        if (inp) inp.disabled = !has || isReadOnly;
+    });
+
     let AMI = charData.stats.ami; let totalAmi = Math.round(AMI * (1 + bonus.ami)); document.getElementById('total-ami').innerText = "Total: " + totalAmi.toLocaleString("pt-BR");
     document.getElementById('box-amiSub').style.display = AMI > 0 ? "block" : "none";
     
     if(AMI === 0) { charData.substats.amiAlc = 0; charData.substats.amiDur = 0; charData.substats.amiPot = 0; charData.substats.amiVel = 0; }
     
     let aAlc = charData.substats.amiAlc || 0, aDur = charData.substats.amiDur || 0, aPot = charData.substats.amiPot || 0, aVel = charData.substats.amiVel || 0;
+    
+    let limitAmiExcedido = false;
+    if(aAlc > 10000) { aAlc = 10000; charData.substats.amiAlc = 10000; limitAmiExcedido = true; }
+    if(aDur > 10000) { aDur = 10000; charData.substats.amiDur = 10000; limitAmiExcedido = true; }
+    if(aPot > 10000) { aPot = 10000; charData.substats.amiPot = 10000; limitAmiExcedido = true; }
+    if(aVel > 10000) { aVel = 10000; charData.substats.amiVel = 10000; limitAmiExcedido = true; }
+    
     let totalAmiSub = aAlc + aDur + aPot + aVel;
     
     if(totalAmiSub > totalAmi) {
@@ -786,6 +819,9 @@ function updateUI() {
         
         document.getElementById('avisoAmi').style.display = "block"; 
         document.getElementById('avisoAmi').textContent = `Limite atingido! Máx: ${totalAmi.toLocaleString("pt-BR")}`;
+    } else if (limitAmiExcedido) {
+        document.getElementById('avisoAmi').style.display = "block"; 
+        document.getElementById('avisoAmi').textContent = `Máximo de 10.000 pontos por atributo alcançado!`;
     } else {
         document.getElementById('avisoAmi').style.display = "none";
     }
@@ -794,6 +830,20 @@ function updateUI() {
     document.getElementById('sub-amiDur').value = charData.substats.amiDur ? charData.substats.amiDur.toLocaleString("pt-BR") : "";
     document.getElementById('sub-amiPot').value = charData.substats.amiPot ? charData.substats.amiPot.toLocaleString("pt-BR") : "";
     document.getElementById('sub-amiVel').value = charData.substats.amiVel ? charData.substats.amiVel.toLocaleString("pt-BR") : "";
+
+    let activeAmiStats = 0;
+    if(charData.info.hasAmiAlc) activeAmiStats++;
+    if(charData.info.hasAmiDur) activeAmiStats++;
+    if(charData.info.hasAmiPot) activeAmiStats++;
+    if(charData.info.hasAmiVel) activeAmiStats++;
+
+    let controlePct = 0;
+    if(activeAmiStats > 0) {
+        let maxPoints = activeAmiStats * 10000;
+        let currentPoints = aAlc + aDur + aPot + aVel;
+        controlePct = Math.round((currentPoints / maxPoints) * 100);
+        if(controlePct > 100) controlePct = 100;
+    }
 
     let inWater = (rc === "Sereiano" || rc === "Tritão" || ln === "Neptune" || (ln === "Charlotte" && (rc2 === "Sereiano" || rc2 === "Tritão")));
     let totalHP = 10000 + Math.round(R * (1 + bonus.r));
@@ -814,8 +864,8 @@ function updateUI() {
     }
     if (V > 0) {
         attrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${strCalc(V, bonus.v) + (inWater ? " (dentro da água)" : "")}\n`;
-        if (REF > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${REF.toLocaleString("pt-BR")}\n`;
-        if (VCORP > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${VCORP.toLocaleString("pt-BR")}\n`;
+        if (REF > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${strCalc(REF, bonus.refl)}\n`;
+        if (VCORP > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${strCalc(VCORP, bonus.vcorp)}\n`;
         attrOut += `\n`;
     }
     
@@ -829,10 +879,11 @@ function updateUI() {
     
     if (AMI > 0) {
         attrOut += `↠ *𝙰𝚔𝚞𝚖𝚊 𝚗𝚘 𝙼𝚒:* ${strCalc(AMI, bonus.ami)}\n`;
-        if (aAlc > 0) attrOut += `> _𝙰𝚕𝚌𝚊𝚗𝚌𝚎:_ ${aAlc.toLocaleString("pt-BR")}\n`;
-        if (aDur > 0) attrOut += `> _𝙳𝚞𝚛𝚊𝚋𝚒𝚕𝚒𝚍𝚊𝚍𝚎:_ ${aDur.toLocaleString("pt-BR")}\n`;
-        if (aPot > 0) attrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${aPot.toLocaleString("pt-BR")}\n`;
-        if (aVel > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${aVel.toLocaleString("pt-BR")}\n`;
+        if (charData.info.hasAmiAlc && aAlc > 0) attrOut += `> _𝙰𝚕𝚌𝚊𝚗𝚌𝚎:_ ${aAlc.toLocaleString("pt-BR")}\n`;
+        if (charData.info.hasAmiDur && aDur > 0) attrOut += `> _𝙳𝚞𝚛𝚊𝚋𝚒𝚕𝚒𝚍𝚊𝚍𝚎:_ ${aDur.toLocaleString("pt-BR")}\n`;
+        if (charData.info.hasAmiPot && aPot > 0) attrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${aPot.toLocaleString("pt-BR")}\n`;
+        if (charData.info.hasAmiVel && aVel > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${aVel.toLocaleString("pt-BR")}\n`;
+        if (activeAmiStats > 0) attrOut += `> _𝙲𝚘𝚗𝚝𝚛ᴏ𝚕𝚎:_ ${controlePct}%\n`;
         attrOut += `\n`;
     }
 
