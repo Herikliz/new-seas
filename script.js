@@ -63,6 +63,8 @@ const classTitles = {
   "Navegador": [{m:"Navegador",f:"Navegadora"},{m:"Cartógrafo",f:"Cartógrafa"},{m:"Timoneiro",f:"Timoneira"},{m:"Capitão dos Ventos",f:"Capitã dos Ventos"},{m:"Semipeixe",f:"Semipeixe"}]
 };
 
+const salarios = {"Aprendiz":0,"Marinheiro":10000000,"Cabo":20000000,"Sargento":30000000,"Tenente":40000000,"Comandante":50000000,"Capitão":60000000,"Comodoro":80000000,"Contra-Almirante":90000000,"Vice-Almirante":100000000,"Almirante":150000000,"Almirante-de-Frota":200000000,"Agente Judicial":10000000,"CP-1":20000000,"CP-2":30000000,"CP-3":40000000,"CP-4":50000000,"CP-5":60000000,"CP-6":70000000,"CP-7":80000000,"CP-8":100000000,"CP-9":150000000,"CP-0":200000000,"Gorosei":500000000,"Líder do Governo":0};
+
 let charData = {
   name: "",
   password: "",
@@ -275,7 +277,7 @@ async function managePassword() {
 }
 
 function toggleEditability() {
-    const elements = document.querySelectorAll('.container input, .container select, .container textarea, .container button');
+    const elements = document.querySelectorAll('.container input:not(#info-salario), .container select, .container textarea, .container button');
     elements.forEach(el => {
         if(el.innerText && (el.innerText.includes("Copiar Ficha") || el.innerText.includes("Copiar Log"))) {
             el.disabled = false;
@@ -395,7 +397,7 @@ function renderLogs() {
                     <button type="button" class="btn btn-outline" style="color:var(--danger); border-color:var(--danger); font-size:10px; padding:2px 6px;" onclick="removeLog(${idx})">Remover</button>
                 </div>
                 <input type="text" placeholder="Ex: Semana 1 (Semana Normal [09/02/2026 – 15/02/2026])" value="${l.titulo}" oninput="updateLog(${idx}, 'titulo', this.value)" style="margin-bottom:5px;">
-                <textarea placeholder="- Auto-narrada [฿50.000.000 | 250 pontos]&#10;- Interação [300 pontos | 2 treinos de técnicas]&#10;- Recrutar NPCs [Humanos: 25 NPCs]&#10;- Trabalho [Tipo 1: ฿30.000.000]&#10;- Treino de Técnicas [150 pontos | 6 treinos de técnicas]&#10;- Treino Padrão [250 pontos]" oninput="updateLog(${idx}, 'conteudo', this.value)" style="min-height:80px;">${l.conteudo}</textarea>
+                <textarea placeholder="- Auto-narrada [฿50.000.000 | 250 pontos]\n- Interação [300 pontos | 2 treinos de técnicas]\n- Recrutar NPCs [Humanos: 25 NPCs]\n- Trabalho [Tipo 1: ฿30.000.000]\n- Treino de Técnicas [150 pontos | 6 treinos de técnicas]\n- Treino Padrão [250 pontos]" oninput="updateLog(${idx}, 'conteudo', this.value)" style="min-height:80px;">${l.conteudo}</textarea>
             </div>
         `;
     });
@@ -417,6 +419,32 @@ function populateSelects() {
 function updateField(category, field, value) { 
     if (category === 'name') { charData.name = value || ""; } else { charData[category][field] = value; } 
     saveData(); updateUI(); 
+}
+
+async function handlePatenteChange(val) {
+    const restritas = ["Vice-Almirante", "Almirante", "Almirante-de-Frota", "CP-8", "CP-9", "CP-0", "Gorosei", "Líder do Governo"];
+    let finalVal = val;
+    if (restritas.includes(val)) {
+        let pwd = await customPrompt("Você é merecedor deste cargo?");
+        if (pwd === MASTER_PASSWORD) {
+            let discurso = charData.info.orgTipo === "Marinha" ? "Você é merecedor sim! A Justiça Absoluta prevalecerá! Que os mares temam a nossa fúria!" : "Você é merecedor sim! A ordem do mundo reside em nossas mãos. O equilíbrio será mantido a qualquer custo!";
+            await customAlert(discurso);
+        } else {
+            await customAlert("Você não merece aquele cargo.");
+            document.getElementById('info-patente').value = "";
+            finalVal = "";
+        }
+    }
+    
+    charData.info.patente = finalVal;
+    if (finalVal !== "" && typeof salarios[finalVal] !== 'undefined') {
+        charData.info.salario = salarios[finalVal] === 0 ? "0" : salarios[finalVal].toLocaleString("pt-BR");
+    } else {
+        charData.info.salario = "";
+    }
+    
+    saveData();
+    updateUI();
 }
 
 function formatAndSave(category, field, el) {
@@ -531,8 +559,49 @@ function updateUI() {
     }
 
     document.getElementById('pc-name').value = charData.name;
-    const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'alcunha', 'altura', 'idade', 'sexo', 'sangue', 'nacionalidade', 'localizacao', 'tripulacao', 'patente', 'salario', 'npcsC', 'npcsE', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2'];
+    const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'alcunha', 'altura', 'idade', 'sexo', 'sangue', 'nacionalidade', 'localizacao', 'tripulacao', 'npcsC', 'npcsE', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2'];
     textFields.forEach(f => { let el = document.getElementById('info-'+f); if(el) el.value = charData.info[f] || ""; });
+
+    let orgTipo = charData.info.orgTipo || "Pirata";
+    document.getElementById('info-orgTipo').value = orgTipo;
+    if(orgTipo === "Pirata") {
+        document.getElementById('box-tripulacao').style.display = "block";
+        document.getElementById('box-patente-salario').style.display = "none";
+        charData.info.patente = "";
+        charData.info.salario = "";
+        let selPatente = document.getElementById('info-patente');
+        if(selPatente) selPatente.value = "";
+    } else {
+        document.getElementById('box-tripulacao').style.display = "none";
+        document.getElementById('box-patente-salario').style.display = "flex";
+        
+        let pMarinha = ["", "Aprendiz", "Marinheiro", "Cabo", "Sargento", "Tenente", "Comandante", "Capitão", "Comodoro", "Contra-Almirante", "Vice-Almirante", "Almirante", "Almirante-de-Frota"];
+        let pGoverno = ["", "Agente Judicial", "CP-1", "CP-2", "CP-3", "CP-4", "CP-5", "CP-6", "CP-7", "CP-8", "CP-9", "CP-0", "Gorosei", "Líder do Governo"];
+        let options = orgTipo === "Marinha" ? pMarinha : pGoverno;
+        
+        let selPatente = document.getElementById('info-patente');
+        if (selPatente) {
+            let html = "";
+            options.forEach(p => html += `<option value="${p}">${p}</option>`);
+            if(selPatente.innerHTML !== html) selPatente.innerHTML = html;
+            
+            if(options.includes(charData.info.patente)) {
+                selPatente.value = charData.info.patente;
+                if(charData.info.patente !== "" && typeof salarios[charData.info.patente] !== 'undefined') {
+                    charData.info.salario = salarios[charData.info.patente] === 0 ? "0" : salarios[charData.info.patente].toLocaleString("pt-BR");
+                } else {
+                    charData.info.salario = "";
+                }
+            } else {
+                charData.info.patente = options[0];
+                selPatente.value = options[0];
+                charData.info.salario = "";
+            }
+        }
+    }
+    
+    let elSalario = document.getElementById('info-salario');
+    if (elSalario) elSalario.value = charData.info.salario || "";
 
     let recEl = document.getElementById('info-recompensa');
     if(recEl) recEl.value = charData.info.recompensa ? charData.info.recompensa.toLocaleString("pt-BR") : "";
@@ -603,16 +672,6 @@ function updateUI() {
     });
     
     document.getElementById('box-selClasseDF').style.display = (combatenteLevel > 0) ? "block" : "none";
-
-    let orgTipo = charData.info.orgTipo || "Pirata";
-    document.getElementById('info-orgTipo').value = orgTipo;
-    if(orgTipo === "Pirata") {
-        document.getElementById('box-tripulacao').style.display = "block";
-        document.getElementById('box-patente-salario').style.display = "none";
-    } else {
-        document.getElementById('box-tripulacao').style.display = "none";
-        document.getElementById('box-patente-salario').style.display = "flex";
-    }
 
     const selLin = document.getElementById('info-linhagem');
     let currentLin = charData.info.linhagem; selLin.innerHTML = "";
@@ -942,7 +1001,7 @@ function updateUI() {
             orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ:_\n* Pirata\n`;
         }
     } else {
-        orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ | 𝐏ᴀᴛᴇɴᴛᴇ | 𝐒ᴀʟᴀ́ʀɪᴏ:_\n* ${i.orgTipo}\n* ${i.patente || ''}\n* ${i.salario || ''}\n`;
+        orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ | 𝐏ᴀᴛᴇɴᴛᴇ | 𝐒ᴀʟᴀ́ʀɪᴏ:_\n* ${i.orgTipo}\n* ${i.patente || ''}\n* ${i.salario ? '฿' + i.salario : ''}\n`;
     }
 
     let outRecompensa = i.recompensa ? `฿${i.recompensa.toLocaleString("pt-BR")}` : '🔒';

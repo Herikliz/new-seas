@@ -154,8 +154,8 @@
               </div>
           </div>
           <div class="input-row" id="box-patente-salario" style="display: none; margin-top: -5px;">
-              <div class="input-group"><label>Patente</label><input type="text" id="info-patente" oninput="updateField('info', 'patente', this.value)"></div>
-              <div class="input-group"><label>Salário</label><input type="text" id="info-salario" oninput="updateField('info', 'salario', this.value)"></div>
+              <div class="input-group"><label>Patente</label><select id="info-patente" onchange="handlePatenteChange(this.value)"></select></div>
+              <div class="input-group"><label>Salário</label><input type="text" id="info-salario" disabled></div>
           </div>
           
           <label style="font-size: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 3px; display: block; border-top: 1px dashed #444; padding-top: 10px;">Estilos de Luta</label>
