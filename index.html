@@ -15,6 +15,7 @@
   <div class="cloud-controls">
     <input type="text" id="doc-id" placeholder="ID da Ficha na Nuvem" title="Digite para salvar/puxar na nuvem" onchange="changeDocId(this.value)">
     <button class="btn btn-outline" style="font-size: 0.8rem; padding: 6px;" onclick="loadFromCloud()" title="Puxar dados">⬇️ Puxar</button>
+    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 6px; color: var(--info); border-color: var(--info);" onclick="changeFichaID()" title="Mudar ID da Ficha">🔄 Mudar ID</button>
     <button id="btn-senha" class="btn btn-outline" style="font-size: 0.8rem; padding: 6px; color: var(--warning); border-color: var(--warning);" onclick="managePassword()" title="Definir ou remover senha">🔑 Senha</button>
   </div>
   <span style="display:flex; align-items:center; gap:10px;">

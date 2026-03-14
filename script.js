@@ -1320,4 +1320,53 @@ async function copyLog() {
     await customAlert("Log copiado para a área de transferência!");
 }
 
+async function changeFichaID() {
+    if (!isFirebaseReady || !db) return;
+    
+    if (currentDocId === '') {
+        await customAlert("Você precisa carregar ou salvar uma ficha primeiro para poder mudar o ID dela.");
+        return;
+    }
+    
+    if (isReadOnly) {
+        await customAlert("Você está no modo de leitura. Insira a senha da ficha atual para provar que é o dono e poder mudar o ID.");
+        return;
+    }
+
+    let novoId = await customPrompt(`O ID atual é "${currentDocId}". Digite o NOVO ID desejado:`);
+    
+    if (!novoId || novoId.trim() === "" || novoId.trim() === currentDocId) {
+        return; 
+    }
+    
+    novoId = novoId.trim();
+    document.getElementById('db-status').classList.add('syncing');
+
+    try {
+        const docRef = await db.collection("fichas_op").doc(novoId).get();
+        if (docRef.exists) {
+            let conf = await customPrompt(`ATENÇÃO: Já existe uma ficha salva no ID "${novoId}". Digite a SENHA MESTRA para sobrescrevê-la e apagar a ficha que está lá:`);
+            if (conf !== MASTER_PASSWORD) {
+                document.getElementById('db-status').classList.remove('syncing');
+                if (conf !== null) await customAlert("Senha incorreta! Operação cancelada.");
+                return;
+            }
+        }
+
+        await db.collection("fichas_op").doc(novoId).set(charData);
+        
+        await db.collection("fichas_op").doc(currentDocId).delete();
+
+        currentDocId = novoId;
+        document.getElementById('doc-id').value = currentDocId;
+        
+        document.getElementById('db-status').classList.remove('syncing');
+        await customAlert(`Sucesso! O ID da ficha agora é "${novoId}".`);
+        
+    } catch (e) {
+        document.getElementById('db-status').classList.remove('syncing');
+        await customAlert("Erro de conexão ao tentar mudar o ID.");
+    }
+}
+
 window.onload = init;
