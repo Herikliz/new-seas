@@ -37,6 +37,11 @@ header {
 .status-dot.online { background: #198754; box-shadow: 0 0 5px #198754; }
 .status-dot.syncing { background: #ffc107; box-shadow: 0 0 5px #ffc107; }
 .container { max-width: 1400px; margin: 20px auto; padding: 0 15px; }
+.char-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+.col-tabs { display: flex; flex-direction: column; gap: 10px; }
+.btn-tab { background: transparent; border: 1px solid var(--success); color: var(--text); padding: 12px; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-size: 11px; font-weight: bold; font-family: 'Segoe UI', sans-serif; transition: 0.2s; }
+.btn-tab:hover { background: rgba(25, 135, 84, 0.1); }
+.btn-tab.active { background: rgba(25, 135, 84, 0.2); border-color: var(--success); }
 .btn { padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin: 3px; color: white; transition: 0.2s; font-family: 'Segoe UI', sans-serif;}
 .btn-outline { background: transparent; border: 1px solid currentColor; color: inherit; }
 .btn-outline:hover:not(:disabled) { background: rgba(255,255,255,0.1); }

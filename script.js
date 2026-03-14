@@ -66,23 +66,36 @@ const classTitles = {
 const salarios = {"Aprendiz":0,"Marinheiro":10000000,"Cabo":20000000,"Sargento":30000000,"Tenente":40000000,"Comandante":50000000,"Capitão":60000000,"Comodoro":80000000,"Contra-Almirante":90000000,"Vice-Almirante":100000000,"Almirante":150000000,"Almirante-de-Frota":200000000,"Agente Judicial":10000000,"CP-1":20000000,"CP-2":30000000,"CP-3":40000000,"CP-4":50000000,"CP-5":60000000,"CP-6":70000000,"CP-7":80000000,"CP-8":100000000,"CP-9":150000000,"CP-0":200000000,"Gorosei":500000000,"Líder do Governo":0};
 
 let charData = {
-  name: "",
   password: "",
-  info: { 
-      classe: "Arqueólogo 1", classe2: "", classe3: "", classe4: "", classe5: "",
-      raca: "Humano", raca2: "Humano", animal: "", animal2: "", linhagem: "Nenhuma", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp",
-      alcunha: "", recompensa: "", altura: "", idade: "", sexo: "Masculino", sangue: "A+", nacionalidade: "", localizacao: "",
-      orgTipo: "Pirata", tripulacao: "", patente: "", salario: "",
-      estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", estilo3: "", freestyle3: "", estilo4: "", freestyle4: "",
-      berries: 5000000, npcsC: "", npcsE: "", akumaNome: "",
-      personalidade: "", historia: "", aparencia: "", inventario: "",
-      hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true
-  },
-  tecnicasList: [],
-  logList: [],
-  stats: { f: 0, d: 0, r: 0, v: 0, esp: 0, ami: 0 },
-  substats: { refl: 0, vcorp: 0, hArm: 0, hObs: 0, hRei: 0, amiAlc: 0, amiDur: 0, amiPot: 0, amiVel: 0 }
+  characters: []
 };
+let activeCharIndex = 0;
+let currentChar = null;
+
+function createEmptyChar(type) {
+    return {
+        type: type,
+        name: "",
+        info: {},
+        tecnicasList: [],
+        logList: [],
+        stats: { f: 0, d: 0, r: 0, v: 0, esp: 0, ami: 0 },
+        substats: { refl: 0, vcorp: 0, hArm: 0, hObs: 0, hRei: 0, amiAlc: 0, amiDur: 0, amiPot: 0, amiVel: 0 }
+    };
+}
+
+function switchChar(idx) {
+    activeCharIndex = idx;
+    currentChar = charData.characters[idx];
+    document.querySelectorAll('.btn-tab').forEach((btn, i) => {
+        if(i === idx) btn.classList.add('active');
+        else btn.classList.remove('active');
+    });
+    updateUI();
+    renderTecnicas();
+    renderLogs();
+    toggleEditability();
+}
 
 function getClassDisplayName(baseClassWithLevel, sexo) {
     if (!baseClassWithLevel) return "";
@@ -175,7 +188,8 @@ function customAlert(msg) {
 
 function init() {
   populateSelects();
-  runFallbackChecks(); 
+  runFallbackChecks();
+  currentChar = charData.characters[activeCharIndex]; 
   renderTecnicas();
   renderLogs();
   updateUI();
@@ -217,6 +231,7 @@ async function loadFromCloud() {
 
           charData = data; 
           runFallbackChecks(); 
+          currentChar = charData.characters[activeCharIndex];
           renderTecnicas(); 
           renderLogs();
           updateUI(); 
@@ -278,12 +293,15 @@ async function managePassword() {
 
 function toggleEditability() {
     const elements = document.querySelectorAll('.container input:not(#info-salario), .container select, .container textarea, .container button');
+    let isNPC = currentChar.type === 'NPC';
     elements.forEach(el => {
         if(el.innerText && (el.innerText.includes("Copiar Ficha") || el.innerText.includes("Copiar Log"))) {
             el.disabled = false;
             return;
         }
-        if(el.type === 'checkbox') {
+        if(isNPC && (el.id === 'info-recompensa' || el.id === 'info-berries' || el.id === 'info-npcsC' || el.id === 'info-npcsE')) {
+            el.disabled = true;
+        } else if(el.type === 'checkbox') {
             el.disabled = isReadOnly;
         } else {
             el.disabled = isReadOnly;
@@ -303,29 +321,48 @@ function toggleEditability() {
 
 function runFallbackChecks() {
   if (typeof charData.password === 'undefined') charData.password = "";
-  if (!charData.info) charData.info = {};
-  if (typeof charData.info.recompensa === 'string') charData.info.recompensa = parseInt(charData.info.recompensa.replace(/\D/g, "")) || "";
-  if (typeof charData.info.berries === 'string') charData.info.berries = parseInt(charData.info.berries.replace(/\D/g, "")) || "";
+  if (!charData.characters || charData.characters.length === 0) {
+      let oldName = charData.name || "";
+      let oldInfo = charData.info || {};
+      let oldTec = charData.tecnicasList || [];
+      let oldLog = charData.logList || [];
+      let oldStats = charData.stats || {};
+      let oldSub = charData.substats || {};
+      charData = {
+          password: charData.password,
+          characters: [
+              { type: 'PC', name: oldName, info: oldInfo, tecnicasList: oldTec, logList: oldLog, stats: oldStats, substats: oldSub },
+              createEmptyChar('PC'), createEmptyChar('NPC'), createEmptyChar('NPC'), createEmptyChar('NPC'), createEmptyChar('NPC')
+          ]
+      };
+  }
 
-  const defInfo = { classe: "Arqueólogo 1", classe2: "", classe3: "", classe4: "", classe5: "", raca: "Humano", raca2: "Humano", animal: "", animal2: "", linhagem: "Nenhuma", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp", alcunha: "", recompensa: "", altura: "", idade: "", sexo: "Masculino", sangue: "A+", nacionalidade: "", localizacao: "", orgTipo: "Pirata", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true };
-  for(let k in defInfo) if (typeof charData.info[k] === 'undefined') charData.info[k] = defInfo[k];
-  if (!charData.stats) charData.stats = { f: 0, d: 0, r: 0, v: 0, esp: 0, ami: 0 };
-  if (!charData.substats) charData.substats = { refl: 0, vcorp: 0, hArm: 0, hObs: 0, hRei: 0, amiAlc: 0, amiDur: 0, amiPot: 0, amiVel: 0 };
+  charData.characters.forEach(c => {
+      if (!c.info) c.info = {};
+      if (typeof c.info.recompensa === 'string') c.info.recompensa = parseInt(c.info.recompensa.replace(/\D/g, "")) || "";
+      if (typeof c.info.berries === 'string') c.info.berries = parseInt(c.info.berries.replace(/\D/g, "")) || "";
 
-  if (!charData.tecnicasList) {
-      charData.tecnicasList = [];
-      if (charData.info && typeof charData.info.tecnicas === 'string' && charData.info.tecnicas.trim() !== '') {
-          charData.tecnicasList.push({ nome: "Técnica Antiga (Migrada)", desc: charData.info.tecnicas, efeito: "" });
+      const defInfo = { classe: "Arqueólogo 1", classe2: "", classe3: "", classe4: "", classe5: "", raca: "Humano", raca2: "Humano", animal: "", animal2: "", linhagem: "Nenhuma", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp", alcunha: "", recompensa: "", altura: "", idade: "", sexo: "Masculino", sangue: "A+", nacionalidade: "", localizacao: "", orgTipo: "Pirata", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true };
+      for(let k in defInfo) if (typeof c.info[k] === 'undefined') c.info[k] = defInfo[k];
+      if (!c.stats) c.stats = { f: 0, d: 0, r: 0, v: 0, esp: 0, ami: 0 };
+      if (!c.substats) c.substats = { refl: 0, vcorp: 0, hArm: 0, hObs: 0, hRei: 0, amiAlc: 0, amiDur: 0, amiPot: 0, amiVel: 0 };
+
+      if (!c.tecnicasList) {
+          c.tecnicasList = [];
+          if (c.info && typeof c.info.tecnicas === 'string' && c.info.tecnicas.trim() !== '') {
+              c.tecnicasList.push({ nome: "Técnica Antiga (Migrada)", desc: c.info.tecnicas, efeito: "" });
+          }
       }
-  }
 
-  if (!charData.logList) {
-      charData.logList = [];
-  }
+      if (!c.logList) {
+          c.logList = [];
+      }
+  });
+  currentChar = charData.characters[activeCharIndex];
 }
 
 function addTecnica() {
-    charData.tecnicasList.push({nome: "", desc: "", efeito: ""});
+    currentChar.tecnicasList.push({nome: "", desc: "", efeito: ""});
     saveData();
     renderTecnicas();
     updateUI();
@@ -333,7 +370,7 @@ function addTecnica() {
 }
 
 function removeTecnica(idx) {
-    charData.tecnicasList.splice(idx, 1);
+    currentChar.tecnicasList.splice(idx, 1);
     saveData();
     renderTecnicas();
     updateUI();
@@ -341,7 +378,7 @@ function removeTecnica(idx) {
 }
 
 function updateTecnica(idx, field, val) {
-    charData.tecnicasList[idx][field] = val;
+    currentChar.tecnicasList[idx][field] = val;
     saveData();
     updateUI();
 }
@@ -349,7 +386,7 @@ function updateTecnica(idx, field, val) {
 function renderTecnicas() {
     const container = document.getElementById('tecnicas-container');
     container.innerHTML = '';
-    charData.tecnicasList.forEach((t, idx) => {
+    currentChar.tecnicasList.forEach((t, idx) => {
         container.innerHTML += `
             <div style="background: rgba(0,0,0,0.3); padding: 10px; border: 1px dashed #555; border-radius: 6px; margin-bottom: 10px;">
                 <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
@@ -365,7 +402,7 @@ function renderTecnicas() {
 }
 
 function addLog() {
-    charData.logList.push({titulo: "", conteudo: ""});
+    currentChar.logList.push({titulo: "", conteudo: ""});
     saveData();
     renderLogs();
     updateUI();
@@ -373,7 +410,7 @@ function addLog() {
 }
 
 function removeLog(idx) {
-    charData.logList.splice(idx, 1);
+    currentChar.logList.splice(idx, 1);
     saveData();
     renderLogs();
     updateUI();
@@ -381,7 +418,7 @@ function removeLog(idx) {
 }
 
 function updateLog(idx, field, val) {
-    charData.logList[idx][field] = val;
+    currentChar.logList[idx][field] = val;
     saveData();
     updateUI();
 }
@@ -389,7 +426,7 @@ function updateLog(idx, field, val) {
 function renderLogs() {
     const container = document.getElementById('logs-container');
     container.innerHTML = '';
-    charData.logList.forEach((l, idx) => {
+    currentChar.logList.forEach((l, idx) => {
         container.innerHTML += `
             <div style="background: rgba(0,0,0,0.3); padding: 10px; border: 1px dashed #555; border-radius: 6px; margin-bottom: 10px;">
                 <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
@@ -417,30 +454,48 @@ function populateSelects() {
 }
 
 function updateField(category, field, value) { 
-    if (category === 'name') { charData.name = value || ""; } else { charData[category][field] = value; } 
+    if (category === 'name') { currentChar.name = value || ""; } else { currentChar[category][field] = value; } 
     saveData(); updateUI(); 
 }
 
 async function handlePatenteChange(val) {
     const restritas = ["Vice-Almirante", "Almirante", "Almirante-de-Frota", "CP-8", "CP-9", "CP-0", "Gorosei", "Líder do Governo"];
+    const senhasPatentes = {
+        "CP-8": "dafne",
+        "CP-9": "maackia",
+        "CP-0": "ochna",
+        "Gorosei": "abelia",
+        "Líder do Governo": "Ἑρμής"
+    };
     let finalVal = val;
     if (restritas.includes(val)) {
         let pwd = await customPrompt("Você é merecedor deste cargo?");
-        if (pwd === MASTER_PASSWORD) {
-            let discurso = charData.info.orgTipo === "Marinha" ? "Você é merecedor sim! A Justiça Absoluta prevalecerá! Que os mares temam a nossa fúria!" : "Você é merecedor sim! A ordem do mundo reside em nossas mãos. O equilíbrio será mantido a qualquer custo!";
-            await customAlert(discurso);
+        if (senhasPatentes[val]) {
+            if (pwd === senhasPatentes[val]) {
+                let discurso = currentChar.info.orgTipo === "Marinha" ? "Você é merecedor sim! A Justiça Absoluta prevalecerá! Que os mares temam a nossa fúria!" : "Você é merecedor sim! A ordem do mundo reside em nossas mãos. O equilíbrio será mantido a qualquer custo!";
+                await customAlert(discurso);
+            } else {
+                await customAlert("Você não merece aquele cargo.");
+                document.getElementById('info-patente').value = "";
+                finalVal = "";
+            }
         } else {
-            await customAlert("Você não merece aquele cargo.");
-            document.getElementById('info-patente').value = "";
-            finalVal = "";
+            if (pwd === MASTER_PASSWORD) {
+                let discurso = currentChar.info.orgTipo === "Marinha" ? "Você é merecedor sim! A Justiça Absoluta prevalecerá! Que os mares temam a nossa fúria!" : "Você é merecedor sim! A ordem do mundo reside em nossas mãos. O equilíbrio será mantido a qualquer custo!";
+                await customAlert(discurso);
+            } else {
+                await customAlert("Você não merece aquele cargo.");
+                document.getElementById('info-patente').value = "";
+                finalVal = "";
+            }
         }
     }
     
-    charData.info.patente = finalVal;
+    currentChar.info.patente = finalVal;
     if (finalVal !== "" && typeof salarios[finalVal] !== 'undefined') {
-        charData.info.salario = salarios[finalVal] === 0 ? "0" : salarios[finalVal].toLocaleString("pt-BR");
+        currentChar.info.salario = salarios[finalVal] === 0 ? "0" : salarios[finalVal].toLocaleString("pt-BR");
     } else {
-        charData.info.salario = "";
+        currentChar.info.salario = "";
     }
     
     saveData();
@@ -449,7 +504,7 @@ async function handlePatenteChange(val) {
 
 function formatAndSave(category, field, el) {
     let cleanVal = el.value.replace(/\D/g, ""); let num = cleanVal ? parseInt(cleanVal, 10) : 0;
-    charData[category][field] = num;
+    currentChar[category][field] = num;
     let cursor = el.selectionStart; let oldLength = el.value.length; el.value = num ? num.toLocaleString("pt-BR") : "";
     let newLength = el.value.length; el.setSelectionRange(cursor + (newLength - oldLength), cursor + (newLength - oldLength));
     saveData(); updateUI();
@@ -458,7 +513,7 @@ function formatAndSave(category, field, el) {
 function formatCurrency(category, field, el) {
     let cleanVal = el.value.replace(/\D/g, "");
     let num = cleanVal ? parseInt(cleanVal, 10) : "";
-    charData[category][field] = num;
+    currentChar[category][field] = num;
     let cursor = el.selectionStart; 
     let oldLength = el.value.length; 
     el.value = cleanVal ? num.toLocaleString("pt-BR") : "";
@@ -492,9 +547,9 @@ function formatRaceStr(rName, aName, isFem) {
 
 function toggleAmi(field, isChecked) {
     let key = 'has' + field.charAt(0).toUpperCase() + field.slice(1);
-    charData.info[key] = isChecked;
+    currentChar.info[key] = isChecked;
     if (!isChecked) {
-        charData.substats[field] = 0;
+        currentChar.substats[field] = 0;
         let el = document.getElementById('sub-' + field);
         if(el) el.value = "";
     }
@@ -503,7 +558,8 @@ function toggleAmi(field, isChecked) {
 }
 
 function updateUI() {
-    let i = charData.info;
+    let i = currentChar.info;
+    let isNPC = currentChar.type === 'NPC';
 
     if (i.raca === "Kuja" && i.sexo !== "Feminino") i.raca = "Humano";
     if (i.raca2 === "Kuja" && i.sexo !== "Feminino") i.raca2 = "Humano";
@@ -558,17 +614,33 @@ function updateUI() {
         anim2.style.display = "none";
     }
 
-    document.getElementById('pc-name').value = charData.name;
-    const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'alcunha', 'altura', 'idade', 'sexo', 'sangue', 'nacionalidade', 'localizacao', 'tripulacao', 'npcsC', 'npcsE', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2'];
-    textFields.forEach(f => { let el = document.getElementById('info-'+f); if(el) el.value = charData.info[f] || ""; });
+    document.getElementById('pc-name').value = currentChar.name;
+    const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'alcunha', 'altura', 'idade', 'sexo', 'sangue', 'nacionalidade', 'localizacao', 'tripulacao', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2'];
+    textFields.forEach(f => { let el = document.getElementById('info-'+f); if(el) el.value = currentChar.info[f] || ""; });
 
-    let orgTipo = charData.info.orgTipo || "Pirata";
+    if(isNPC) {
+        document.getElementById('info-recompensa').value = "Bloqueado";
+        document.getElementById('info-berries').value = "Bloqueado";
+        document.getElementById('info-npcsC').value = "Bloqueado";
+        document.getElementById('info-npcsE').value = "Bloqueado";
+    } else {
+        let recEl = document.getElementById('info-recompensa');
+        if(recEl) recEl.value = currentChar.info.recompensa ? currentChar.info.recompensa.toLocaleString("pt-BR") : "";
+        let berEl = document.getElementById('info-berries');
+        if(berEl) berEl.value = currentChar.info.berries ? currentChar.info.berries.toLocaleString("pt-BR") : "";
+        let npcCEl = document.getElementById('info-npcsC');
+        if(npcCEl) npcCEl.value = currentChar.info.npcsC || "";
+        let npcEEl = document.getElementById('info-npcsE');
+        if(npcEEl) npcEEl.value = currentChar.info.npcsE || "";
+    }
+
+    let orgTipo = currentChar.info.orgTipo || "Pirata";
     document.getElementById('info-orgTipo').value = orgTipo;
     if(orgTipo === "Pirata") {
         document.getElementById('box-tripulacao').style.display = "block";
         document.getElementById('box-patente-salario').style.display = "none";
-        charData.info.patente = "";
-        charData.info.salario = "";
+        currentChar.info.patente = "";
+        currentChar.info.salario = "";
         let selPatente = document.getElementById('info-patente');
         if(selPatente) selPatente.value = "";
     } else {
@@ -585,31 +657,25 @@ function updateUI() {
             options.forEach(p => html += `<option value="${p}">${p}</option>`);
             if(selPatente.innerHTML !== html) selPatente.innerHTML = html;
             
-            if(options.includes(charData.info.patente)) {
-                selPatente.value = charData.info.patente;
-                if(charData.info.patente !== "" && typeof salarios[charData.info.patente] !== 'undefined') {
-                    charData.info.salario = salarios[charData.info.patente] === 0 ? "0" : salarios[charData.info.patente].toLocaleString("pt-BR");
+            if(options.includes(currentChar.info.patente)) {
+                selPatente.value = currentChar.info.patente;
+                if(currentChar.info.patente !== "" && typeof salarios[currentChar.info.patente] !== 'undefined') {
+                    currentChar.info.salario = salarios[currentChar.info.patente] === 0 ? "0" : salarios[currentChar.info.patente].toLocaleString("pt-BR");
                 } else {
-                    charData.info.salario = "";
+                    currentChar.info.salario = "";
                 }
             } else {
-                charData.info.patente = options[0];
+                currentChar.info.patente = options[0];
                 selPatente.value = options[0];
-                charData.info.salario = "";
+                currentChar.info.salario = "";
             }
         }
     }
     
     let elSalario = document.getElementById('info-salario');
-    if (elSalario) elSalario.value = charData.info.salario || "";
+    if (elSalario) elSalario.value = currentChar.info.salario || "";
 
-    let recEl = document.getElementById('info-recompensa');
-    if(recEl) recEl.value = charData.info.recompensa ? charData.info.recompensa.toLocaleString("pt-BR") : "";
-    
-    let berEl = document.getElementById('info-berries');
-    if(berEl) berEl.value = charData.info.berries ? charData.info.berries.toLocaleString("pt-BR") : "";
-
-    let D = charData.stats.d, F = charData.stats.f, R = charData.stats.r, V = charData.stats.v;
+    let D = currentChar.stats.d, F = currentChar.stats.f, R = currentChar.stats.r, V = currentChar.stats.v;
     let totalBase = D + F + R + V;
 
     let avisoBase = document.getElementById('avisoBase');
@@ -617,19 +683,19 @@ function updateUI() {
 
     let html1 = "";
     baseClassesList.forEach(c => {
-        let display = getClassDisplayName(`${c} 1`, charData.info.sexo);
+        let display = getClassDisplayName(`${c} 1`, currentChar.info.sexo);
         html1 += `<option value="${c} 1">${display}</option>`;
     });
     let el1 = document.getElementById('info-classe');
     if(el1.innerHTML !== html1) el1.innerHTML = html1;
-    el1.value = charData.info.classe || "Arqueólogo 1";
-    charData.info.classe = el1.value;
+    el1.value = currentChar.info.classe || "Arqueólogo 1";
+    currentChar.info.classe = el1.value;
 
     const classSlots = [
-        {id: 'classe2', req: 5000, prev: [charData.info.classe]},
-        {id: 'classe3', req: 10000, prev: [charData.info.classe, charData.info.classe2]},
-        {id: 'classe4', req: 20000, prev: [charData.info.classe, charData.info.classe2, charData.info.classe3]},
-        {id: 'classe5', req: 35000, prev: [charData.info.classe, charData.info.classe2, charData.info.classe3, charData.info.classe4]}
+        {id: 'classe2', req: 5000, prev: [currentChar.info.classe]},
+        {id: 'classe3', req: 10000, prev: [currentChar.info.classe, currentChar.info.classe2]},
+        {id: 'classe4', req: 20000, prev: [currentChar.info.classe, currentChar.info.classe2, currentChar.info.classe3]},
+        {id: 'classe5', req: 35000, prev: [currentChar.info.classe, currentChar.info.classe2, currentChar.info.classe3, currentChar.info.classe4]}
     ];
 
     classSlots.forEach(slot => {
@@ -647,24 +713,24 @@ function updateUI() {
             let html = `<option value="">-- Selecione --</option>`;
             baseClassesList.forEach(c => {
                 if(counts[c] <= 5) {
-                    let display = getClassDisplayName(`${c} ${counts[c]}`, charData.info.sexo);
+                    let display = getClassDisplayName(`${c} ${counts[c]}`, currentChar.info.sexo);
                     html += `<option value="${c} ${counts[c]}">${display}</option>`;
                 }
             });
             if(el.innerHTML !== html) el.innerHTML = html;
             
-            let currentVal = charData.info[slot.id];
+            let currentVal = currentChar.info[slot.id];
             let optionExists = Array.from(el.options).some(o => o.value === currentVal);
-            if(optionExists && currentVal !== "") { el.value = currentVal; } else { el.value = ""; charData.info[slot.id] = ""; }
+            if(optionExists && currentVal !== "") { el.value = currentVal; } else { el.value = ""; currentChar.info[slot.id] = ""; }
         } else {
             el.innerHTML = `<option value="">🔒 Requer ${slot.req.toLocaleString('pt-BR')}</option>`;
             el.disabled = true;
-            charData.info[slot.id] = "";
+            currentChar.info[slot.id] = "";
         }
     });
 
     let combatenteLevel = 0;
-    [charData.info.classe, charData.info.classe2, charData.info.classe3, charData.info.classe4, charData.info.classe5].forEach(c => {
+    [currentChar.info.classe, currentChar.info.classe2, currentChar.info.classe3, currentChar.info.classe4, currentChar.info.classe5].forEach(c => {
         if(c && c.startsWith("Combatente")) {
             let match = c.match(/Combatente (\d+)/);
             if(match) combatenteLevel = Math.max(combatenteLevel, parseInt(match[1]));
@@ -674,11 +740,11 @@ function updateUI() {
     document.getElementById('box-selClasseDF').style.display = (combatenteLevel > 0) ? "block" : "none";
 
     const selLin = document.getElementById('info-linhagem');
-    let currentLin = charData.info.linhagem; selLin.innerHTML = "";
-    for(let l in linhagens) { if(!linhagens[l].req || linhagens[l].req.includes(charData.info.raca)) { selLin.innerHTML += `<option value="${l}">${l}</option>`; } }
-    if(Array.from(selLin.options).some(o => o.value === currentLin)) { selLin.value = currentLin; } else { charData.info.linhagem = "Nenhuma"; selLin.value = "Nenhuma"; currentLin = "Nenhuma"; }
+    let currentLin = currentChar.info.linhagem; selLin.innerHTML = "";
+    for(let l in linhagens) { if(!linhagens[l].req || linhagens[l].req.includes(currentChar.info.raca)) { selLin.innerHTML += `<option value="${l}">${l}</option>`; } }
+    if(Array.from(selLin.options).some(o => o.value === currentLin)) { selLin.value = currentLin; } else { currentChar.info.linhagem = "Nenhuma"; selLin.value = "Nenhuma"; currentLin = "Nenhuma"; }
 
-    let rc = charData.info.raca; let rc2 = charData.info.raca2; let ln = currentLin;
+    let rc = currentChar.info.raca; let rc2 = currentChar.info.raca2; let ln = currentLin;
     let isLinhagemVisible = (rc && !["Bucaneiro","Oni","Lunariano"].includes(rc));
     document.getElementById('container-linhagem').style.display = isLinhagemVisible ? "block" : "none"; 
     
@@ -696,17 +762,17 @@ function updateUI() {
     let isMink = (rc === "Mink" || (ln === "Charlotte" && rc2 === "Mink"));
     document.getElementById('box-estilo-mink').style.display = isMink ? "flex" : "none";
 
-    let baseClass = (charData.info.classe || "Arqueólogo 1").split(" ")[0];
+    let baseClass = (currentChar.info.classe || "Arqueólogo 1").split(" ")[0];
     let allowedEstilo1 = classStyles[baseClass] || ["Freestyle"];
     let elEst1 = document.getElementById('info-estilo1');
     if (elEst1) {
         let htmlE1 = "";
         allowedEstilo1.forEach(e => htmlE1 += `<option value="${e}">${e}</option>`);
         if (elEst1.innerHTML !== htmlE1) elEst1.innerHTML = htmlE1;
-        if (!allowedEstilo1.includes(charData.info.estilo1)) {
-            charData.info.estilo1 = allowedEstilo1[0];
+        if (!allowedEstilo1.includes(currentChar.info.estilo1)) {
+            currentChar.info.estilo1 = allowedEstilo1[0];
         }
-        elEst1.value = charData.info.estilo1;
+        elEst1.value = currentChar.info.estilo1;
     }
 
     [2, 3, 4].forEach(n => {
@@ -717,10 +783,10 @@ function updateUI() {
                 allStyles.forEach(e => htmlE += `<option value="${e}">${e}</option>`);
                 elEst.innerHTML = htmlE;
             }
-            if (!allStyles.includes(charData.info['estilo'+n])) {
-                charData.info['estilo'+n] = "Nenhum";
+            if (!allStyles.includes(currentChar.info['estilo'+n])) {
+                currentChar.info['estilo'+n] = "Nenhum";
             }
-            elEst.value = charData.info['estilo'+n];
+            elEst.value = currentChar.info['estilo'+n];
         }
     });
 
@@ -730,8 +796,8 @@ function updateUI() {
     [1, 2, 3, 4].forEach(n => {
         let elFree = document.getElementById('info-freestyle'+n);
         if (elFree) {
-            elFree.style.display = charData.info['estilo'+n] === 'Freestyle' ? 'block' : 'none';
-            elFree.value = charData.info['freestyle'+n] || "";
+            elFree.style.display = currentChar.info['estilo'+n] === 'Freestyle' ? 'block' : 'none';
+            elFree.value = currentChar.info['freestyle'+n] || "";
         }
     });
 
@@ -743,14 +809,14 @@ function updateUI() {
         document.getElementById('box-haki').style.display = "block"; 
     } else {
         espEl.disabled = true; espEl.placeholder = `🔒 Requer ${reqEsp.toLocaleString("pt-BR")}`;
-        charData.stats.esp = 0; charData.substats.hArm = 0; charData.substats.hObs = 0; charData.substats.hRei = 0;
+        currentChar.stats.esp = 0; currentChar.substats.hArm = 0; currentChar.substats.hObs = 0; currentChar.substats.hRei = 0;
         document.getElementById('box-haki').style.display = "none";
     }
 
     let amiEl = document.getElementById('stat-ami');
     if(ln === "Silvers") {
         amiEl.disabled = true; amiEl.placeholder = "🔒 Indisponível";
-        charData.stats.ami = 0; charData.substats.amiAlc = 0; charData.substats.amiDur = 0; charData.substats.amiPot = 0; charData.substats.amiVel = 0;
+        currentChar.stats.ami = 0; currentChar.substats.amiAlc = 0; currentChar.substats.amiDur = 0; currentChar.substats.amiPot = 0; currentChar.substats.amiVel = 0;
     } else { 
         amiEl.disabled = isReadOnly ? true : false; 
         amiEl.placeholder = "0"; 
@@ -758,16 +824,16 @@ function updateUI() {
 
     let bonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0, refl:0, vcorp:0};
 
-    if(combatenteLevel > 0) { bonus[charData.info.selClasseDF] += combatenteLevel * 0.05; }
+    if(combatenteLevel > 0) { bonus[currentChar.info.selClasseDF] += combatenteLevel * 0.05; }
 
     if(racas[rc]) { bonus.d += racas[rc].d || 0; bonus.f += racas[rc].f || 0; bonus.r += racas[rc].r || 0; bonus.v += racas[rc].v || 0; }
-    if(rc === "Humano") { bonus[charData.info.selDF] += 0.20; bonus[charData.info.selRV] += 0.20; } else if(rc === "Kuja") { bonus[charData.info.selDF] += 0.30; bonus[charData.info.selRV] += 0.20; } else if(rc === "Três-Olhos" || rc === "Mink") { bonus[charData.info.selDF] += 0.15; }
+    if(rc === "Humano") { bonus[currentChar.info.selDF] += 0.20; bonus[currentChar.info.selRV] += 0.20; } else if(rc === "Kuja") { bonus[currentChar.info.selDF] += 0.30; bonus[currentChar.info.selRV] += 0.20; } else if(rc === "Três-Olhos" || rc === "Mink") { bonus[currentChar.info.selDF] += 0.15; }
 
     if(document.getElementById('container-linhagem').style.display === "block" && linhagens[ln]) {
         if(linhagens[ln].charlotte) bonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0, refl:0, vcorp:0};
         bonus.d += linhagens[ln].d || 0; bonus.f += linhagens[ln].f || 0; bonus.r += linhagens[ln].r || 0; bonus.v += linhagens[ln].v || 0; bonus.esp += linhagens[ln].esp || 0; bonus.ha += linhagens[ln].ha || 0; bonus.ho += linhagens[ln].ho || 0; bonus.hr += linhagens[ln].hr || 0; bonus.ami += linhagens[ln].ami || 0;
         
-        if(ln === "Barnum") { bonus[charData.info.selLinDF] += 0.15; bonus[charData.info.selLinRV] += 0.15; } else if(ln === "Charlotte") { bonus[charData.info.selLinDF] += 0.20; bonus[charData.info.selLinRV] += 0.20; } else if(ln === "D.") { bonus[charData.info.selLin4] += 0.15; bonus[charData.info.selLinEspAmi] += 0.15; } else if(ln === "Gan") { bonus[charData.info.selLinDF] += 0.15; } else if(ln === "Kong") { bonus[charData.info.selLin4] += 0.10; } else if(ln === "Silvers") { bonus[charData.info.selLin4] += 0.15; }
+        if(ln === "Barnum") { bonus[currentChar.info.selLinDF] += 0.15; bonus[currentChar.info.selLinRV] += 0.15; } else if(ln === "Charlotte") { bonus[currentChar.info.selLinDF] += 0.20; bonus[currentChar.info.selLinRV] += 0.20; } else if(ln === "D.") { bonus[currentChar.info.selLin4] += 0.15; bonus[currentChar.info.selLinEspAmi] += 0.15; } else if(ln === "Gan") { bonus[currentChar.info.selLinDF] += 0.15; } else if(ln === "Kong") { bonus[currentChar.info.selLin4] += 0.10; } else if(ln === "Silvers") { bonus[currentChar.info.selLin4] += 0.15; }
         
         if(ln === "Dracule") { if(totalBase >= 15000) bonus.d += 0.20; else if(totalBase >= 10000) bonus.d += 0.15; else if(totalBase >= 5000) bonus.d += 0.10; } else if(ln === "Capone") { if(totalBase >= 15000) bonus.d += 0.25; else if(totalBase >= 10000) bonus.d += 0.20; else if(totalBase >= 5000) bonus.d += 0.15; } else if(ln === "Augur") { if(totalBase >= 20000) bonus.d += 0.15; else if(totalBase >= 10000) bonus.d += 0.10; else if(totalBase >= 5000) bonus.d += 0.05; } else if(ln === "Newgate") { if(totalBase >= 10000) { bonus.f += 0.20; bonus.r += 0.20; } else if(totalBase >= 5000) { bonus.f += 0.10; bonus.r += 0.10; } } else if(ln === "Boa") { if(totalBase >= 10000) bonus.v += 0.20; else if(totalBase >= 5000) bonus.v += 0.10; } else if(ln === "Neptune") { if(totalBase >= 15000) { bonus.v += 0.20; bonus.refl += 0.15; bonus.r += 0.15; } else if(totalBase >= 10000) { bonus.v += 0.20; bonus.refl += 0.10; bonus.r += 0.10; } else if(totalBase >= 5000) { bonus.v += 0.10; bonus.refl += 0.05; bonus.r += 0.05; } } else if(ln === "Sakazuki") { if(totalBase >= 15000) { bonus.f += 0.15; } else if(totalBase >= 10000) { bonus.f += 0.10; } else if(totalBase >= 5000) { bonus.f += 0.05; } } else if(ln === "Silvers") { if(totalBase >= 20000) { bonus.ha += 0.15; bonus.ho += 0.15; bonus.hr += 0.15; } else if(totalBase >= 10000) { bonus.ha += 0.10; bonus.ho += 0.10; bonus.hr += 0.10; } else if(totalBase >= 5000) { bonus.ha += 0.05; bonus.ho += 0.05; bonus.hr += 0.05; } }
         
@@ -775,7 +841,7 @@ function updateUI() {
     }
 
     const statFields = ['f', 'd', 'r', 'v', 'esp', 'ami'];
-    statFields.forEach(f => { let el = document.getElementById('stat-'+f); if(el) el.value = charData.stats[f] ? charData.stats[f].toLocaleString("pt-BR") : ""; });
+    statFields.forEach(f => { let el = document.getElementById('stat-'+f); if(el) el.value = currentChar.stats[f] ? currentChar.stats[f].toLocaleString("pt-BR") : ""; });
 
     let totalD = Math.round(D * (1 + bonus.d)); document.getElementById('total-d').innerText = "Total: " + totalD.toLocaleString("pt-BR");
     let totalF = Math.round(F * (1 + bonus.f)); document.getElementById('total-f').innerText = "Total: " + totalF.toLocaleString("pt-BR");
@@ -784,20 +850,20 @@ function updateUI() {
     let totalV = Math.round(V * (1 + bonus.v)); document.getElementById('total-v').innerText = "Total: " + totalV.toLocaleString("pt-BR");
     document.getElementById('box-velocidade').style.display = totalV > 0 ? "flex" : "none";
     
-    if(totalV === 0) { charData.substats.refl = 0; charData.substats.vcorp = 0; }
+    if(totalV === 0) { currentChar.substats.refl = 0; currentChar.substats.vcorp = 0; }
     
-    let REF = charData.substats.refl || 0, VCORP = charData.substats.vcorp || 0;
+    let REF = currentChar.substats.refl || 0, VCORP = currentChar.substats.vcorp || 0;
     let totalVelSub = REF + VCORP;
     
     if(totalVelSub > totalV) {
         let diff = totalVelSub - totalV;
         let active = document.activeElement;
         
-        if(active && active.id === 'sub-refl') { REF -= diff; charData.substats.refl = REF; }
-        else if(active && active.id === 'sub-vcorp') { VCORP -= diff; charData.substats.vcorp = VCORP; }
+        if(active && active.id === 'sub-refl') { REF -= diff; currentChar.substats.refl = REF; }
+        else if(active && active.id === 'sub-vcorp') { VCORP -= diff; currentChar.substats.vcorp = VCORP; }
         else {
-            if(VCORP >= diff) { VCORP -= diff; charData.substats.vcorp = VCORP; }
-            else if(REF >= diff) { REF -= diff; charData.substats.refl = REF; }
+            if(VCORP >= diff) { VCORP -= diff; currentChar.substats.vcorp = VCORP; }
+            else if(REF >= diff) { REF -= diff; currentChar.substats.refl = REF; }
         }
         
         document.getElementById('avisoVel').style.display = "block"; 
@@ -806,25 +872,25 @@ function updateUI() {
         document.getElementById('avisoVel').style.display = "none";
     }
     
-    document.getElementById('sub-refl').value = charData.substats.refl ? charData.substats.refl.toLocaleString("pt-BR") : "";
-    document.getElementById('sub-vcorp').value = charData.substats.vcorp ? charData.substats.vcorp.toLocaleString("pt-BR") : "";
+    document.getElementById('sub-refl').value = currentChar.substats.refl ? currentChar.substats.refl.toLocaleString("pt-BR") : "";
+    document.getElementById('sub-vcorp').value = currentChar.substats.vcorp ? currentChar.substats.vcorp.toLocaleString("pt-BR") : "";
 
-    let ESP = charData.stats.esp; let totalEsp = Math.round(ESP * (1 + bonus.esp)); document.getElementById('total-esp').innerText = "Total: " + totalEsp.toLocaleString("pt-BR");
+    let ESP = currentChar.stats.esp; let totalEsp = Math.round(ESP * (1 + bonus.esp)); document.getElementById('total-esp').innerText = "Total: " + totalEsp.toLocaleString("pt-BR");
     
-    let HA = charData.substats.hArm || 0, HO = charData.substats.hObs || 0, HR = charData.substats.hRei || 0;
+    let HA = currentChar.substats.hArm || 0, HO = currentChar.substats.hObs || 0, HR = currentChar.substats.hRei || 0;
     let totalHaki = HA + HO + HR;
     
     if(totalHaki > totalEsp) {
         let diff = totalHaki - totalEsp;
         let active = document.activeElement;
         
-        if(active && active.id === 'sub-hArm') { HA -= diff; charData.substats.hArm = HA; }
-        else if(active && active.id === 'sub-hObs') { HO -= diff; charData.substats.hObs = HO; }
-        else if(active && active.id === 'sub-hRei') { HR -= diff; charData.substats.hRei = HR; }
+        if(active && active.id === 'sub-hArm') { HA -= diff; currentChar.substats.hArm = HA; }
+        else if(active && active.id === 'sub-hObs') { HO -= diff; currentChar.substats.hObs = HO; }
+        else if(active && active.id === 'sub-hRei') { HR -= diff; currentChar.substats.hRei = HR; }
         else {
-            if(HR >= diff) { HR -= diff; charData.substats.hRei = HR; }
-            else if(HO >= diff) { HO -= diff; charData.substats.hObs = HO; }
-            else if(HA >= diff) { HA -= diff; charData.substats.hArm = HA; }
+            if(HR >= diff) { HR -= diff; currentChar.substats.hRei = HR; }
+            else if(HO >= diff) { HO -= diff; currentChar.substats.hObs = HO; }
+            else if(HA >= diff) { HA -= diff; currentChar.substats.hArm = HA; }
         }
         
         document.getElementById('avisoEsp').style.display = "block"; 
@@ -833,31 +899,31 @@ function updateUI() {
         document.getElementById('avisoEsp').style.display = "none";
     }
     
-    document.getElementById('sub-hArm').value = charData.substats.hArm ? charData.substats.hArm.toLocaleString("pt-BR") : "";
-    document.getElementById('sub-hObs').value = charData.substats.hObs ? charData.substats.hObs.toLocaleString("pt-BR") : "";
-    document.getElementById('sub-hRei').value = charData.substats.hRei ? charData.substats.hRei.toLocaleString("pt-BR") : "";
+    document.getElementById('sub-hArm').value = currentChar.substats.hArm ? currentChar.substats.hArm.toLocaleString("pt-BR") : "";
+    document.getElementById('sub-hObs').value = currentChar.substats.hObs ? currentChar.substats.hObs.toLocaleString("pt-BR") : "";
+    document.getElementById('sub-hRei').value = currentChar.substats.hRei ? currentChar.substats.hRei.toLocaleString("pt-BR") : "";
 
     ['amiAlc', 'amiDur', 'amiPot', 'amiVel'].forEach(f => {
         let chk = document.getElementById('chk-' + f);
         let inp = document.getElementById('sub-' + f);
         let key = 'has' + f.charAt(0).toUpperCase() + f.slice(1);
-        let has = charData.info[key];
+        let has = currentChar.info[key];
         if (chk) chk.checked = has;
         if (inp) inp.disabled = !has || isReadOnly;
     });
 
-    let AMI = charData.stats.ami; let totalAmi = Math.round(AMI * (1 + bonus.ami)); document.getElementById('total-ami').innerText = "Total: " + totalAmi.toLocaleString("pt-BR");
+    let AMI = currentChar.stats.ami; let totalAmi = Math.round(AMI * (1 + bonus.ami)); document.getElementById('total-ami').innerText = "Total: " + totalAmi.toLocaleString("pt-BR");
     document.getElementById('box-amiSub').style.display = AMI > 0 ? "block" : "none";
     
-    if(AMI === 0) { charData.substats.amiAlc = 0; charData.substats.amiDur = 0; charData.substats.amiPot = 0; charData.substats.amiVel = 0; }
+    if(AMI === 0) { currentChar.substats.amiAlc = 0; currentChar.substats.amiDur = 0; currentChar.substats.amiPot = 0; currentChar.substats.amiVel = 0; }
     
-    let aAlc = charData.substats.amiAlc || 0, aDur = charData.substats.amiDur || 0, aPot = charData.substats.amiPot || 0, aVel = charData.substats.amiVel || 0;
+    let aAlc = currentChar.substats.amiAlc || 0, aDur = currentChar.substats.amiDur || 0, aPot = currentChar.substats.amiPot || 0, aVel = currentChar.substats.amiVel || 0;
     
     let limitAmiExcedido = false;
-    if(aAlc > 10000) { aAlc = 10000; charData.substats.amiAlc = 10000; limitAmiExcedido = true; }
-    if(aDur > 10000) { aDur = 10000; charData.substats.amiDur = 10000; limitAmiExcedido = true; }
-    if(aPot > 10000) { aPot = 10000; charData.substats.amiPot = 10000; limitAmiExcedido = true; }
-    if(aVel > 10000) { aVel = 10000; charData.substats.amiVel = 10000; limitAmiExcedido = true; }
+    if(aAlc > 10000) { aAlc = 10000; currentChar.substats.amiAlc = 10000; limitAmiExcedido = true; }
+    if(aDur > 10000) { aDur = 10000; currentChar.substats.amiDur = 10000; limitAmiExcedido = true; }
+    if(aPot > 10000) { aPot = 10000; currentChar.substats.amiPot = 10000; limitAmiExcedido = true; }
+    if(aVel > 10000) { aVel = 10000; currentChar.substats.amiVel = 10000; limitAmiExcedido = true; }
     
     let totalAmiSub = aAlc + aDur + aPot + aVel;
     
@@ -865,15 +931,15 @@ function updateUI() {
         let diff = totalAmiSub - totalAmi;
         let active = document.activeElement;
         
-        if(active && active.id === 'sub-amiAlc') { aAlc -= diff; charData.substats.amiAlc = aAlc; }
-        else if(active && active.id === 'sub-amiDur') { aDur -= diff; charData.substats.amiDur = aDur; }
-        else if(active && active.id === 'sub-amiPot') { aPot -= diff; charData.substats.amiPot = aPot; }
-        else if(active && active.id === 'sub-amiVel') { aVel -= diff; charData.substats.amiVel = aVel; }
+        if(active && active.id === 'sub-amiAlc') { aAlc -= diff; currentChar.substats.amiAlc = aAlc; }
+        else if(active && active.id === 'sub-amiDur') { aDur -= diff; currentChar.substats.amiDur = aDur; }
+        else if(active && active.id === 'sub-amiPot') { aPot -= diff; currentChar.substats.amiPot = aPot; }
+        else if(active && active.id === 'sub-amiVel') { aVel -= diff; currentChar.substats.amiVel = aVel; }
         else {
-            if(aVel >= diff) { aVel -= diff; charData.substats.amiVel = aVel; }
-            else if(aPot >= diff) { aPot -= diff; charData.substats.amiPot = aPot; }
-            else if(aDur >= diff) { aDur -= diff; charData.substats.amiDur = aDur; }
-            else if(aAlc >= diff) { aAlc -= diff; charData.substats.amiAlc = aAlc; }
+            if(aVel >= diff) { aVel -= diff; currentChar.substats.amiVel = aVel; }
+            else if(aPot >= diff) { aPot -= diff; currentChar.substats.amiPot = aPot; }
+            else if(aDur >= diff) { aDur -= diff; currentChar.substats.amiDur = aDur; }
+            else if(aAlc >= diff) { aAlc -= diff; currentChar.substats.amiAlc = aAlc; }
         }
         
         document.getElementById('avisoAmi').style.display = "block"; 
@@ -885,16 +951,16 @@ function updateUI() {
         document.getElementById('avisoAmi').style.display = "none";
     }
     
-    document.getElementById('sub-amiAlc').value = charData.substats.amiAlc ? charData.substats.amiAlc.toLocaleString("pt-BR") : "";
-    document.getElementById('sub-amiDur').value = charData.substats.amiDur ? charData.substats.amiDur.toLocaleString("pt-BR") : "";
-    document.getElementById('sub-amiPot').value = charData.substats.amiPot ? charData.substats.amiPot.toLocaleString("pt-BR") : "";
-    document.getElementById('sub-amiVel').value = charData.substats.amiVel ? charData.substats.amiVel.toLocaleString("pt-BR") : "";
+    document.getElementById('sub-amiAlc').value = currentChar.substats.amiAlc ? currentChar.substats.amiAlc.toLocaleString("pt-BR") : "";
+    document.getElementById('sub-amiDur').value = currentChar.substats.amiDur ? currentChar.substats.amiDur.toLocaleString("pt-BR") : "";
+    document.getElementById('sub-amiPot').value = currentChar.substats.amiPot ? currentChar.substats.amiPot.toLocaleString("pt-BR") : "";
+    document.getElementById('sub-amiVel').value = currentChar.substats.amiVel ? currentChar.substats.amiVel.toLocaleString("pt-BR") : "";
 
     let activeAmiStats = 0;
-    if(charData.info.hasAmiAlc) activeAmiStats++;
-    if(charData.info.hasAmiDur) activeAmiStats++;
-    if(charData.info.hasAmiPot) activeAmiStats++;
-    if(charData.info.hasAmiVel) activeAmiStats++;
+    if(currentChar.info.hasAmiAlc) activeAmiStats++;
+    if(currentChar.info.hasAmiDur) activeAmiStats++;
+    if(currentChar.info.hasAmiPot) activeAmiStats++;
+    if(currentChar.info.hasAmiVel) activeAmiStats++;
 
     let controlePct = 0;
     if(activeAmiStats > 0) {
@@ -938,10 +1004,10 @@ function updateUI() {
     
     if (AMI > 0) {
         attrOut += `↠ *𝙰𝚔𝚞𝚖𝚊 𝚗𝚘 𝙼𝚒:* ${strCalc(AMI, bonus.ami)}\n`;
-        if (charData.info.hasAmiAlc && aAlc > 0) attrOut += `> _𝙰𝚕𝚌𝚊𝚗𝚌𝚎:_ ${aAlc.toLocaleString("pt-BR")}\n`;
-        if (charData.info.hasAmiDur && aDur > 0) attrOut += `> _𝙳𝚞𝚛𝚊𝚋𝚒𝚕𝚒𝚍𝚊𝚍𝚎:_ ${aDur.toLocaleString("pt-BR")}\n`;
-        if (charData.info.hasAmiPot && aPot > 0) attrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${aPot.toLocaleString("pt-BR")}\n`;
-        if (charData.info.hasAmiVel && aVel > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${aVel.toLocaleString("pt-BR")}\n`;
+        if (currentChar.info.hasAmiAlc && aAlc > 0) attrOut += `> _𝙰𝚕𝚌𝚊𝚗𝚌𝚎:_ ${aAlc.toLocaleString("pt-BR")}\n`;
+        if (currentChar.info.hasAmiDur && aDur > 0) attrOut += `> _𝙳𝚞𝚛𝚊𝚋𝚒𝚕𝚒𝚍𝚊𝚍𝚎:_ ${aDur.toLocaleString("pt-BR")}\n`;
+        if (currentChar.info.hasAmiPot && aPot > 0) attrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${aPot.toLocaleString("pt-BR")}\n`;
+        if (currentChar.info.hasAmiVel && aVel > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${aVel.toLocaleString("pt-BR")}\n`;
         if (activeAmiStats > 0) attrOut += `> _𝙲𝚘𝚗𝚝𝚛ᴏ𝚕𝚎:_ ${controlePct}%\n`;
         attrOut += `\n`;
     }
@@ -958,10 +1024,10 @@ function updateUI() {
     let outNpcsE = formatNpc(i.npcsE, "🔒");
 
     let tecnicasOut = "";
-    if (charData.tecnicasList && charData.tecnicasList.length > 0) {
+    if (currentChar.tecnicasList && currentChar.tecnicasList.length > 0) {
         tecnicasOut += "▬▬▬▬  [ 𝐓ᴇ́ᴄɴɪᴄᴀs ]  ▬▬▬▬\n\n";
         
-        let tecnicasOrdenadas = [...charData.tecnicasList].sort((a, b) => {
+        let tecnicasOrdenadas = [...currentChar.tecnicasList].sort((a, b) => {
             let nA = (a.nome || "").trim().toLowerCase();
             let nB = (b.nome || "").trim().toLowerCase();
             return nA.localeCompare(nB);
@@ -1050,21 +1116,22 @@ function updateUI() {
         let raca2Output = formatRaceStr(i.raca2, i.animal2, i.sexo === "Feminino");
         racaOutput += ` / ${raca2Output}`;
     }
+    
+    let recompensaOutText = !isNPC ? `\n  : ᓩ _𝐑ᴇᴄᴏᴍᴘᴇɴsᴀ:_\n> ${outRecompensa}\n` : "";
+    let berriesOutText = !isNPC ? `\n : ᓩ _𝐁ᴇʀʀɪᴇs:_\n> ${outBerries}\n` : "";
+    let npcsOutText = !isNPC ? `\n  : ᓩ _𝐍𝐏𝐂s ᴄᴏᴍᴜɴꜱ:_\n${outNpcsC}\n\n  : ᓩ _𝐍𝐏𝐂s ᴇꜱᴘᴇᴄɪᴀɪꜱ:_\n${outNpcsE}\n` : "";
 
     let out = `*Nᴇᴡ sᴇᴀs*
 — ロールプレイングゲーム - 𝚁𝙿𝙶 [𝙾𝙽𝙴 𝙿𝙸𝙴𝙲𝙴]
      — 新しい海 - 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 ~*ɴꜱ*~
                           ᖴIᑕᕼᗩ
-Iີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊
+Iີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊
   : ᓩ _𝐍ᴏᴍᴇ:_
-> ${charData.name}
+> ${currentChar.name}
 
   : ᓩ _𝐀ʟᴄᴜɴʜᴀ:_
 > ${i.alcunha || '🔒'}
-
-  : ᓩ _𝐑ᴇᴄᴏᴍᴘᴇɴsᴀ:_
-> ${outRecompensa}
-
+${recompensaOutText}
   : ᓩ _𝐀ʟᴛᴜʀᴀ:_
 > ${i.altura}
 
@@ -1101,16 +1168,7 @@ ${histPersOut}
 ${orgOut}
   : ᓩ _𝐄sᴛɪʟᴏs ᴅᴇ ʟᴜᴛᴀ:_
 ${estilosText.trim()}
-
- : ᓩ _𝐁ᴇʀʀɪᴇs:_
-> ${outBerries}
-
-  : ᓩ _𝐍𝐏𝐂s ᴄᴏᴍᴜɴꜱ:_
-${outNpcsC}
-
-  : ᓩ _𝐍𝐏𝐂s ᴇꜱᴘᴇᴄɪᴀɪꜱ:_
-${outNpcsE}
-
+${berriesOutText}${npcsOutText}
 > _𝐈ɴᴠᴇɴᴛᴀ́ʀɪᴏ:_
 ${i.inventario}
 
@@ -1127,9 +1185,9 @@ ${attrOut}${tecnicasOut}`;
 
     document.getElementById('resBox').textContent = out.trim();
 
-    let logOut = "*Log de Atualizações:*Iີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊\n";
-    if (charData.logList && charData.logList.length > 0) {
-        charData.logList.forEach(l => {
+    let logOut = "*Log de Atualizações:*Iີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊\n";
+    if (currentChar.logList && currentChar.logList.length > 0) {
+        currentChar.logList.forEach(l => {
             if (l.titulo || l.conteudo) {
                 if (l.titulo) logOut += `> ${l.titulo}\n`;
                 if (l.conteudo) {

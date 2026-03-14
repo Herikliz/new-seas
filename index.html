@@ -4,11 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ficha New Seas OP RPG</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-
 <link rel="stylesheet" href="style.css">
-
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
@@ -27,6 +24,21 @@
 </header>
 
 <div class="container">
+  <div class="char-tabs">
+    <div class="col-tabs">
+      <button class="btn-tab active" onclick="switchChar(0)">PERSONAGEM 1</button>
+      <button class="btn-tab" onclick="switchChar(1)">PERSONAGEM 2</button>
+    </div>
+    <div class="col-tabs">
+      <button class="btn-tab" onclick="switchChar(2)">NPC</button>
+      <button class="btn-tab" onclick="switchChar(3)">NPC</button>
+    </div>
+    <div class="col-tabs">
+      <button class="btn-tab" onclick="switchChar(4)">NPC</button>
+      <button class="btn-tab" onclick="switchChar(5)">NPC</button>
+    </div>
+  </div>
+
   <div class="three-col-grid">
       <div class="box">
           <div class="box-title" style="color: var(--info);">Identidade</div>
