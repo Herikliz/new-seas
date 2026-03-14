@@ -125,8 +125,52 @@ function renderTabs() {
         html += `<button class="btn-add" onclick="addNPC(${pIdx})" title="Adicionar NPC">+</button>`;
         html += `</div>`;
     });
-    html += `<button class="btn-add btn-add-pc" onclick="addPC()">+ Personagem</button>`;
+    html += `<div style="display: flex; gap: 10px; margin-top: 5px;">
+                <button class="btn-add btn-add-pc" onclick="addPC()">+ Personagem</button>
+                <button class="btn-add btn-add-pc" style="border-color: var(--danger); color: var(--danger);" onclick="deleteCurrentChar()">🗑️ Apagar Selecionado</button>
+             </div>`;
     container.innerHTML = html;
+}
+
+async function deleteCurrentChar() {
+    if (isReadOnly) {
+        await customAlert("Você está no modo de leitura. Não é possível apagar.");
+        return;
+    }
+
+    if (charData.password && charData.password.trim() !== "") {
+        let pwd = await customPrompt("Digite a senha da ficha para confirmar a exclusão:");
+        if (pwd !== charData.password && pwd !== MASTER_PASSWORD) {
+            if (pwd !== null) await customAlert("Senha incorreta! Exclusão cancelada.");
+            return;
+        }
+    } else {
+        let pwd = await customPrompt("A ficha não tem senha. Digite 'SIM' para confirmar a exclusão:");
+        if (pwd !== "SIM" && pwd !== "sim") {
+            return;
+        }
+    }
+
+    if (activeNpcIndex !== -1) {
+        charData.pcs[activePcIndex].npcs.splice(activeNpcIndex, 1);
+        activeNpcIndex = -1;
+    } else {
+        charData.pcs.splice(activePcIndex, 1);
+        if (charData.pcs.length === 0) {
+            charData.pcs.push({ pc: createEmptyChar(false), npcs: [] });
+        }
+        activePcIndex = 0;
+        activeNpcIndex = -1;
+    }
+
+    currentChar = activeNpcIndex === -1 ? charData.pcs[activePcIndex].pc : charData.pcs[activePcIndex].npcs[activeNpcIndex];
+    saveData();
+    renderTabs();
+    renderTecnicas();
+    renderLogs();
+    updateUI();
+    toggleEditability();
+    await customAlert("Apagado com sucesso!");
 }
 
 function getClassDisplayName(baseClassWithLevel, sexo) {
