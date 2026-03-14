@@ -282,9 +282,21 @@ function initFirebase() {
   } catch(e) {}
 }
 
-function changeDocId(newId) {
-  currentDocId = newId ? newId.trim() : '';
-  if(currentDocId !== '') { loadFromCloud(); }
+async function changeDocId(newId) {
+  if (!newId || newId.trim() === '') {
+      currentDocId = '';
+      return;
+  }
+  newId = newId.trim();
+  
+  if (!/^\d{4}$/.test(newId)) {
+      await customAlert("O ID da ficha deve conter EXATAMENTE 4 NÚMEROS (ex: 1234).");
+      document.getElementById('doc-id').value = currentDocId;
+      return;
+  }
+  
+  currentDocId = newId;
+  loadFromCloud();
 }
 
 async function loadFromCloud() {
@@ -1333,13 +1345,19 @@ async function changeFichaID() {
         return;
     }
 
-    let novoId = await customPrompt(`O ID atual é "${currentDocId}". Digite o NOVO ID desejado:`);
+    let novoId = await customPrompt(`O ID atual é "${currentDocId}". Digite o NOVO ID desejado (Exatamente 4 números):`);
     
     if (!novoId || novoId.trim() === "" || novoId.trim() === currentDocId) {
         return; 
     }
     
     novoId = novoId.trim();
+    
+    if (!/^\d{4}$/.test(novoId)) {
+        await customAlert("O NOVO ID deve conter EXATAMENTE 4 NÚMEROS (ex: 1234).");
+        return;
+    }
+
     document.getElementById('db-status').classList.add('syncing');
 
     try {

@@ -13,7 +13,7 @@
 
 <header>
   <div class="cloud-controls">
-    <input type="text" id="doc-id" placeholder="ID da Ficha na Nuvem" title="Digite para salvar/puxar na nuvem" onchange="changeDocId(this.value)">
+    <input type="text" id="doc-id" maxlength="4" placeholder="ID (4 Números)" title="Digite 4 números para salvar/puxar na nuvem" onchange="changeDocId(this.value)" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
     <button class="btn btn-outline" style="font-size: 0.8rem; padding: 6px;" onclick="loadFromCloud()" title="Puxar dados">⬇️ Puxar</button>
     <button class="btn btn-outline" style="font-size: 0.8rem; padding: 6px; color: var(--info); border-color: var(--info);" onclick="changeFichaID()" title="Mudar ID da Ficha">🔄 Mudar ID</button>
     <button id="btn-senha" class="btn btn-outline" style="font-size: 0.8rem; padding: 6px; color: var(--warning); border-color: var(--warning);" onclick="managePassword()" title="Definir ou remover senha">🔑 Senha</button>
