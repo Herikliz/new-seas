@@ -1226,6 +1226,8 @@ function updateUI() {
         let raca2Output = formatRaceStr(i.raca2, i.animal2, i.sexo === "Feminino");
         racaOutput += ` / ${raca2Output}`;
     }
+
+    let displayLinhagem = i.linhagem.replace("Tenryūbito: Família ", "");
     
     let recompensaOutText = `\n  : ᓩ _𝐑ᴇᴄᴏᴍᴘᴇɴsᴀ:_\n> ${outRecompensa}\n`;
     let berriesOutText = !isNPC ? `\n : ᓩ _𝐁ᴇʀʀɪᴇs:_\n> ${outBerries}\n` : "";
@@ -1249,7 +1251,7 @@ ${recompensaOutText}
 > ${i.idade || '(Mínimo: 15)'}
 
   : ᓩ _${i.linhagem !== "Nenhuma" ? "𝐑ᴀᴄ̧ᴀ | 𝐋ɪɴʜᴀɢᴇᴍ" : "𝐑ᴀᴄ̧ᴀ"}:_
-> ${i.linhagem !== "Nenhuma" ? racaOutput + " | " + i.linhagem : racaOutput}
+> ${i.linhagem !== "Nenhuma" ? racaOutput + " | " + displayLinhagem : racaOutput}
 
   : ᓩ _𝐒ᴇxᴏ:_
 > ${i.sexo}
