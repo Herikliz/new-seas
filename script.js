@@ -1248,8 +1248,8 @@ ${recompensaOutText}
   : ᓩ _𝐈ᴅᴀᴅᴇ:_
 > ${i.idade || '(Mínimo: 15)'}
 
-  : ᓩ _𝐑ᴀᴄ̧ᴀ | 𝐋ɪɴʜᴀɢᴇᴍ:_
-> ${racaOutput} | ${i.linhagem}
+  : ᓩ _${i.linhagem !== "Nenhuma" ? "𝐑ᴀᴄ̧ᴀ | 𝐋ɪɴʜᴀɢᴇᴍ" : "𝐑ᴀᴄ̧ᴀ"}:_
+> ${i.linhagem !== "Nenhuma" ? racaOutput + " | " + i.linhagem : racaOutput}
 
   : ᓩ _𝐒ᴇxᴏ:_
 > ${i.sexo}
