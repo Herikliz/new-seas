@@ -23,7 +23,7 @@ const linhagens = { "Nenhuma":{}, "Augur":{v:.10,d:.20,req:["Humano"]}, "Barnum"
 const locais = {
   "East Blue": ["Base da Marinha G-03", "Clockwork", "Conomi", "Cozia", "Dawn", "Gecko", "Goat", "Ilha Shimotsuki", "Ilha dos Animais Raros", "Ilha Navio de Guerra", "Kumate", "Mirrorball", "Organ", "Oykot", "Polestar", "Tequila Wolf", "Yotsuba"],
   "South Blue": ["Base da Marinha G-10", "Baterilla", "Briss", "Centaurea", "Karate", "Kutsukku", "Reino Negro de Drum", "Roshwan", "Samba", "Samuwanai", "Sorbet", "Taya", "Torino", "Tumi", "Vespa"],
-  "West Blue": ["Ballywood", "Base da Marinha G-12", "God Valley", "Ilusia", "Kano", "Las Camp", "Ohara", "Thriller Bark", "Toroa"],
+  "West Blue": ["Ballywood", "Base da Marinha G-12", "God Valley", "Ilusia", "Kano", "Las Camp", "Ohara", "Soja", "Thriller Bark", "Toroa"],
   "North Blue": ["Base da Marinha G-11", "Deul", "Downs", "Flevance", "Ilha da Andorinha", "Lvneel", "Minion", "Polo Norte", "Rakesh", "Rubeck", "Spider Miles", "Whiteland"],
   "Paraíso": ["Baltigo", "Banaro", "Base da Marinha G-01", "Base da Marinha G-02", "Base da Marinha G-08", "Boin", "Cactus", "Corrente Tarai", "Drum", "Enies Lobby", "Foolshout", "Ilha dos Homens-Peixe", "Ilha Spa", "Jaya", "Karakuri", "Kenzan", "Kuraigana", "Kyuka", "Little Garden", "Long Ring Long Land", "Mary Geoise", "Merveille", "Momoiro", "Namakura", "Nanimonai", "Pucci", "Reino Lulusia", "Sabaody", "San Faldo", "Sandy", "Skypiea", "Water 7"],
   "Novo Mundo": ["Applenine", "Base da Marinha G-09", "Base da Marinha G-13", "Base da Marinha G-14", "Base da Marinha G-15", "Dressrosa", "Egghead", "Elbaf", "Foodvalten", "Hachinosu", "Mystoria", "Prodence", "Punk Hazard", "Raijin", "Risky Red", "Wano", "Whole Cake", "Yukiryu", "Zou"],
