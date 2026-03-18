@@ -1274,7 +1274,7 @@ ${histPersOut}
 > ${i.aparencia}
 
   : ᓩ _𝐍ᴀᴄɪᴏɴᴀʟɪᴅᴀᴅᴇ:_
-> ${i.nacionalidade}
+> ${i.nacionalidade || 'Desconhecida'}
 
   : ᓩ _𝐋ᴏᴄᴀʟɪᴢᴀᴄ̧ᴀ̃ᴏ ᴀᴛᴜᴀʟ:_
 > ${i.localizacao || '(Local presente no mapa do RPG)'}
