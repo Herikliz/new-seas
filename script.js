@@ -936,11 +936,12 @@ function updateUI() {
 
     if(combatenteLevel > 0) { bonus[currentChar.info.selClasseDF] += combatenteLevel * 0.05; }
 
-    if(racas[rc]) { bonus.d += racas[rc].d || 0; bonus.f += racas[rc].f || 0; bonus.r += racas[rc].r || 0; bonus.v += racas[rc].v || 0; }
-    if(rc === "Humano") { bonus[currentChar.info.selDF] += 0.20; bonus[currentChar.info.selRV] += 0.20; } else if(rc === "Kuja") { bonus[currentChar.info.selDF] += 0.30; bonus[currentChar.info.selRV] += 0.20; } else if(rc === "Três-Olhos" || rc === "Mink") { bonus[currentChar.info.selDF] += 0.15; }
+    if(ln !== "Charlotte") {
+        if(racas[rc]) { bonus.d += racas[rc].d || 0; bonus.f += racas[rc].f || 0; bonus.r += racas[rc].r || 0; bonus.v += racas[rc].v || 0; }
+        if(rc === "Humano") { bonus[currentChar.info.selDF] += 0.20; bonus[currentChar.info.selRV] += 0.20; } else if(rc === "Kuja") { bonus[currentChar.info.selDF] += 0.30; bonus[currentChar.info.selRV] += 0.20; } else if(rc === "Três-Olhos" || rc === "Mink") { bonus[currentChar.info.selDF] += 0.15; }
+    }
 
     if(document.getElementById('container-linhagem').style.display === "block" && linhagens[ln]) {
-        if(linhagens[ln].charlotte) bonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0, refl:0, vcorp:0};
         bonus.d += linhagens[ln].d || 0; bonus.f += linhagens[ln].f || 0; bonus.r += linhagens[ln].r || 0; bonus.v += linhagens[ln].v || 0; bonus.esp += linhagens[ln].esp || 0; bonus.ha += linhagens[ln].ha || 0; bonus.ho += linhagens[ln].ho || 0; bonus.hr += linhagens[ln].hr || 0; bonus.ami += linhagens[ln].ami || 0;
         
         if(ln === "Barnum") { bonus[currentChar.info.selLinDF] += 0.15; bonus[currentChar.info.selLinRV] += 0.15; } else if(ln === "Charlotte") { bonus[currentChar.info.selLinDF] += 0.20; bonus[currentChar.info.selLinRV] += 0.20; } else if(ln === "D.") { bonus[currentChar.info.selLin4] += 0.15; bonus[currentChar.info.selLinEspAmi] += 0.15; } else if(ln === "Gan") { bonus[currentChar.info.selLinDF] += 0.15; } else if(ln === "Kong") { bonus[currentChar.info.selLin4] += 0.10; } else if(ln === "Silvers") { bonus[currentChar.info.selLin4] += 0.15; }
