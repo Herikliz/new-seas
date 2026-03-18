@@ -1235,6 +1235,15 @@ function updateUI() {
     let berriesOutText = !isNPC ? `\n : ᓩ _𝐁ᴇʀʀɪᴇs:_\n> ${outBerries}\n` : "";
     let npcsOutText = !isNPC ? `\n  : ᓩ _𝐍𝐏𝐂s ᴄᴏᴍᴜɴꜱ:_\n${outNpcsC}\n\n  : ᓩ _𝐍𝐏𝐂s ᴇꜱᴘᴇᴄɪᴀɪꜱ:_\n${outNpcsE}\n` : "";
 
+    let inventarioFormatado = "";
+    if (i.inventario && i.inventario.trim() !== "") {
+        inventarioFormatado = i.inventario.split('\n').map(l => {
+            let t = l.trim();
+            if (t === "") return "";
+            return t.startsWith("*") ? t : "* " + t;
+        }).filter(l => l !== "").join('\n');
+    }
+
     let out = `*Nᴇᴡ sᴇᴀs*
 — ロールプレイングゲーム - 𝚁𝙿𝙶 [𝙾𝙽𝙴 𝙿𝙸𝙴𝙲𝙴]
      — 新しい海 - 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 ~*ɴꜱ*~
@@ -1284,7 +1293,7 @@ ${orgOut}
 ${estilosText.trim()}
 ${berriesOutText}${npcsOutText}
 > _𝐈ɴᴠᴇɴᴛᴀ́ʀɪᴏ:_
-${i.inventario}
+${inventarioFormatado}
 
   : ᓩ _𝐀ᴋᴜᴍᴀ ɴᴏ ᴍɪ:_
 > ${i.akumaNome || '🔒'}
