@@ -649,8 +649,9 @@ function formatRaceStr(rName, aName, isFem) {
         else if (res === "Sereiano") res = "Sereiana";
     }
     if (["Tritão", "Wotan", "Mink"].includes(rName)) {
-        let a = aName && aName.trim() !== "" ? aName.trim() : (rName === "Mink" ? "Fuinha" : "Tubarão");
-        res += `: ${a}`;
+        if (aName && aName.trim() !== "") {
+            res += `: ${aName.trim()}`;
+        }
     }
     return res;
 }
