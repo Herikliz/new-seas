@@ -1191,7 +1191,7 @@ function updateUI() {
     let formatStyle = (n) => {
         let st = i['estilo'+n];
         if (!st || st === "Nenhum") return null;
-        if (st === "Freestyle") return `Freestyle: ${i['freestyle'+n] || 'Nome'}`;
+        if (st === "Freestyle") return i['freestyle'+n] && i['freestyle'+n].trim() !== "" ? `Freestyle: ${i['freestyle'+n]}` : "Freestyle";
         return st;
     };
 
