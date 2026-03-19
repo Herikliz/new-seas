@@ -536,12 +536,19 @@ function renderTecnicas() {
                     <label style="color:var(--info);">Técnica ${idx + 1}</label>
                     <button type="button" class="btn btn-outline" style="color:var(--danger); border-color:var(--danger); font-size:10px; padding:2px 6px;" onclick="removeTecnica(${idx})">Remover</button>
                 </div>
-                <input type="text" placeholder="Nome da Técnica (Ex: Golpe Rápido)" value="${t.nome}" oninput="updateTecnica(${idx}, 'nome', this.value)" style="margin-bottom:5px;">
-                <textarea placeholder="Descrição da Técnica" oninput="updateTecnica(${idx}, 'desc', this.value)" style="min-height:50px; margin-bottom:5px;">${t.desc}</textarea>
-                <input type="text" placeholder="Efeito / Buff (Ex: Perde 10% de Res)" value="${t.efeito}" oninput="updateTecnica(${idx}, 'efeito', this.value)">
+                <textarea placeholder="Nome da Técnica (Ex: Golpe Rápido)" oninput="updateTecnica(${idx}, 'nome', this.value)" style="min-height:38px; margin-bottom:5px; text-align:justify; padding-top:8px;">${t.nome}</textarea>
+                <textarea placeholder="Descrição da Técnica" oninput="updateTecnica(${idx}, 'desc', this.value)" style="min-height:50px; margin-bottom:5px; text-align:justify;">${t.desc}</textarea>
+                <textarea placeholder="Efeito / Buff (Ex: Perde 10% de Res)" oninput="updateTecnica(${idx}, 'efeito', this.value)" style="min-height:38px; text-align:justify; padding-top:8px;">${t.efeito}</textarea>
             </div>
         `;
     });
+
+    setTimeout(() => {
+        container.querySelectorAll('textarea').forEach(ta => {
+            ta.style.height = 'auto';
+            ta.style.height = (ta.scrollHeight) + 'px';
+        });
+    }, 10);
 }
 
 function addLog() {
