@@ -421,6 +421,10 @@ function toggleEditability() {
             el.disabled = false;
             return;
         }
+        if(el.value === "Electro") {
+            el.disabled = true;
+            return;
+        }
         if(isNPC && (el.id === 'info-berries' || el.id === 'info-npcsC' || el.id === 'info-npcsE')) {
             el.disabled = true;
         } else if(el.type === 'checkbox') {
@@ -439,6 +443,8 @@ function toggleEditability() {
             pwdBtn.innerText = (charData.password && charData.password !== "") ? "🔑 Redefinir Senha" : "🔑 Definir Senha";
         }
     }
+    
+    updateUI();
 }
 
 function runFallbackChecks() {
