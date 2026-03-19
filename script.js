@@ -489,7 +489,7 @@ function runFallbackChecks() {
           if (typeof c.info.recompensa === 'string') c.info.recompensa = parseInt(c.info.recompensa.replace(/\D/g, "")) || "";
           if (typeof c.info.berries === 'string') c.info.berries = parseInt(c.info.berries.replace(/\D/g, "")) || "";
 
-          const defInfo = { classe: "Arqueólogo 1", classe2: "", classe3: "", classe4: "", classe5: "", raca: "Humano", raca2: "Humano", animal: "", animal2: "", linhagem: "Nenhuma", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp", alcunha: "", recompensa: "", altura: "", idade: "", sexo: "Masculino", sangue: "A+", nacionalidade: "", localizacao: "", orgTipo: "Pirata", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true };
+          const defInfo = { classe: "Arqueólogo 1", classe2: "", classe3: "", classe4: "", classe5: "", raca: "Humano", raca2: "Humano", animal: "", animal2: "", linhagem: "Nenhuma", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp", alcunha: "", recompensa: "", altura: "", idade: "", sexo: "Masculino", sangue: "A+", nacionalidade: "", localizacao: "", orgTipo: "Pirata", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, tecnicasColapsado: false };
           for(let k in defInfo) if (typeof c.info[k] === 'undefined') c.info[k] = defInfo[k];
           if (!c.stats) c.stats = { f: 0, d: 0, r: 0, v: 0, esp: 0, ami: 0 };
           if (!c.substats) c.substats = { refl: 0, vcorp: 0, hArm: 0, hObs: 0, hRei: 0, amiAlc: 0, amiDur: 0, amiPot: 0, amiVel: 0 };
@@ -522,6 +522,12 @@ function removeTecnica(idx) {
 
 function updateTecnica(idx, field, val) {
     currentChar.tecnicasList[idx][field] = val;
+    saveData();
+    updateUI();
+}
+
+function toggleTecnicasCollapse() {
+    currentChar.info.tecnicasColapsado = !currentChar.info.tecnicasColapsado;
     saveData();
     updateUI();
 }
@@ -1120,6 +1126,18 @@ function updateUI() {
     document.getElementById('sub-amiDur').value = currentChar.substats.amiDur ? currentChar.substats.amiDur.toLocaleString("pt-BR") : "";
     document.getElementById('sub-amiPot').value = currentChar.substats.amiPot ? currentChar.substats.amiPot.toLocaleString("pt-BR") : "";
     document.getElementById('sub-amiVel').value = currentChar.substats.amiVel ? currentChar.substats.amiVel.toLocaleString("pt-BR") : "";
+
+    let techWrapper = document.getElementById('tecnicas-wrapper');
+    let techIcon = document.getElementById('tecnicas-toggle-icon');
+    if (techWrapper && techIcon) {
+        if (currentChar.info.tecnicasColapsado) {
+            techWrapper.style.display = 'none';
+            techIcon.textContent = '◀';
+        } else {
+            techWrapper.style.display = 'block';
+            techIcon.textContent = '▼';
+        }
+    }
 
     let activeAmiStats = 0;
     if(currentChar.info.hasAmiAlc) activeAmiStats++;

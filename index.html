@@ -288,7 +288,7 @@
 
     <div>
         <div class="box">
-            <div class="box-title">Inventário, Técnicas e NPCs</div>
+            <div class="box-title">Inventário e NPCs</div>
             <div class="input-row">
                 <div class="input-group"><label>NPCs Comuns</label><textarea id="info-npcsC" oninput="updateField('info', 'npcsC', this.value)"></textarea></div>
                 <div class="input-group"><label>NPCs Especiais</label><textarea id="info-npcsE" placeholder="🔒" oninput="updateField('info', 'npcsE', this.value)"></textarea></div>
@@ -297,9 +297,16 @@
                 <label>Inventário</label>
                 <textarea id="info-inventario" placeholder="* Item 1&#10;* Item 2" style="min-height: 120px;" oninput="updateField('info', 'inventario', this.value)"></textarea>
             </div>
-            <div class="input-group">
+        </div>
+
+        <div class="box">
+            <div class="box-title" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: none; padding-bottom: 0;" onclick="toggleTecnicasCollapse()" title="Clique para minimizar ou maximizar">
+                <span>Técnicas</span>
+                <span id="tecnicas-toggle-icon" style="font-size: 14px;">▼</span>
+            </div>
+            <div id="tecnicas-wrapper" class="input-group" style="margin-top: 15px; border-top: 1px dashed #444; padding-top: 15px;">
                 <label style="display:flex; justify-content:space-between; align-items:center;">
-                    Técnicas
+                    Lista de Técnicas
                     <button type="button" class="btn btn-outline btn-success" style="font-size: 10px; padding: 2px 6px;" onclick="addTecnica()">+ Adicionar Técnica</button>
                 </label>
                 <div id="tecnicas-container"></div>
