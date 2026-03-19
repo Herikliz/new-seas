@@ -1089,12 +1089,20 @@ function updateUI() {
     let inWater = (rc === "Sereiano" || rc === "Tritão" || ln === "Neptune" || (ln === "Charlotte" && (rc2 === "Sereiano" || rc2 === "Tritão")));
     let totalHP = 10000 + Math.round(R * (1 + bonus.r));
 
+    let formatHistPers = (text) => {
+        return text.split('\n').map(l => {
+            let trimL = l.trim();
+            if (trimL === "") return "";
+            return '> ' + trimL.replace(/^>\s*/, '');
+        }).join('\n');
+    };
+
     let histPersOut = "";
     if(i.personalidade && i.personalidade.trim() !== "") {
-        histPersOut += `\n  : ᓩ _𝐏ᴇʀsᴏɴᴀʟɪᴅᴀᴅᴇ:_\n> ${i.personalidade}\n`;
+        histPersOut += `\n  : ᓩ _𝐏ᴇʀsᴏɴᴀʟɪᴅᴀᴅᴇ:_\n${formatHistPers(i.personalidade)}\n`;
     }
     if(i.historia && i.historia.trim() !== "") {
-        histPersOut += `\n  : ᓩ _𝐇ɪsᴛᴏ́ʀɪᴀ:_\n> ${i.historia}\n`;
+        histPersOut += `\n  : ᓩ _𝐇ɪsᴛᴏ́ʀɪᴀ:_\n${formatHistPers(i.historia)}\n`;
     }
 
     let attrOut = "";
