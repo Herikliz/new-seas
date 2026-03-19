@@ -11,7 +11,7 @@ let db = null;
 let isFirebaseReady = false;
 
 let isReadOnly = false;
-const MASTER_PASSWORD = "Ben10";
+const ADMIN_PASSWORD = "Ben10";
 
 let currentDocId = ''; 
 document.getElementById('doc-id').value = currentDocId;
@@ -168,7 +168,7 @@ async function deleteCurrentChar() {
 
     if (charData.password && charData.password.trim() !== "") {
         let pwd = await customPrompt("Digite a senha da ficha para confirmar a exclusão:");
-        if (pwd !== charData.password && pwd !== MASTER_PASSWORD) {
+        if (pwd !== charData.password && pwd !== ADMIN_PASSWORD) {
             if (pwd !== null) await customAlert("Senha incorreta! Exclusão cancelada.");
             return;
         }
@@ -338,7 +338,7 @@ async function loadFromCloud() {
 
           if (data.password && data.password.trim() !== '') {
               let entered = await customPrompt("Esta ficha é protegida por senha. Digite a senha para editar (ou cancele para apenas visualizar a ficha):");
-              if (entered !== data.password && entered !== MASTER_PASSWORD) {
+              if (entered !== data.password && entered !== ADMIN_PASSWORD) {
                   isReadOnly = true;
                   if(entered !== null) await customAlert("Senha incorreta. A ficha foi aberta no Modo de Leitura.");
               } else {
@@ -391,7 +391,7 @@ async function managePassword() {
 
     if (charData.password && charData.password.trim() !== "") {
         let oldPass = await customPrompt("Digite a senha atual para autorizar a mudança:");
-        if (oldPass === charData.password || oldPass === MASTER_PASSWORD) {
+        if (oldPass === charData.password || oldPass === ADMIN_PASSWORD) {
             let newPass = await customPrompt("Digite a nova senha (ou deixe totalmente em branco para REMOVER a proteção atual):");
             if (newPass !== null) {
                 charData.password = newPass.trim();
@@ -628,7 +628,7 @@ async function handlePatenteChange(val) {
                 finalVal = "";
             }
         } else {
-            if (pwd === MASTER_PASSWORD) {
+            if (pwd === ADMIN_PASSWORD) {
                 let discurso = currentChar.info.orgTipo === "Marinha" ? "Você é merecedor sim! A Justiça Absoluta prevalecerá! Que os mares temam a nossa fúria!" : "Você é merecedor sim! A ordem do mundo reside em nossas mãos. O equilíbrio será mantido a qualquer custo!";
                 await customAlert(discurso);
             } else {
@@ -1471,8 +1471,8 @@ async function changeFichaID() {
     try {
         const docRef = await db.collection("fichas_op").doc(novoId).get();
         if (docRef.exists) {
-            let conf = await customPrompt(`ATENÇÃO: Já existe uma ficha salva no ID "${novoId}". Digite a SENHA MESTRA para sobrescrevê-la e apagar a ficha que está lá:`);
-            if (conf !== MASTER_PASSWORD) {
+            let conf = await customPrompt(`ATENÇÃO: Já existe uma ficha salva no ID "${novoId}". Digite a SENHA DE ADM para sobrescrevê-la e apagar a ficha que está lá:`);
+            if (conf !== ADMIN_PASSWORD) {
                 document.getElementById('db-status').classList.remove('syncing');
                 if (conf !== null) await customAlert("Senha incorreta! Operação cancelada.");
                 return;
@@ -1501,5 +1501,46 @@ document.body.addEventListener('input', function(e) {
         e.target.style.height = (e.target.scrollHeight) + 'px';
     }
 });
+
+async function deleteFichaID() {
+    if (!isFirebaseReady || !db) return;
+    
+    if (currentDocId === '') {
+        await customAlert("Nenhuma ficha foi carregada para ser apagada.");
+        return;
+    }
+
+    let conf = await customPrompt(`ATENÇÃO: Você está prestes a apagar COMPLETAMENTE o ID "${currentDocId}" do banco de dados. Digite a SENHA DE ADM para confirmar:`);
+    
+    if (conf !== ADMIN_PASSWORD) {
+        if (conf !== null) await customAlert("Senha de ADM incorreta! Operação cancelada.");
+        return;
+    }
+
+    document.getElementById('db-status').classList.add('syncing');
+
+    try {
+        await db.collection("fichas_op").doc(currentDocId).delete();
+        
+        currentDocId = '';
+        document.getElementById('doc-id').value = '';
+        charData = { password: "", pcs: [] };
+        isReadOnly = false;
+        
+        runFallbackChecks();
+        currentChar = charData.pcs[0].pc;
+        renderTabs();
+        renderTecnicas();
+        renderLogs();
+        updateUI();
+        toggleEditability();
+        
+        document.getElementById('db-status').classList.remove('syncing');
+        await customAlert(`Sucesso! O ID foi completamente apagado.`);
+    } catch (e) {
+        document.getElementById('db-status').classList.remove('syncing');
+        await customAlert("Erro de conexão ao tentar apagar o ID.");
+    }
+}
 
 window.onload = init;
