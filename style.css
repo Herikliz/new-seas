@@ -110,7 +110,7 @@ option { color: var(--text); font-family: 'Lora', serif; font-weight: normal; }
 
 .box { transition: all 0.3s ease; }
 .box.collapsed > *:not(.box-title) { display: none !important; }
-.box-title { cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; user-select: none; }
-.box-title:hover { color: var(--text); }
-.box-title::after { content: '▼'; font-size: 10px; color: #888; }
-.box.collapsed .box-title::after { content: '▶'; }
+.collapsible-title { cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; user-select: none; }
+.collapsible-title:hover { color: var(--text); }
+.collapsible-title::after { content: '▼'; font-size: 10px; color: #888; }
+.box.collapsed .collapsible-title::after { content: '▶'; }
