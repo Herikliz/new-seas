@@ -489,7 +489,7 @@ function runFallbackChecks() {
           if (typeof c.info.recompensa === 'string') c.info.recompensa = parseInt(c.info.recompensa.replace(/\D/g, "")) || "";
           if (typeof c.info.berries === 'string') c.info.berries = parseInt(c.info.berries.replace(/\D/g, "")) || "";
 
-          const defInfo = { classe: "Arqueólogo 1", classe2: "", classe3: "", classe4: "", classe5: "", raca: "Humano", raca2: "Humano", animal: "", animal2: "", linhagem: "Nenhuma", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp", alcunha: "", recompensa: "", altura: "", idade: "", sexo: "Masculino", sangue: "A+", nacionalidade: "", localizacao: "", orgTipo: "Pirata", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, tecnicasColapsado: false };
+          const defInfo = { classe: "Arqueólogo 1", classe2: "", classe3: "", classe4: "", classe5: "", raca: "Humano", raca2: "Humano", animal: "", animal2: "", linhagem: "Nenhuma", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp", alcunha: "", recompensa: "", altura: "", idade: "", sexo: "Masculino", sangue: "A+", nacionalidade: "", localizacao: "", orgTipo: "Pirata", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, tecnicasColapsado: false, logsColapsado: false, resumoColapsado: false };
           for(let k in defInfo) if (typeof c.info[k] === 'undefined') c.info[k] = defInfo[k];
           if (!c.stats) c.stats = { f: 0, d: 0, r: 0, v: 0, esp: 0, ami: 0 };
           if (!c.substats) c.substats = { refl: 0, vcorp: 0, hArm: 0, hObs: 0, hRei: 0, amiAlc: 0, amiDur: 0, amiPot: 0, amiVel: 0 };
@@ -528,6 +528,18 @@ function updateTecnica(idx, field, val) {
 
 function toggleTecnicasCollapse() {
     currentChar.info.tecnicasColapsado = !currentChar.info.tecnicasColapsado;
+    saveData();
+    updateUI();
+}
+
+function toggleLogsCollapse() {
+    currentChar.info.logsColapsado = !currentChar.info.logsColapsado;
+    saveData();
+    updateUI();
+}
+
+function toggleResumoCollapse() {
+    currentChar.info.resumoColapsado = !currentChar.info.resumoColapsado;
     saveData();
     updateUI();
 }
@@ -1136,6 +1148,30 @@ function updateUI() {
         } else {
             techWrapper.style.display = 'block';
             techIcon.textContent = '▼';
+        }
+    }
+
+    let logsWrapper = document.getElementById('logs-wrapper');
+    let logsIcon = document.getElementById('logs-toggle-icon');
+    if (logsWrapper && logsIcon) {
+        if (currentChar.info.logsColapsado) {
+            logsWrapper.style.display = 'none';
+            logsIcon.textContent = '◀';
+        } else {
+            logsWrapper.style.display = 'block';
+            logsIcon.textContent = '▼';
+        }
+    }
+
+    let resumoWrapper = document.getElementById('resumo-wrapper');
+    let resumoIcon = document.getElementById('resumo-toggle-icon');
+    if (resumoWrapper && resumoIcon) {
+        if (currentChar.info.resumoColapsado) {
+            resumoWrapper.style.display = 'none';
+            resumoIcon.textContent = '◀';
+        } else {
+            resumoWrapper.style.display = 'block';
+            resumoIcon.textContent = '▼';
         }
     }
 
