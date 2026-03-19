@@ -417,7 +417,7 @@ function toggleEditability() {
     const elements = document.querySelectorAll('.container input:not(#info-salario), .container select, .container textarea, .container button');
     let isNPC = currentChar.isNPC;
     elements.forEach(el => {
-        if(el.innerText && (el.innerText.includes("Copiar Ficha") || el.innerText.includes("Copiar Log"))) {
+        if((el.innerText && el.innerText.includes("Copiar")) || el.id === 'num-logs-copy') {
             el.disabled = false;
             return;
         }
