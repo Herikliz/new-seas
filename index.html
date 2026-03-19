@@ -324,7 +324,11 @@
                 <span id="resumo-toggle-icon" style="font-size: 14px;">▼</span>
             </div>
             <div id="resumo-wrapper" style="margin-top: 15px; border-top: 1px dashed #444; padding-top: 15px;">
-                <button class="btn btn-outline" style="color:var(--success); border-color:var(--success); margin-bottom: 15px;" onclick="copyFicha()">📋 Copiar Ficha</button>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <button class="btn btn-outline" style="color:var(--success); border-color:var(--success);" onclick="copyFicha()">📋 Copiar Ficha</button>
+                    <button class="btn btn-outline" style="color:var(--info); border-color:var(--info);" onclick="copyAtributos()">📋 Copiar Atributos</button>
+                    <button class="btn btn-outline" style="color:var(--warning); border-color:var(--warning);" onclick="copyTecnicas()">📋 Copiar Técnicas</button>
+                </div>
                 <pre id="resBox"></pre>
             </div>
         </div>
