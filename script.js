@@ -370,7 +370,11 @@ function saveData() {
   if (isFirebaseReady && db && currentDocId !== '') {
       document.getElementById('db-status').classList.add('syncing');
       db.collection('fichas_op').doc(currentDocId).set(charData)
-        .then(() => { setTimeout(() => document.getElementById('db-status').classList.remove('syncing'), 300); })
+        .then(() => { 
+            setTimeout(() => document.getElementById('db-status').classList.remove('syncing'), 300); 
+            let toast = document.getElementById('save-toast');
+            if(toast) { toast.style.opacity = '1'; setTimeout(() => toast.style.opacity = '0', 2000); }
+        })
         .catch(error => { document.getElementById('db-status').classList.remove('syncing'); document.getElementById('db-status').classList.remove('online'); });
   }
 }
@@ -1484,5 +1488,39 @@ async function changeFichaID() {
         await customAlert("Erro de conexão ao tentar mudar o ID.");
     }
 }
+
+document.body.addEventListener('input', function(e) {
+    if (e.target.tagName.toLowerCase() === 'textarea') {
+        e.target.style.height = 'auto';
+        e.target.style.height = (e.target.scrollHeight) + 'px';
+    }
+});
+
+function applyUXImprovements() {
+    document.querySelectorAll('.box').forEach(box => {
+        if (!box.classList.contains('collapsed')) {
+            box.classList.add('collapsed');
+        }
+        let title = box.querySelector('.box-title');
+        if (title && !title.hasAttribute('data-clickable')) {
+            title.setAttribute('data-clickable', 'true');
+            title.onclick = () => {
+                box.classList.toggle('collapsed');
+                if (!box.classList.contains('collapsed')) {
+                    box.querySelectorAll('textarea').forEach(ta => {
+                        ta.style.height = 'auto';
+                        ta.style.height = (ta.scrollHeight) + 'px';
+                    });
+                }
+            };
+        }
+    });
+}
+
+let originalInit = init;
+init = function() {
+    originalInit();
+    applyUXImprovements();
+};
 
 window.onload = init;

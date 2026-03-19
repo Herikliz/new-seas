@@ -18,6 +18,7 @@ body {
   font-family: 'Lora', serif; 
 }
 header { 
+  position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.5);
   background-color: #111; 
   padding: 15px; 
   text-align: center; 
@@ -60,7 +61,7 @@ input:disabled, textarea:disabled, select:disabled { background-color: #1a1a1a; 
 .currency-input span { padding-left: 10px; padding-right: 5px; color: #b3b3b3; font-weight: bold; font-family: 'Lora', serif; }
 .currency-input input { border: none; background: transparent; box-shadow: none; border-radius: 0; padding-left: 0; width: 100%; margin: 0;}
 .currency-input input:focus { outline: none; border: none; background: transparent; }
-textarea { resize: vertical; min-height: 80px; text-align: justify; line-height: 1.5; }
+textarea { overflow: hidden; resize: none; min-height: 80px; text-align: justify; line-height: 1.5; }
 .box-title, label { font-family: 'Cinzel', serif; color: #b3b3b3; }
 .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;}
 .three-col-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; align-items: start; margin-bottom: 20px;}
@@ -106,3 +107,10 @@ option { color: var(--text); font-family: 'Lora', serif; font-weight: normal; }
   font-size: 14px;
   font-family: 'Lora', serif;
 }
+
+.box { transition: all 0.3s ease; }
+.box.collapsed > *:not(.box-title) { display: none !important; }
+.box-title { cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; user-select: none; }
+.box-title:hover { color: var(--text); }
+.box-title::after { content: '▼'; font-size: 10px; color: #888; }
+.box.collapsed .box-title::after { content: '▶'; }
