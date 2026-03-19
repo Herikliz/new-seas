@@ -33,6 +33,34 @@ const locais = {
 const allStyles = ["Nenhum", "Armadilha de Cores", "Arsenal", "Arte do Tempo", "Artista Marcial", "Atirador", "Black Cat", "Boujutsu", "Boxe", "Combate Gigante", "Combate Tontatta", "Cortes Precisos", "Electro", "Escultura de Forma", "Fencing", "Freestyle", "Fúria das Marés", "Galaxy Combat", "Hasshoken", "Impacto Estrutural", "Instinto Animal", "Jao Kun Dō", "Karatê Homem-Peixe", "Kitsunebi-ryū", "Kozuki-Nitōryū", "Kung Fu", "Melodia Impactante", "Mutōryū", "Ninjutsu", "Okama Kenpō", "Paladino", "Perna Negra", "Punchstyle", "Punho Suave", "Ranger", "Rokushiki", "Rope Action", "Seimei Kikan", "Sinfonia Ilusória", "Stinstyle", "Sumô", "Swordstyle", "Tōryū", "Yaristyle"];
 const classStyles = {"Arqueólogo":["Instinto Animal"],"Artista":["Armadilha de Cores","Escultura de Forma"],"Atirador":["Atirador"],"Carpinteiro":["Impacto Estrutural","Rope Action"],"Cientista":["Punho Suave"],"Combatente":["Freestyle"],"Cozinheiro":["Cortes Precisos","Perna Negra"],"Ferreiro":["Impacto Estrutural","Rope Action"],"Inventor":["Impacto Estrutural","Rope Action"],"Médico":["Punho Suave"],"Musicista":["Melodia Impactante","Sinfonia Ilusória"],"Navegador":["Arte do Tempo","Fúria das Marés"]};
 
+const patenteGender = {
+  "Aprendiz": {m: "Aprendiz", f: "Aprendiz"},
+  "Marinheiro": {m: "Marinheiro", f: "Marinheira"},
+  "Cabo": {m: "Cabo", f: "Cabo"},
+  "Sargento": {m: "Sargento", f: "Sargento"},
+  "Tenente": {m: "Tenente", f: "Tenente"},
+  "Comandante": {m: "Comandante", f: "Comandante"},
+  "Capitão": {m: "Capitão", f: "Capitã"},
+  "Comodoro": {m: "Comodoro", f: "Comodoro"},
+  "Contra-Almirante": {m: "Contra-Almirante", f: "Contra-Almirante"},
+  "Vice-Almirante": {m: "Vice-Almirante", f: "Vice-Almirante"},
+  "Almirante": {m: "Almirante", f: "Almirante"},
+  "Almirante-de-Frota": {m: "Almirante-de-Frota", f: "Almirante-de-Frota"},
+  "Agente Judicial": {m: "Agente Judicial", f: "Agente Judicial"},
+  "CP-1": {m: "CP-1", f: "CP-1"},
+  "CP-2": {m: "CP-2", f: "CP-2"},
+  "CP-3": {m: "CP-3", f: "CP-3"},
+  "CP-4": {m: "CP-4", f: "CP-4"},
+  "CP-5": {m: "CP-5", f: "CP-5"},
+  "CP-6": {m: "CP-6", f: "CP-6"},
+  "CP-7": {m: "CP-7", f: "CP-7"},
+  "CP-8": {m: "CP-8", f: "CP-8"},
+  "CP-9": {m: "CP-9", f: "CP-9"},
+  "CP-0": {m: "CP-0", f: "CP-0"},
+  "Gorosei": {m: "Gorosei", f: "Gorosei"},
+  "Líder do Governo": {m: "Líder do Governo", f: "Líder do Governo"}
+};
+
 const baseClassGender = {
   "Arqueólogo": {m: "Arqueólogo", f: "Arqueóloga"},
   "Artista": {m: "Artista", f: "Artista"},
@@ -765,7 +793,11 @@ function updateUI() {
         let selPatente = document.getElementById('info-patente');
         if (selPatente) {
             let html = "";
-            options.forEach(p => html += `<option value="${p}">${p}</option>`);
+            let gKey = currentChar.info.sexo === 'Feminino' ? 'f' : 'm';
+            options.forEach(p => {
+                let dName = (p !== "" && patenteGender[p]) ? patenteGender[p][gKey] : p;
+                html += `<option value="${p}">${dName}</option>`;
+            });
             if(selPatente.innerHTML !== html) selPatente.innerHTML = html;
             
             if(options.includes(currentChar.info.patente)) {
@@ -1191,7 +1223,12 @@ function updateUI() {
             orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ:_\n* Pirata\n`;
         }
     } else {
-        orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ | 𝐏ᴀᴛᴇɴᴛᴇ | 𝐒ᴀʟᴀ́ʀɪᴏ:_\n* ${i.orgTipo}\n* ${i.patente || ''}\n* ${i.salario ? '฿' + i.salario : ''}\n`;
+        let displayPatente = i.patente || '';
+        if (displayPatente !== "") {
+            let gKey = i.sexo === 'Feminino' ? 'f' : 'm';
+            displayPatente = patenteGender[displayPatente] ? patenteGender[displayPatente][gKey] : displayPatente;
+        }
+        orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ | 𝐏ᴀᴛᴇɴᴛᴇ | 𝐒ᴀʟᴀ́ʀɪᴏ:_\n* ${i.orgTipo}\n* ${displayPatente}\n* ${i.salario ? '฿' + i.salario : ''}\n`;
     }
 
     let outRecompensa = i.recompensa ? `฿${i.recompensa.toLocaleString("pt-BR")}` : '🔒';
