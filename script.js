@@ -1496,35 +1496,4 @@ document.body.addEventListener('input', function(e) {
     }
 });
 
-function applyUXImprovements() {
-    const targetTitles = ["História e Personalidade", "Inventário, Técnicas e NPCs", "Resumo da Ficha Pronta", "Log de Atualizações"];
-    document.querySelectorAll('.box').forEach(box => {
-        let title = box.querySelector('.box-title');
-        if (title && targetTitles.includes(title.textContent.trim())) {
-            title.classList.add('collapsible-title');
-            if (!box.classList.contains('collapsed')) {
-                box.classList.add('collapsed');
-            }
-            if (!title.hasAttribute('data-clickable')) {
-                title.setAttribute('data-clickable', 'true');
-                title.onclick = () => {
-                    box.classList.toggle('collapsed');
-                    if (!box.classList.contains('collapsed')) {
-                        box.querySelectorAll('textarea').forEach(ta => {
-                            ta.style.height = 'auto';
-                            ta.style.height = (ta.scrollHeight) + 'px';
-                        });
-                    }
-                };
-            }
-        }
-    });
-}
-
-let originalInit = init;
-init = function() {
-    originalInit();
-    applyUXImprovements();
-};
-
 window.onload = init;
