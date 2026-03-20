@@ -489,7 +489,7 @@ function runFallbackChecks() {
           if (typeof c.info.recompensa === 'string') c.info.recompensa = parseInt(c.info.recompensa.replace(/\D/g, "")) || "";
           if (typeof c.info.berries === 'string') c.info.berries = parseInt(c.info.berries.replace(/\D/g, "")) || "";
 
-          const defInfo = { classe: "Arqueólogo 1", classe2: "", classe3: "", classe4: "", classe5: "", raca: "Humano", raca2: "Humano", animal: "", animal2: "", linhagem: "Nenhuma", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp", alcunha: "", recompensa: "", altura: "", idade: "", sexo: "Masculino", sangue: "A+", nacionalidade: "", localizacao: "", orgTipo: "Pirata", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, tecnicasColapsado: false, logsColapsado: false, resumoColapsado: false };
+          const defInfo = { classe: "Arqueólogo 1", classe2: "", classe3: "", classe4: "", classe5: "", raca: "Humano", raca2: "Humano", animal: "", animal2: "", linhagem: "Nenhuma", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp", alcunha: "", recompensa: "", altura: "", idade: "", sexo: "Masculino", sangue: "A+", nacionalidade: "", localizacao: "", orgTipo: "Pirata", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, tecnicasColapsado: false, logsColapsado: false, resumoColapsado: false, akumaId: "" };
           for(let k in defInfo) if (typeof c.info[k] === 'undefined') c.info[k] = defInfo[k];
           if (!c.stats) c.stats = { f: 0, d: 0, r: 0, v: 0, esp: 0, ami: 0 };
           if (!c.substats) c.substats = { refl: 0, vcorp: 0, hArm: 0, hObs: 0, hRei: 0, amiAlc: 0, amiDur: 0, amiPot: 0, amiVel: 0 };
@@ -1632,3 +1632,67 @@ async function deleteFichaID() {
 }
 
 window.onload = init;
+
+window.selecionarAkuma = async function(novoAkumaId) {
+    let oldAkumaId = currentChar.info.akumaId;
+    let selectEl = document.getElementById('select-akuma');
+    
+    if(novoAkumaId === "nenhuma") {
+        currentChar.info.akumaNome = "";
+        currentChar.info.akumaId = "";
+    } else {
+        let novoNome = selectEl.options[selectEl.selectedIndex].text.replace(' [Pendente]', '').replace(' [Aprovada]', '');
+        currentChar.info.akumaNome = novoNome;
+        currentChar.info.akumaId = novoAkumaId;
+        await db.collection("lista_one_piece_db").doc(novoAkumaId).update({
+            pedidoPor: currentDocId,
+            pedidoNome: currentChar.info.alcunha || "Desconhecido"
+        });
+    }
+
+    if(oldAkumaId && oldAkumaId !== novoAkumaId) {
+        await db.collection("lista_one_piece_db").doc(oldAkumaId).update({
+            pedidoPor: null,
+            pedidoNome: null
+        });
+    }
+
+    saveData();
+    updateUI();
+};
+
+db.collection("lista_one_piece_db").onSnapshot((snapshot) => {
+    let selectEl = document.getElementById('select-akuma');
+    if(!selectEl) return;
+    
+    let currentVal = currentChar?.info?.akumaId || "nenhuma";
+    selectEl.innerHTML = '<option value="nenhuma">Nenhuma</option>';
+    
+    snapshot.forEach(documento => {
+        let d = documento.data();
+        if(d.type === 'Akuma no Mi') {
+            if(!d.ocupada && !d.pedidoPor) {
+                let opt = document.createElement('option');
+                opt.value = documento.id;
+                opt.textContent = `${d.name} (${d.subtype})`;
+                selectEl.appendChild(opt);
+            } else if(documento.id === currentVal) {
+                let opt = document.createElement('option');
+                opt.value = documento.id;
+                opt.textContent = `${d.name} (${d.subtype}) ${d.ocupada ? '[Aprovada]' : '[Pendente]'}`;
+                selectEl.appendChild(opt);
+            }
+        }
+    });
+    selectEl.value = currentVal;
+});
+
+setInterval(() => {
+    let selectEl = document.getElementById('select-akuma');
+    if(selectEl && currentChar && currentChar.info) {
+        let expectedVal = currentChar.info.akumaId || "nenhuma";
+        if(selectEl.value !== expectedVal && selectEl.querySelector(`option[value="${expectedVal}"]`)) {
+            selectEl.value = expectedVal;
+        }
+    }
+}, 1000);
