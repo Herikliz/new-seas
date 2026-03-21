@@ -20,16 +20,6 @@ const baseClassesList = ["Arqueólogo", "Artista", "Atirador", "Carpinteiro", "C
 const racas = { "Braços Longos":{f:.40}, "Bucaneiro":{f:.40,r:.40}, "Gigante":{f:.30,r:.30,v:-.20}, "Humano":{}, "Kuja":{}, "Kumate":{d:.40}, "Lunariano":{v:.35,r:.45}, "Meio-Gigante":{f:.25,r:.25}, "Mink":{v:.15,r:.15}, "Oni":{f:.35,r:.45}, "Pernas Longas":{v:.40}, "Povo do Céu: Birkan":{d:.20,v:.20}, "Povo do Céu: Shandia":{d:.20,v:.20}, "Povo do Céu: Skypieano":{d:.20,v:.20}, "Sereiano":{v:.40}, "Tontatta":{f:.20,v:.20}, "Três-Olhos":{v:.15,r:.15}, "Tritão":{f:.20,r:.20,v:.30}, "Wotan":{f:.25,r:.25} };
 const linhagens = { "Nenhuma":{}, "Augur":{v:.10,d:.20,req:["Humano"]}, "Barnum":{req:["Braços Longos","Pernas Longas","Kumate","Três-Olhos"]}, "Boa":{f:.15,ha:.15,req:["Kuja"]}, "Capone":{v:.10,d:.15,req:["Humano"]}, "Charlotte":{charlotte:true}, "Chinjao":{f:.15,r:.15,req:["Humano"]}, "D.":{}, "Dracule":{d:.20,ho:.10,req:["Humano"]}, "Drole":{f:.20,r:.10,v:.10,req:["Gigante","Meio-Gigante","Wotan"]}, "Família do Sol":{f:.15,r:.15,req:["Tritão","Sereiano","Wotan"]}, "Gan":{esp:.15,req:["Povo do Céu: Birkan","Povo do Céu: Shandia","Povo do Céu: Skypieano"]}, "Kong":{req:["Humano"]}, "Kozuki":{v:.10,d:.10,esp:.10,req:["Humano"]}, "Kurozumi":{v:.10,d:.20,req:["Humano"]}, "Laufey":{r:.20,f:.10,v:-.20,req:["Gigante"]}, "Mokomo":{v:.10,req:["Mink"]}, "Nefertari":{d:.15,v:.15,req:["Humano"]}, "Neptune":{v:.25,req:["Sereiano"]}, "Newgate":{f:.10,r:.20,req:["Humano","Meio-Gigante"]}, "Sakazuki":{r:.10,f:.20,req:["Humano"]}, "Silvers":{esp:.15,req:["Humano"]}, "Tenryūbito: Família Donquixote":{d:.15,ami:.15,req:["Humano"]}, "Tenryūbito: Família Figarland":{d:.15,esp:.15,req:["Humano"]} };
 
-const locais = {
-  "East Blue": ["Base da Marinha G-03", "Clockwork", "Conomi", "Cozia", "Dawn", "Gecko", "Goat", "Ilha Shimotsuki", "Ilha dos Animais Raros", "Ilha Navio de Guerra", "Kumate", "Mirrorball", "Organ", "Oykot", "Polestar", "Tequila Wolf", "Yotsuba"],
-  "South Blue": ["Base da Marinha G-10", "Baterilla", "Briss", "Centaurea", "Karate", "Kutsukku", "Reino Negro de Drum", "Roshwan", "Samba", "Samuwanai", "Sorbet", "Taya", "Torino", "Tumi", "Vespa"],
-  "West Blue": ["Ballywood", "Base da Marinha G-12", "God Valley", "Ilusia", "Kano", "Las Camp", "Ohara", "Soja", "Thriller Bark", "Toroa"],
-  "North Blue": ["Base da Marinha G-11", "Deul", "Downs", "Flevance", "Kuen", "Lvneel", "Minion", "Notice", "Polo Norte", "Rakesh", "Rubeck", "Spider Miles", "Swallow", "Welbems", "Whiteland"],
-  "Paraíso": ["Baltigo", "Banaro", "Base da Marinha G-01", "Base da Marinha G-02", "Base da Marinha G-08", "Boin", "Cactus", "Corrente Tarai", "Drum", "Enies Lobby", "Foolshout", "Ilha dos Homens-Peixe", "Ilha Spa", "Jaya", "Karakuri", "Kenzan", "Kuraigana", "Kyuka", "Little Garden", "Long Ring Long Land", "Mary Geoise", "Merveille", "Momoiro", "Namakura", "Nanimonai", "Pucci", "Reino Lulusia", "Sabaody", "San Faldo", "Sandy", "Skypiea", "Water 7"],
-  "Novo Mundo": ["Applenine", "Base da Marinha G-09", "Base da Marinha G-13", "Base da Marinha G-14", "Base da Marinha G-15", "Dressrosa", "Egghead", "Elbaf", "Foodvalten", "Hachinosu", "Mystoria", "Prodence", "Punk Hazard", "Raijin", "Risky Red", "Wano", "Whole Cake", "Yukiryu", "Zou"],
-  "Calm Belt": ["Amazon Lily", "Base da Marinha G-04", "Base da Marinha G-05", "Base da Marinha G-06", "Base da Marinha G-07", "Impel Down", "Rusukaina", "Shitsurakujima"]
-};
-
 const allStyles = ["Nenhum", "Armadilha de Cores", "Arsenal", "Arte do Tempo", "Artista Marcial", "Atirador", "Black Cat", "Boujutsu", "Boxe", "Combate Gigante", "Combate Tontatta", "Cortes Precisos", "Electro", "Escultura de Forma", "Fencing", "Freestyle", "Fúria das Marés", "Galaxy Combat", "Hasshoken", "Impacto Estrutural", "Instinto Animal", "Jao Kun Dō", "Karatê Homem-Peixe", "Kitsunebi-ryū", "Kozuki-Nitōryū", "Kung Fu", "Melodia Impactante", "Mutōryū", "Ninjutsu", "Okama Kenpō", "Paladino", "Perna Negra", "Punchstyle", "Punho Suave", "Ranger", "Rokushiki", "Rope Action", "Seimei Kikan", "Sinfonia Ilusória", "Stinstyle", "Sumô", "Swordstyle", "Tōryū", "Yaristyle"];
 const classStyles = {"Arqueólogo":["Instinto Animal"],"Artista":["Armadilha de Cores","Escultura de Forma"],"Atirador":["Atirador"],"Carpinteiro":["Impacto Estrutural","Rope Action"],"Cientista":["Punho Suave"],"Combatente":["Freestyle"],"Cozinheiro":["Cortes Precisos","Perna Negra"],"Ferreiro":["Impacto Estrutural","Rope Action"],"Inventor":["Impacto Estrutural","Rope Action"],"Médico":["Punho Suave"],"Musicista":["Melodia Impactante","Sinfonia Ilusória"],"Navegador":["Arte do Tempo","Fúria das Marés"]};
 
@@ -609,16 +599,7 @@ function renderLogs() {
 }
 
 function populateSelects() {
-    let locationHtml = `<option value="">-- Selecione --</option>`;
-    for(let region in locais) {
-        locationHtml += `<optgroup label="${region}">`;
-        locais[region].forEach(loc => {
-            locationHtml += `<option value="${loc}">${loc}</option>`;
-        });
-        locationHtml += `</optgroup>`;
-    }
-    document.getElementById('info-nacionalidade').innerHTML = locationHtml;
-    document.getElementById('info-localizacao').innerHTML = locationHtml;
+
 }
 
 function updateField(category, field, value) { 
@@ -1662,37 +1643,95 @@ window.selecionarAkuma = async function(novoAkumaId) {
 };
 
 db.collection("lista_one_piece_db").onSnapshot((snapshot) => {
-    let selectEl = document.getElementById('select-akuma');
-    if(!selectEl) return;
+    let selectAkuma = document.getElementById('select-akuma');
+    let selectNac = document.getElementById('info-nacionalidade');
+    let selectLoc = document.getElementById('info-localizacao');
     
-    let currentVal = currentChar?.info?.akumaId || "nenhuma";
-    selectEl.innerHTML = '<option value="nenhuma">Nenhuma</option>';
+    let currentAkumaVal = currentChar?.info?.akumaId || "nenhuma";
+    let currentNacVal = currentChar?.info?.nacionalidade || "";
+    let currentLocVal = currentChar?.info?.localizacao || "";
+
+    if (selectAkuma) selectAkuma.innerHTML = '<option value="nenhuma">Nenhuma</option>';
     
+    let ilhasArray = [];
+
     snapshot.forEach(documento => {
         let d = documento.data();
         if(d.type === 'Akuma no Mi') {
-            if(!d.ocupada && !d.pedidoPor) {
-                let opt = document.createElement('option');
-                opt.value = documento.id;
-                opt.textContent = `${d.name} (${d.subtype})`;
-                selectEl.appendChild(opt);
-            } else if(documento.id === currentVal) {
-                let opt = document.createElement('option');
-                opt.value = documento.id;
-                opt.textContent = `${d.name} (${d.subtype}) ${d.ocupada ? '[Aprovada]' : '[Pendente]'}`;
-                selectEl.appendChild(opt);
+            if (selectAkuma) {
+                if(!d.ocupada && !d.pedidoPor) {
+                    let opt = document.createElement('option');
+                    opt.value = documento.id;
+                    opt.textContent = `${d.name} (${d.subtype})`;
+                    selectAkuma.appendChild(opt);
+                } else if(documento.id === currentAkumaVal) {
+                    let opt = document.createElement('option');
+                    opt.value = documento.id;
+                    opt.textContent = `${d.name} (${d.subtype}) ${d.ocupada ? '[Aprovada]' : '[Pendente]'}`;
+                    selectAkuma.appendChild(opt);
+                }
             }
+        } else if (d.type === 'Ilha') {
+            ilhasArray.push(d);
         }
     });
-    selectEl.value = currentVal;
+
+    ilhasArray.sort((a, b) => a.name.localeCompare(b.name));
+
+    let mares = {};
+    ilhasArray.forEach(ilha => {
+        let mar = ilha.mar || "Outros";
+        if (!mares[mar]) mares[mar] = [];
+        mares[mar].push(ilha);
+    });
+
+    let ilhasHTML = '<option value="">Desconhecida / Nenhuma</option>';
+    const ordemMares = ['East Blue', 'West Blue', 'North Blue', 'South Blue', 'Paraíso', 'Novo Mundo', 'Calm Belt', 'Localização Desconhecida', 'Outros'];
+    
+    ordemMares.forEach(mar => {
+        if (mares[mar] && mares[mar].length > 0) {
+            ilhasHTML += `<optgroup label="${mar}">`;
+            mares[mar].forEach(ilha => {
+                ilhasHTML += `<option value="${ilha.name}">${ilha.name}</option>`;
+            });
+            ilhasHTML += `</optgroup>`;
+        }
+    });
+
+    if (selectNac) {
+        selectNac.innerHTML = ilhasHTML;
+        selectNac.value = currentNacVal;
+    }
+    if (selectLoc) {
+        selectLoc.innerHTML = ilhasHTML;
+        selectLoc.value = currentLocVal;
+    }
 });
 
 setInterval(() => {
-    let selectEl = document.getElementById('select-akuma');
-    if(selectEl && currentChar && currentChar.info) {
-        let expectedVal = currentChar.info.akumaId || "nenhuma";
-        if(selectEl.value !== expectedVal && selectEl.querySelector(`option[value="${expectedVal}"]`)) {
-            selectEl.value = expectedVal;
+    if(!currentChar || !currentChar.info) return;
+    
+    let selectAkuma = document.getElementById('select-akuma');
+    if(selectAkuma) {
+        let expectedAkuma = currentChar.info.akumaId || "nenhuma";
+        if(selectAkuma.value !== expectedAkuma && selectAkuma.querySelector(`option[value="${expectedAkuma}"]`)) {
+            selectAkuma.value = expectedAkuma;
+        }
+    }
+    
+    let selectNac = document.getElementById('info-nacionalidade');
+    if(selectNac) {
+        let expectedNac = currentChar.info.nacionalidade || "";
+        if(selectNac.value !== expectedNac && selectNac.querySelector(`option[value="${expectedNac}"]`)) {
+            selectNac.value = expectedNac;
+        }
+    }
+    
+    let selectLoc = document.getElementById('info-localizacao');
+    if(selectLoc) {
+        let expectedLoc = currentChar.info.localizacao || "";
+        if(selectLoc.value !== expectedLoc && selectLoc.querySelector(`option[value="${expectedLoc}"]`)) {
+            selectLoc.value = expectedLoc;
         }
     }
 }, 1000);
