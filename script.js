@@ -1657,24 +1657,10 @@ window.selecionarAkuma = async function(novoAkumaId) {
         currentChar.info.akumaNome = novoNome;
         currentChar.info.akumaId = novoAkumaId;
         
-        let inputNome = document.getElementById('info-nome');
-        let inputAlcunha = document.getElementById('info-alcunha');
-        let nomeDoPersonagem = "Desconhecido";
-        
-        if (inputNome && inputNome.value.trim() !== "") {
-            nomeDoPersonagem = inputNome.value.trim();
-        } else if (inputAlcunha && inputAlcunha.value.trim() !== "") {
-            nomeDoPersonagem = inputAlcunha.value.trim();
-        } else if (currentChar.info.nome) {
-            nomeDoPersonagem = currentChar.info.nome;
-        } else if (currentChar.nome) {
-            nomeDoPersonagem = currentChar.nome;
-        }
-        
         try {
             await db.collection("lista_one_piece_db").doc(novoAkumaId).update({
                 pedidoPor: currentDocId,
-                pedidoNome: nomeDoPersonagem
+                pedidoNome: currentDocId
             });
         } catch(e) {}
     }
