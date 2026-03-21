@@ -1616,31 +1616,38 @@ async function deleteFichaID() {
 window.onload = init;
 
 window.selecionarAkuma = async function(novoAkumaId) {
+    if (!currentChar.info) currentChar.info = {};
     let oldAkumaId = currentChar.info.akumaId;
     let selectEl = document.getElementById('select-akuma');
     
-    if(novoAkumaId === "nenhuma") {
+    if(novoAkumaId === "nenhuma" || !novoAkumaId) {
         currentChar.info.akumaNome = "";
         currentChar.info.akumaId = "";
     } else {
-        let novoNome = selectEl.options[selectEl.selectedIndex].text.replace(' [Pendente]', '').replace(' [Aprovada]', '');
+        let textoOpcao = selectEl.options[selectEl.selectedIndex].text;
+        let novoNome = textoOpcao.replace(' [Pendente]', '').replace(' [Aprovada]', '').split(' - ฿')[0].trim();
         currentChar.info.akumaNome = novoNome;
         currentChar.info.akumaId = novoAkumaId;
-        await db.collection("lista_one_piece_db").doc(novoAkumaId).update({
-            pedidoPor: currentDocId,
-            pedidoNome: currentChar.info.alcunha || "Desconhecido"
-        });
+        
+        try {
+            await db.collection("lista_one_piece_db").doc(novoAkumaId).update({
+                pedidoPor: currentDocId,
+                pedidoNome: currentDocId
+            });
+        } catch(e) {}
     }
 
-    if(oldAkumaId && oldAkumaId !== novoAkumaId) {
-        await db.collection("lista_one_piece_db").doc(oldAkumaId).update({
-            pedidoPor: null,
-            pedidoNome: null
-        });
+    if(oldAkumaId && oldAkumaId !== "nenhuma" && oldAkumaId !== novoAkumaId) {
+        try {
+            await db.collection("lista_one_piece_db").doc(oldAkumaId).update({
+                pedidoPor: null,
+                pedidoNome: null
+            });
+        } catch(e) {}
     }
 
-    saveData();
-    updateUI();
+    if(typeof saveData === 'function') saveData();
+    if(typeof updateUI === 'function') updateUI();
 };
 
 window.selecionarAkuma = async function(novoAkumaId) {
