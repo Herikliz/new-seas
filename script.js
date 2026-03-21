@@ -1656,10 +1656,12 @@ window.selecionarAkuma = async function(novoAkumaId) {
         currentChar.info.akumaNome = novoNome;
         currentChar.info.akumaId = novoAkumaId;
         
+        let nomeDoPersonagem = currentChar.nome || (currentChar.info && currentChar.info.nome) || (currentChar.info && currentChar.info.alcunha) || "Desconhecido";
+        
         try {
             await db.collection("lista_one_piece_db").doc(novoAkumaId).update({
                 pedidoPor: currentDocId,
-                pedidoNome: currentChar.info.nome || "Desconhecido"
+                pedidoNome: nomeDoPersonagem
             });
         } catch(e) {}
     }
