@@ -1659,7 +1659,7 @@ window.selecionarAkuma = async function(novoAkumaId) {
         try {
             await db.collection("lista_one_piece_db").doc(novoAkumaId).update({
                 pedidoPor: currentDocId,
-                pedidoNome: currentChar.info.alcunha || "Desconhecido"
+                pedidoNome: currentChar.info.nome || "Desconhecido"
             });
         } catch(e) {}
     }
