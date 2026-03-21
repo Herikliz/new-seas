@@ -1643,6 +1643,40 @@ window.selecionarAkuma = async function(novoAkumaId) {
     updateUI();
 };
 
+window.selecionarAkuma = async function(novoAkumaId) {
+    let oldAkumaId = currentChar.info.akumaId;
+    let selectEl = document.getElementById('select-akuma');
+    
+    if(novoAkumaId === "nenhuma" || !novoAkumaId) {
+        currentChar.info.akumaNome = "";
+        currentChar.info.akumaId = "";
+    } else {
+        let textoOpcao = selectEl.options[selectEl.selectedIndex].text;
+        let novoNome = textoOpcao.replace(' [Pendente]', '').replace(' [Aprovada]', '').split(' - ฿')[0].trim();
+        currentChar.info.akumaNome = novoNome;
+        currentChar.info.akumaId = novoAkumaId;
+        
+        try {
+            await db.collection("lista_one_piece_db").doc(novoAkumaId).update({
+                pedidoPor: currentDocId,
+                pedidoNome: currentChar.info.alcunha || "Desconhecido"
+            });
+        } catch(e) {}
+    }
+
+    if(oldAkumaId && oldAkumaId !== novoAkumaId) {
+        try {
+            await db.collection("lista_one_piece_db").doc(oldAkumaId).update({
+                pedidoPor: null,
+                pedidoNome: null
+            });
+        } catch(e) {}
+    }
+
+    saveData();
+    updateUI();
+};
+
 function iniciarMonitoramentoBancoDeDados() {
     db.collection("lista_one_piece_db").onSnapshot((snapshot) => {
         let selectAkuma = document.getElementById('select-akuma');
@@ -1661,15 +1695,16 @@ function iniciarMonitoramentoBancoDeDados() {
             let d = documento.data();
             if(d.type === 'Akuma no Mi') {
                 if (selectAkuma) {
+                    let txtPreco = d.preco ? ` - ฿ ${Number(d.preco).toLocaleString('pt-BR')}` : "";
                     if(!d.ocupada && !d.pedidoPor) {
                         let opt = document.createElement('option');
                         opt.value = documento.id;
-                        opt.textContent = `${d.name} (${d.subtype})`;
+                        opt.textContent = `${d.name} (${d.subtype})${txtPreco}`;
                         selectAkuma.appendChild(opt);
                     } else if(documento.id === currentAkumaVal) {
                         let opt = document.createElement('option');
                         opt.value = documento.id;
-                        opt.textContent = `${d.name} (${d.subtype}) ${d.ocupada ? '[Aprovada]' : '[Pendente]'}`;
+                        opt.textContent = `${d.name} (${d.subtype})${txtPreco} ${d.ocupada ? '[Aprovada]' : '[Pendente]'}`;
                         selectAkuma.appendChild(opt);
                     }
                 }
