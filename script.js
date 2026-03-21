@@ -1687,31 +1687,60 @@ function iniciarMonitoramentoBancoDeDados() {
         let currentNacVal = currentChar?.info?.nacionalidade || "";
         let currentLocVal = currentChar?.info?.localizacao || "";
 
-        if (selectAkuma) selectAkuma.innerHTML = '<option value="nenhuma">Nenhuma</option>';
-        
+        let akumasArray = [];
         let ilhasArray = [];
 
         snapshot.forEach(documento => {
             let d = documento.data();
-            if(d.type === 'Akuma no Mi') {
-                if (selectAkuma) {
-                    let txtPreco = d.preco ? ` - ฿ ${Number(d.preco).toLocaleString('pt-BR')}` : "";
-                    if(!d.ocupada && !d.pedidoPor) {
-                        let opt = document.createElement('option');
-                        opt.value = documento.id;
-                        opt.textContent = `${d.name} (${d.subtype})${txtPreco}`;
-                        selectAkuma.appendChild(opt);
-                    } else if(documento.id === currentAkumaVal) {
-                        let opt = document.createElement('option');
-                        opt.value = documento.id;
-                        opt.textContent = `${d.name} (${d.subtype})${txtPreco} ${d.ocupada ? '[Aprovada]' : '[Pendente]'}`;
-                        selectAkuma.appendChild(opt);
-                    }
+            d.id = documento.id;
+            
+            if (d.type === 'Akuma no Mi') {
+                if (!d.ocupada && !d.pedidoPor) {
+                    akumasArray.push(d);
+                } else if (documento.id === currentAkumaVal) {
+                    akumasArray.push(d);
                 }
             } else if (d.type === 'Ilha') {
                 ilhasArray.push(d);
             }
         });
+
+        let akumasPorTipo = { 'Paramecia': [], 'Zoan': [], 'Logia': [] };
+        
+        akumasArray.forEach(a => {
+            if (a.subtype.includes('Paramecia')) akumasPorTipo['Paramecia'].push(a);
+            else if (a.subtype.includes('Zoan')) akumasPorTipo['Zoan'].push(a);
+            else if (a.subtype === 'Logia') akumasPorTipo['Logia'].push(a);
+        });
+
+        akumasPorTipo['Paramecia'].sort((a, b) => a.name.localeCompare(b.name));
+        akumasPorTipo['Logia'].sort((a, b) => a.name.localeCompare(b.name));
+        
+        const ordemZoan = { 'Zoan': 1, 'Zoan Ancestral': 2, 'Zoan Mítica': 3 };
+        akumasPorTipo['Zoan'].sort((a, b) => {
+            let oA = ordemZoan[a.subtype] || 99;
+            let oB = ordemZoan[b.subtype] || 99;
+            if (oA !== oB) return oA - oB;
+            return a.name.localeCompare(b.name);
+        });
+
+        let akumaHTML = '<option value="nenhuma">Nenhuma</option>';
+        
+        ['Paramecia', 'Zoan', 'Logia'].forEach(tipo => {
+            if (akumasPorTipo[tipo].length > 0) {
+                akumaHTML += `<optgroup label="${tipo}">`;
+                akumasPorTipo[tipo].forEach(a => {
+                    let txtPreco = a.preco ? ` - ฿ ${Number(a.preco).toLocaleString('pt-BR')}` : "";
+                    akumaHTML += `<option value="${a.id}">${a.name} (${a.subtype})${txtPreco}</option>`;
+                });
+                akumaHTML += `</optgroup>`;
+            }
+        });
+
+        if (selectAkuma) {
+            selectAkuma.innerHTML = akumaHTML;
+            selectAkuma.value = currentAkumaVal;
+        }
 
         ilhasArray.sort((a, b) => a.name.localeCompare(b.name));
 
