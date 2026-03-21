@@ -1644,6 +1644,7 @@ window.selecionarAkuma = async function(novoAkumaId) {
 };
 
 window.selecionarAkuma = async function(novoAkumaId) {
+    if (!currentChar.info) currentChar.info = {};
     let oldAkumaId = currentChar.info.akumaId;
     let selectEl = document.getElementById('select-akuma');
     
@@ -1656,7 +1657,19 @@ window.selecionarAkuma = async function(novoAkumaId) {
         currentChar.info.akumaNome = novoNome;
         currentChar.info.akumaId = novoAkumaId;
         
-        let nomeDoPersonagem = currentChar.nome || (currentChar.info && currentChar.info.nome) || (currentChar.info && currentChar.info.alcunha) || "Desconhecido";
+        let inputNome = document.getElementById('info-nome');
+        let inputAlcunha = document.getElementById('info-alcunha');
+        let nomeDoPersonagem = "Desconhecido";
+        
+        if (inputNome && inputNome.value.trim() !== "") {
+            nomeDoPersonagem = inputNome.value.trim();
+        } else if (inputAlcunha && inputAlcunha.value.trim() !== "") {
+            nomeDoPersonagem = inputAlcunha.value.trim();
+        } else if (currentChar.info.nome) {
+            nomeDoPersonagem = currentChar.info.nome;
+        } else if (currentChar.nome) {
+            nomeDoPersonagem = currentChar.nome;
+        }
         
         try {
             await db.collection("lista_one_piece_db").doc(novoAkumaId).update({
@@ -1666,7 +1679,7 @@ window.selecionarAkuma = async function(novoAkumaId) {
         } catch(e) {}
     }
 
-    if(oldAkumaId && oldAkumaId !== novoAkumaId) {
+    if(oldAkumaId && oldAkumaId !== "nenhuma" && oldAkumaId !== novoAkumaId) {
         try {
             await db.collection("lista_one_piece_db").doc(oldAkumaId).update({
                 pedidoPor: null,
@@ -1675,8 +1688,8 @@ window.selecionarAkuma = async function(novoAkumaId) {
         } catch(e) {}
     }
 
-    saveData();
-    updateUI();
+    if(typeof saveData === 'function') saveData();
+    if(typeof updateUI === 'function') updateUI();
 };
 
 function iniciarMonitoramentoBancoDeDados() {
@@ -1685,28 +1698,25 @@ function iniciarMonitoramentoBancoDeDados() {
         let selectNac = document.getElementById('info-nacionalidade');
         let selectLoc = document.getElementById('info-localizacao');
         
-        let currentAkumaVal = currentChar?.info?.akumaId || "nenhuma";
-        let currentNacVal = currentChar?.info?.nacionalidade || "";
-        let currentLocVal = currentChar?.info?.localizacao || "";
+        let currentAkumaVal = (currentChar && currentChar.info) ? currentChar.info.akumaId : "nenhuma";
+        let currentNacVal = (currentChar && currentChar.info) ? currentChar.info.nacionalidade : "";
+        let currentLocVal = (currentChar && currentChar.info) ? currentChar.info.localizacao : "";
 
         let akumasArray = [];
         let ilhasArray = [];
+        let frutaDoJogador = null;
 
-        if (currentAkumaVal !== "nenhuma") {
-            let akumaAindaValida = false;
-            snapshot.forEach(documento => {
-                if (documento.id === currentAkumaVal) {
-                    let d = documento.data();
-                    if (d.pedidoPor === currentDocId || d.donoId === currentDocId) {
-                        akumaAindaValida = true;
-                    }
-                }
-            });
-            if (!akumaAindaValida) {
+        snapshot.forEach(documento => {
+            if (documento.id === currentAkumaVal) frutaDoJogador = documento.data();
+        });
+
+        if (currentAkumaVal !== "nenhuma" && currentAkumaVal) {
+            if (!frutaDoJogador || (frutaDoJogador.pedidoPor !== currentDocId && frutaDoJogador.donoId !== currentDocId)) {
                 if (currentChar && currentChar.info) {
                     currentChar.info.akumaId = "nenhuma";
                     currentChar.info.akumaNome = "";
                     currentAkumaVal = "nenhuma";
+                    if (selectAkuma) selectAkuma.value = "nenhuma";
                     if (typeof saveData === 'function') saveData();
                 }
             }
