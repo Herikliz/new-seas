@@ -1699,9 +1699,10 @@ function iniciarMonitoramentoBancoDeDados() {
         let akumasPorTipo = { 'Paramecia': [], 'Zoan': [], 'Logia': [] };
         
         akumasArray.forEach(a => {
-            if (a.subtype.includes('Paramecia')) akumasPorTipo['Paramecia'].push(a);
-            else if (a.subtype.includes('Zoan')) akumasPorTipo['Zoan'].push(a);
-            else if (a.subtype === 'Logia') akumasPorTipo['Logia'].push(a);
+            let st = a.subtype || "";
+            if (st.includes('Paramecia')) akumasPorTipo['Paramecia'].push(a);
+            else if (st.includes('Zoan')) akumasPorTipo['Zoan'].push(a);
+            else if (st.includes('Logia')) akumasPorTipo['Logia'].push(a);
         });
 
         akumasPorTipo['Paramecia'].sort((a, b) => a.name.localeCompare(b.name));
