@@ -1650,41 +1650,6 @@ window.selecionarAkuma = async function(novoAkumaId) {
     if(typeof updateUI === 'function') updateUI();
 };
 
-window.selecionarAkuma = async function(novoAkumaId) {
-    if (!currentChar.info) currentChar.info = {};
-    let oldAkumaId = currentChar.info.akumaId;
-    let selectEl = document.getElementById('select-akuma');
-    
-    if(novoAkumaId === "nenhuma" || !novoAkumaId) {
-        currentChar.info.akumaNome = "";
-        currentChar.info.akumaId = "";
-    } else {
-        let textoOpcao = selectEl.options[selectEl.selectedIndex].text;
-        let novoNome = textoOpcao.replace(' [Pendente]', '').replace(' [Aprovada]', '').split(' - ฿')[0].trim();
-        currentChar.info.akumaNome = novoNome;
-        currentChar.info.akumaId = novoAkumaId;
-        
-        try {
-            await db.collection("lista_one_piece_db").doc(novoAkumaId).update({
-                pedidoPor: currentDocId,
-                pedidoNome: currentDocId
-            });
-        } catch(e) {}
-    }
-
-    if(oldAkumaId && oldAkumaId !== "nenhuma" && oldAkumaId !== novoAkumaId) {
-        try {
-            await db.collection("lista_one_piece_db").doc(oldAkumaId).update({
-                pedidoPor: null,
-                pedidoNome: null
-            });
-        } catch(e) {}
-    }
-
-    if(typeof saveData === 'function') saveData();
-    if(typeof updateUI === 'function') updateUI();
-};
-
 function iniciarMonitoramentoBancoDeDados() {
     db.collection("lista_one_piece_db").onSnapshot((snapshot) => {
         let selectAkuma = document.getElementById('select-akuma');
@@ -1711,6 +1676,7 @@ function iniciarMonitoramentoBancoDeDados() {
                     currentAkumaVal = "nenhuma";
                     if (selectAkuma) selectAkuma.value = "nenhuma";
                     if (typeof saveData === 'function') saveData();
+                    if (typeof updateUI === 'function') updateUI();
                 }
             }
         }
