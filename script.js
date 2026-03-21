@@ -1690,6 +1690,26 @@ function iniciarMonitoramentoBancoDeDados() {
         let akumasArray = [];
         let ilhasArray = [];
 
+        if (currentAkumaVal !== "nenhuma") {
+            let akumaAindaValida = false;
+            snapshot.forEach(documento => {
+                if (documento.id === currentAkumaVal) {
+                    let d = documento.data();
+                    if (d.pedidoPor === currentDocId || d.donoId === currentDocId) {
+                        akumaAindaValida = true;
+                    }
+                }
+            });
+            if (!akumaAindaValida) {
+                if (currentChar && currentChar.info) {
+                    currentChar.info.akumaId = "nenhuma";
+                    currentChar.info.akumaNome = "";
+                    currentAkumaVal = "nenhuma";
+                    if (typeof saveData === 'function') saveData();
+                }
+            }
+        }
+
         snapshot.forEach(documento => {
             let d = documento.data();
             d.id = documento.id;
