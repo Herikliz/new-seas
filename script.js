@@ -297,6 +297,7 @@ function initFirebase() {
       firebase.initializeApp(firebaseConfig); db = firebase.firestore(); isFirebaseReady = true;
       document.getElementById('db-status').classList.add('online');
       if(currentDocId !== '') { loadFromCloud(); }
+      iniciarMonitoramentoBancoDeDados();
   } catch(e) {}
 }
 
@@ -1642,71 +1643,73 @@ window.selecionarAkuma = async function(novoAkumaId) {
     updateUI();
 };
 
-db.collection("lista_one_piece_db").onSnapshot((snapshot) => {
-    let selectAkuma = document.getElementById('select-akuma');
-    let selectNac = document.getElementById('info-nacionalidade');
-    let selectLoc = document.getElementById('info-localizacao');
-    
-    let currentAkumaVal = currentChar?.info?.akumaId || "nenhuma";
-    let currentNacVal = currentChar?.info?.nacionalidade || "";
-    let currentLocVal = currentChar?.info?.localizacao || "";
+function iniciarMonitoramentoBancoDeDados() {
+    db.collection("lista_one_piece_db").onSnapshot((snapshot) => {
+        let selectAkuma = document.getElementById('select-akuma');
+        let selectNac = document.getElementById('info-nacionalidade');
+        let selectLoc = document.getElementById('info-localizacao');
+        
+        let currentAkumaVal = currentChar?.info?.akumaId || "nenhuma";
+        let currentNacVal = currentChar?.info?.nacionalidade || "";
+        let currentLocVal = currentChar?.info?.localizacao || "";
 
-    if (selectAkuma) selectAkuma.innerHTML = '<option value="nenhuma">Nenhuma</option>';
-    
-    let ilhasArray = [];
+        if (selectAkuma) selectAkuma.innerHTML = '<option value="nenhuma">Nenhuma</option>';
+        
+        let ilhasArray = [];
 
-    snapshot.forEach(documento => {
-        let d = documento.data();
-        if(d.type === 'Akuma no Mi') {
-            if (selectAkuma) {
-                if(!d.ocupada && !d.pedidoPor) {
-                    let opt = document.createElement('option');
-                    opt.value = documento.id;
-                    opt.textContent = `${d.name} (${d.subtype})`;
-                    selectAkuma.appendChild(opt);
-                } else if(documento.id === currentAkumaVal) {
-                    let opt = document.createElement('option');
-                    opt.value = documento.id;
-                    opt.textContent = `${d.name} (${d.subtype}) ${d.ocupada ? '[Aprovada]' : '[Pendente]'}`;
-                    selectAkuma.appendChild(opt);
+        snapshot.forEach(documento => {
+            let d = documento.data();
+            if(d.type === 'Akuma no Mi') {
+                if (selectAkuma) {
+                    if(!d.ocupada && !d.pedidoPor) {
+                        let opt = document.createElement('option');
+                        opt.value = documento.id;
+                        opt.textContent = `${d.name} (${d.subtype})`;
+                        selectAkuma.appendChild(opt);
+                    } else if(documento.id === currentAkumaVal) {
+                        let opt = document.createElement('option');
+                        opt.value = documento.id;
+                        opt.textContent = `${d.name} (${d.subtype}) ${d.ocupada ? '[Aprovada]' : '[Pendente]'}`;
+                        selectAkuma.appendChild(opt);
+                    }
                 }
+            } else if (d.type === 'Ilha') {
+                ilhasArray.push(d);
             }
-        } else if (d.type === 'Ilha') {
-            ilhasArray.push(d);
+        });
+
+        ilhasArray.sort((a, b) => a.name.localeCompare(b.name));
+
+        let mares = {};
+        ilhasArray.forEach(ilha => {
+            let mar = ilha.mar || "Outros";
+            if (!mares[mar]) mares[mar] = [];
+            mares[mar].push(ilha);
+        });
+
+        let ilhasHTML = '<option value="">Desconhecida / Nenhuma</option>';
+        const ordemMares = ['East Blue', 'West Blue', 'North Blue', 'South Blue', 'Paraíso', 'Novo Mundo', 'Calm Belt', 'Localização Desconhecida', 'Outros'];
+        
+        ordemMares.forEach(mar => {
+            if (mares[mar] && mares[mar].length > 0) {
+                ilhasHTML += `<optgroup label="${mar}">`;
+                mares[mar].forEach(ilha => {
+                    ilhasHTML += `<option value="${ilha.name}">${ilha.name}</option>`;
+                });
+                ilhasHTML += `</optgroup>`;
+            }
+        });
+
+        if (selectNac) {
+            selectNac.innerHTML = ilhasHTML;
+            selectNac.value = currentNacVal;
+        }
+        if (selectLoc) {
+            selectLoc.innerHTML = ilhasHTML;
+            selectLoc.value = currentLocVal;
         }
     });
-
-    ilhasArray.sort((a, b) => a.name.localeCompare(b.name));
-
-    let mares = {};
-    ilhasArray.forEach(ilha => {
-        let mar = ilha.mar || "Outros";
-        if (!mares[mar]) mares[mar] = [];
-        mares[mar].push(ilha);
-    });
-
-    let ilhasHTML = '<option value="">Desconhecida / Nenhuma</option>';
-    const ordemMares = ['East Blue', 'West Blue', 'North Blue', 'South Blue', 'Paraíso', 'Novo Mundo', 'Calm Belt', 'Localização Desconhecida', 'Outros'];
-    
-    ordemMares.forEach(mar => {
-        if (mares[mar] && mares[mar].length > 0) {
-            ilhasHTML += `<optgroup label="${mar}">`;
-            mares[mar].forEach(ilha => {
-                ilhasHTML += `<option value="${ilha.name}">${ilha.name}</option>`;
-            });
-            ilhasHTML += `</optgroup>`;
-        }
-    });
-
-    if (selectNac) {
-        selectNac.innerHTML = ilhasHTML;
-        selectNac.value = currentNacVal;
-    }
-    if (selectLoc) {
-        selectLoc.innerHTML = ilhasHTML;
-        selectLoc.value = currentLocVal;
-    }
-});
+}
 
 setInterval(() => {
     if(!currentChar || !currentChar.info) return;
