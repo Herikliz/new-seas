@@ -58,7 +58,7 @@ const baseClassGender = {
   "Carpinteiro": {m: "Carpinteiro", f: "Carpinteira"},
   "Cientista": {m: "Cientista", f: "Cientista"},
   "Combatente": {m: "Combatente", f: "Combatente"},
-  "Cozinheiro": {m: "Garçom", f: "Garçonete"},
+  "Cozinheiro": {m: "Cozinheiro", f: "Cozinheira"},
   "Ferreiro": {m: "Ferreiro", f: "Ferreira"},
   "Inventor": {m: "Inventor", f: "Inventora"},
   "Médico": {m: "Médico", f: "Médica"},
@@ -78,7 +78,7 @@ const classTitles = {
   "Inventor": [{m:"Improvisador",f:"Improvisadora"},{m:"Mecânico",f:"Mecânica"},{m:"Arquitetônico",f:"Arquitetônica"},{m:"Condutor",f:"Condutora"},{m:"Artífice",f:"Artífice"}],
   "Médico": [{m:"Clínico de Campo",f:"Clínica de Campo"},{m:"Cirurgião",f:"Cirurgiã"},{m:"Biomédico Avançado",f:"Biomédica Avançada"},{m:"Mestre da Vida",f:"Mestra da Vida"},{m:"Apóstolo da Cura",f:"Apóstola da Cura"}],
   "Musicista": [{m:"Sonante",f:"Sonante"},{m:"Celebridade Local",f:"Celebridade Local"},{m:"Pop Star",f:"Pop Star"},{m:"Ídolo Mundial",f:"Ídolo Mundial"},{m:"Imperador Sonoro",f:"Imperatriz Sonora"}],
-  "Navegador": [{m:"Navegador",f:"Navegadora"},{m:"Cartógrafo",f:"Cartógrafa"},{m:"Timoneiro",f:"Timoneira"},{m:"Capitão dos Ventos",f:"Capitã dos Ventos"},{m:"Semipeixe",f:"Semipeixe"}]
+  "Navegador": [{m:"Marujo",f:"Maruja"},{m:"Cartógrafo",f:"Cartógrafa"},{m:"Timoneiro",f:"Timoneira"},{m:"Capitão dos Ventos",f:"Capitã dos Ventos"},{m:"Semipeixe",f:"Semipeixe"}]
 };
 
 const salarios = {"Aprendiz":0,"Marinheiro":10000000,"Cabo":20000000,"Sargento":30000000,"Tenente":40000000,"Comandante":50000000,"Capitão":60000000,"Comodoro":80000000,"Contra-Almirante":90000000,"Vice-Almirante":100000000,"Almirante":150000000,"Almirante-de-Frota":200000000,"Agente Judicial":10000000,"CP-1":20000000,"CP-2":30000000,"CP-3":40000000,"CP-4":50000000,"CP-5":60000000,"CP-6":70000000,"CP-7":80000000,"CP-8":100000000,"CP-9":150000000,"CP-0":200000000,"Gorosei":500000000,"Líder do Governo":0};
