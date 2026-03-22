@@ -1688,7 +1688,7 @@ function iniciarMonitoramentoBancoDeDados() {
             if (d.type === 'Akuma no Mi') {
                 if (!d.ocupada && !d.pedidoPor) {
                     akumasArray.push(d);
-                } else if (documento.id === currentAkumaVal) {
+                } else if (documento.id === currentAkumaVal || d.donoId === currentDocId || d.pedidoPor === currentDocId) {
                     akumasArray.push(d);
                 }
             } else if (d.type === 'Ilha') {
