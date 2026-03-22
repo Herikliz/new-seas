@@ -428,7 +428,7 @@ function toggleEditability() {
     const elements = document.querySelectorAll('.container input:not(#info-salario), .container select, .container textarea, .container button');
     let isNPC = currentChar.isNPC;
     elements.forEach(el => {
-        if((el.innerText && el.innerText.includes("Copiar")) || el.id === 'num-logs-copy') {
+        if((el.innerText && (el.innerText.includes("Copiar") || el.innerText.includes("Colapsar"))) || el.id === 'num-logs-copy') {
             el.disabled = false;
             return;
         }
@@ -500,8 +500,23 @@ function runFallbackChecks() {
           if (typeof c.info.recompensa === 'string') c.info.recompensa = parseInt(c.info.recompensa.replace(/\D/g, "")) || "";
           if (typeof c.info.berries === 'string') c.info.berries = parseInt(c.info.berries.replace(/\D/g, "")) || "";
 
-          const defInfo = { classe: "Arqueólogo 1", classe2: "", classe3: "", classe4: "", classe5: "", raca: "Humano", raca2: "Humano", animal: "", animal2: "", linhagem: "Nenhuma", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp", alcunha: "", recompensa: "", altura: "", idade: "", sexo: "Masculino", sangue: "A+", nacionalidade: "", localizacao: "", orgTipo: "Pirata", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, tecnicasColapsado: false, logsColapsado: false, resumoColapsado: false, akumaId: "" };
+          if (typeof c.info.boxTec === 'undefined') c.info.boxTec = c.info.tecnicasColapsado || false;
+          if (typeof c.info.boxLog === 'undefined') c.info.boxLog = c.info.logsColapsado || false;
+          if (typeof c.info.boxRes === 'undefined') c.info.boxRes = c.info.resumoColapsado || false;
+
+          const defInfo = { 
+              classe: "", classe2: "", classe3: "", classe4: "", classe5: "", raca: "", raca2: "", animal: "", animal2: "", 
+              linhagem: "", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp", 
+              alcunha: "", recompensa: "", altura: "", idade: "", sexo: "", sangue: "", nacionalidade: "", localizacao: "", 
+              telefone: "", orgTipo: "", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", 
+              estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", 
+              personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, 
+              amiResPct: "", calcUseAttr: "d", calcInimigoRes: "", sceneType: "Treino Padrão", sceneText: "",
+              boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxVel: false, boxEsp: false, boxAmi: false, boxHist: false, 
+              boxInv: false, boxCalc: false, boxScene: false, akumaId: "" 
+          };
           for(let k in defInfo) if (typeof c.info[k] === 'undefined') c.info[k] = defInfo[k];
+          
           if (!c.stats) c.stats = { f: 0, d: 0, r: 0, v: 0, esp: 0, ami: 0 };
           if (!c.substats) c.substats = { refl: 0, vcorp: 0, hArm: 0, hObs: 0, hRei: 0, amiAlc: 0, amiDur: 0, amiPot: 0, amiVel: 0 };
           if (!c.tecnicasList) c.tecnicasList = [];
@@ -514,6 +529,21 @@ function runFallbackChecks() {
 
   currentChar = activeNpcIndex === -1 ? charData.pcs[activePcIndex].pc : charData.pcs[activePcIndex].npcs[activeNpcIndex];
 }
+
+window.toggleBox = function(id) {
+    if (!currentChar) return;
+    currentChar.info[id] = !currentChar.info[id];
+    saveData();
+    updateUI();
+};
+
+window.toggleAllBoxes = function(state) {
+    if (!currentChar) return;
+    const boxKeys = ['boxIden', 'boxMec', 'boxSoc', 'boxBase', 'boxVel', 'boxEsp', 'boxAmi', 'boxHist', 'boxLog', 'boxInv', 'boxTec', 'boxRes', 'boxCalc', 'boxScene'];
+    boxKeys.forEach(k => currentChar.info[k] = state);
+    saveData();
+    updateUI();
+};
 
 function addTecnica() {
     currentChar.tecnicasList.push({nome: "", desc: "", efeito: ""});
@@ -533,24 +563,6 @@ function removeTecnica(idx) {
 
 function updateTecnica(idx, field, val) {
     currentChar.tecnicasList[idx][field] = val;
-    saveData();
-    updateUI();
-}
-
-function toggleTecnicasCollapse() {
-    currentChar.info.tecnicasColapsado = !currentChar.info.tecnicasColapsado;
-    saveData();
-    updateUI();
-}
-
-function toggleLogsCollapse() {
-    currentChar.info.logsColapsado = !currentChar.info.logsColapsado;
-    saveData();
-    updateUI();
-}
-
-function toggleResumoCollapse() {
-    currentChar.info.resumoColapsado = !currentChar.info.resumoColapsado;
     saveData();
     updateUI();
 }
@@ -619,9 +631,7 @@ function renderLogs() {
     });
 }
 
-function populateSelects() {
-
-}
+function populateSelects() {}
 
 function updateField(category, field, value) { 
     if (category === 'name') { 
@@ -635,34 +645,17 @@ function updateField(category, field, value) {
 
 async function handlePatenteChange(val) {
     const restritas = ["Vice-Almirante", "Almirante", "Almirante-de-Frota", "CP-8", "CP-9", "CP-0", "Gorosei", "Líder do Governo"];
-    const senhasPatentes = {
-        "CP-8": "dafne",
-        "CP-9": "maackia",
-        "CP-0": "ochna",
-        "Gorosei": "abelia",
-        "Líder do Governo": "Ἑρμής"
-    };
+    const senhasPatentes = { "CP-8": "dafne", "CP-9": "maackia", "CP-0": "ochna", "Gorosei": "abelia", "Líder do Governo": "Ἑρμής" };
     let finalVal = val;
     if (restritas.includes(val)) {
         let pwd = await customPrompt("Você é merecedor deste cargo?");
-        if (senhasPatentes[val]) {
-            if (pwd === senhasPatentes[val]) {
-                let discurso = currentChar.info.orgTipo === "Marinha" ? "Você é merecedor sim! A Justiça Absoluta prevalecerá! Que os mares temam a nossa fúria!" : "Você é merecedor sim! A ordem do mundo reside em nossas mãos. O equilíbrio será mantido a qualquer custo!";
-                await customAlert(discurso);
-            } else {
-                await customAlert("Você não merece aquele cargo.");
-                document.getElementById('info-patente').value = "";
-                finalVal = "";
-            }
+        if (senhasPatentes[val] ? pwd === senhasPatentes[val] : pwd === ADMIN_PASSWORD) {
+            let discurso = currentChar.info.orgTipo === "Marinha" ? "Você é merecedor sim! A Justiça Absoluta prevalecerá! Que os mares temam a nossa fúria!" : "Você é merecedor sim! A ordem do mundo reside em nossas mãos. O equilíbrio será mantido a qualquer custo!";
+            await customAlert(discurso);
         } else {
-            if (pwd === ADMIN_PASSWORD) {
-                let discurso = currentChar.info.orgTipo === "Marinha" ? "Você é merecedor sim! A Justiça Absoluta prevalecerá! Que os mares temam a nossa fúria!" : "Você é merecedor sim! A ordem do mundo reside em nossas mãos. O equilíbrio será mantido a qualquer custo!";
-                await customAlert(discurso);
-            } else {
-                await customAlert("Você não merece aquele cargo.");
-                document.getElementById('info-patente').value = "";
-                finalVal = "";
-            }
+            await customAlert("Você não merece aquele cargo.");
+            document.getElementById('info-patente').value = "";
+            finalVal = "";
         }
     }
     
@@ -672,16 +665,15 @@ async function handlePatenteChange(val) {
     } else {
         currentChar.info.salario = "";
     }
-    
-    saveData();
-    updateUI();
+    saveData(); updateUI();
 }
 
 function formatAndSave(category, field, el) {
     let cleanVal = el.value.replace(/\D/g, ""); let num = cleanVal ? parseInt(cleanVal, 10) : 0;
     currentChar[category][field] = num;
-    let cursor = el.selectionStart; let oldLength = el.value.length; el.value = num ? num.toLocaleString("pt-BR") : "";
-    let newLength = el.value.length; el.setSelectionRange(cursor + (newLength - oldLength), cursor + (newLength - oldLength));
+    let cursor = el.selectionStart; let oldLength = el.value.length; 
+    el.value = cleanVal ? num.toLocaleString("pt-BR") : "";
+    let newLength = el.value.length; try { el.setSelectionRange(cursor + (newLength - oldLength), cursor + (newLength - oldLength)); } catch(e){}
     saveData(); updateUI();
 }
 
@@ -689,11 +681,9 @@ function formatCurrency(category, field, el) {
     let cleanVal = el.value.replace(/\D/g, "");
     let num = cleanVal ? parseInt(cleanVal, 10) : "";
     currentChar[category][field] = num;
-    let cursor = el.selectionStart; 
-    let oldLength = el.value.length; 
+    let cursor = el.selectionStart; let oldLength = el.value.length; 
     el.value = cleanVal ? num.toLocaleString("pt-BR") : "";
-    let newLength = el.value.length; 
-    try { el.setSelectionRange(cursor + (newLength - oldLength), cursor + (newLength - oldLength)); } catch(e){}
+    let newLength = el.value.length; try { el.setSelectionRange(cursor + (newLength - oldLength), cursor + (newLength - oldLength)); } catch(e){}
     saveData(); updateUI();
 }
 
@@ -714,9 +704,7 @@ function formatRaceStr(rName, aName, isFem) {
         else if (res === "Sereiano") res = "Sereiana";
     }
     if (["Tritão", "Wotan", "Mink"].includes(rName)) {
-        if (aName && aName.trim() !== "") {
-            res += `: ${aName.trim()}`;
-        }
+        if (aName && aName.trim() !== "") res += `: ${aName.trim()}`;
     }
     return res;
 }
@@ -737,16 +725,35 @@ function updateUI() {
     let i = currentChar.info;
     let isNPC = currentChar.isNPC;
 
-    if (i.raca === "Kuja" && i.sexo !== "Feminino") i.raca = "Humano";
-    if (i.raca2 === "Kuja" && i.sexo !== "Feminino") i.raca2 = "Humano";
+    ['boxIden', 'boxMec', 'boxSoc', 'boxBase', 'boxVel', 'boxEsp', 'boxAmi', 'boxHist', 'boxLog', 'boxInv', 'boxTec', 'boxRes', 'boxCalc', 'boxScene'].forEach(id => {
+        let wrapper = document.getElementById('wrapper-' + id);
+        let icon = document.getElementById('icon-' + id);
+        let titleBlock = document.getElementById('title-' + id);
+        if (wrapper && icon && titleBlock) {
+            if (i[id]) { 
+                wrapper.style.display = 'none';
+                icon.textContent = '◀';
+                titleBlock.style.borderBottom = 'none';
+                titleBlock.style.paddingBottom = '0';
+            } else {
+                wrapper.style.display = 'block';
+                icon.textContent = '▼';
+                titleBlock.style.borderBottom = '1px dashed #444';
+                titleBlock.style.paddingBottom = '8px';
+            }
+        }
+    });
+
+    if (i.raca === "Kuja" && i.sexo !== "Feminino") i.raca = "";
+    if (i.raca2 === "Kuja" && i.sexo !== "Feminino") i.raca2 = "";
 
     const noCharlotteRaces = ["Bucaneiro", "Lunariano", "Oni", "Meio-Gigante", "Wotan"];
     if (i.linhagem === "Charlotte") {
-        if (noCharlotteRaces.includes(i.raca)) i.raca = "Humano";
-        if (noCharlotteRaces.includes(i.raca2)) i.raca2 = "Humano";
+        if (noCharlotteRaces.includes(i.raca)) i.raca = "";
+        if (noCharlotteRaces.includes(i.raca2)) i.raca2 = "";
     }
 
-    let rHtml = "";
+    let rHtml = '<option value="">-- Selecione --</option>';
     for(let r in racas) {
         if (r === "Kuja" && i.sexo !== "Feminino") continue;
         if (i.linhagem === "Charlotte" && noCharlotteRaces.includes(r)) continue;
@@ -759,7 +766,7 @@ function updateUI() {
     let sRaca2 = document.getElementById('info-raca2');
     if (i.linhagem === "Charlotte") {
         sRaca2.style.display = "block";
-        let r2Html = "";
+        let r2Html = '<option value="">-- Selecione --</option>';
         for(let r in racas) {
             if (r === "Kuja" && i.sexo !== "Feminino") continue;
             if (noCharlotteRaces.includes(r)) continue;
@@ -771,31 +778,25 @@ function updateUI() {
         sRaca2.style.display = "none";
     }
 
-    if (!sRaca.value) { i.raca = "Humano"; sRaca.value = "Humano"; }
-    if (i.linhagem === "Charlotte" && !sRaca2.value) { i.raca2 = "Humano"; sRaca2.value = "Humano"; }
-
     let anim1 = document.getElementById('info-animal');
     if (["Tritão", "Wotan", "Mink"].includes(i.raca)) {
-        anim1.style.display = "block";
-        anim1.placeholder = i.raca === "Mink" ? "Mamífero" : "Animal Marinho";
-    } else {
-        anim1.style.display = "none";
-    }
+        anim1.style.display = "block"; anim1.placeholder = i.raca === "Mink" ? "Mamífero" : "Animal Marinho";
+    } else { anim1.style.display = "none"; }
 
     let anim2 = document.getElementById('info-animal2');
     if (i.linhagem === "Charlotte" && ["Tritão", "Wotan", "Mink"].includes(i.raca2)) {
-        anim2.style.display = "block";
-        anim2.placeholder = i.raca2 === "Mink" ? "Mamífero" : "Animal Marinho";
-    } else {
-        anim2.style.display = "none";
-    }
+        anim2.style.display = "block"; anim2.placeholder = i.raca2 === "Mink" ? "Mamífero" : "Animal Marinho";
+    } else { anim2.style.display = "none"; }
 
     document.getElementById('pc-name').value = currentChar.name;
-    const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'alcunha', 'altura', 'idade', 'sexo', 'sangue', 'nacionalidade', 'localizacao', 'tripulacao', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2'];
-    textFields.forEach(f => { let el = document.getElementById('info-'+f); if(el) el.value = currentChar.info[f] || ""; });
+    const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'alcunha', 'altura', 'idade', 'sexo', 'sangue', 'telefone', 'nacionalidade', 'localizacao', 'tripulacao', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2', 'sceneType', 'sceneText', 'calcUseAttr', 'calcUseAmi'];
+    textFields.forEach(f => { let el = document.getElementById('info-'+f); if(el) el.value = i[f] || ""; });
+
+    let calcResEl = document.getElementById('info-calcInimigoRes');
+    if(calcResEl) calcResEl.value = i.calcInimigoRes ? i.calcInimigoRes.toLocaleString("pt-BR") : "";
 
     let recEl = document.getElementById('info-recompensa');
-    if(recEl) recEl.value = currentChar.info.recompensa ? currentChar.info.recompensa.toLocaleString("pt-BR") : "";
+    if(recEl) recEl.value = i.recompensa ? i.recompensa.toLocaleString("pt-BR") : "";
 
     if(isNPC) {
         document.getElementById('info-berries').value = "Bloqueado";
@@ -803,23 +804,22 @@ function updateUI() {
         document.getElementById('info-npcsE').value = "Bloqueado";
     } else {
         let berEl = document.getElementById('info-berries');
-        if(berEl) berEl.value = currentChar.info.berries ? currentChar.info.berries.toLocaleString("pt-BR") : "";
+        if(berEl) berEl.value = i.berries ? i.berries.toLocaleString("pt-BR") : "";
         let npcCEl = document.getElementById('info-npcsC');
-        if(npcCEl) npcCEl.value = currentChar.info.npcsC || "";
+        if(npcCEl) npcCEl.value = i.npcsC || "";
         let npcEEl = document.getElementById('info-npcsE');
-        if(npcEEl) npcEEl.value = currentChar.info.npcsE || "";
+        if(npcEEl) npcEEl.value = i.npcsE || "";
     }
 
-    let orgTipo = currentChar.info.orgTipo || "Pirata";
+    let orgTipo = i.orgTipo || "";
     document.getElementById('info-orgTipo').value = orgTipo;
     if(orgTipo === "Pirata") {
         document.getElementById('box-tripulacao').style.display = "block";
         document.getElementById('box-patente-salario').style.display = "none";
-        currentChar.info.patente = "";
-        currentChar.info.salario = "";
+        i.patente = ""; i.salario = "";
         let selPatente = document.getElementById('info-patente');
         if(selPatente) selPatente.value = "";
-    } else {
+    } else if (orgTipo !== "") {
         document.getElementById('box-tripulacao').style.display = "none";
         document.getElementById('box-patente-salario').style.display = "flex";
         
@@ -830,52 +830,44 @@ function updateUI() {
         let selPatente = document.getElementById('info-patente');
         if (selPatente) {
             let html = "";
-            let gKey = currentChar.info.sexo === 'Feminino' ? 'f' : 'm';
+            let gKey = i.sexo === 'Feminino' ? 'f' : 'm';
             options.forEach(p => {
-                let dName = (p !== "" && patenteGender[p]) ? patenteGender[p][gKey] : p;
+                let dName = (p !== "" && patenteGender[p]) ? patenteGender[p][gKey] : (p === "" ? "-- Selecione --" : p);
                 html += `<option value="${p}">${dName}</option>`;
             });
             if(selPatente.innerHTML !== html) selPatente.innerHTML = html;
-            
-            if(options.includes(currentChar.info.patente)) {
-                selPatente.value = currentChar.info.patente;
-                if(currentChar.info.patente !== "" && typeof salarios[currentChar.info.patente] !== 'undefined') {
-                    currentChar.info.salario = salarios[currentChar.info.patente] === 0 ? "0" : salarios[currentChar.info.patente].toLocaleString("pt-BR");
-                } else {
-                    currentChar.info.salario = "";
-                }
-            } else {
-                currentChar.info.patente = options[0];
-                selPatente.value = options[0];
-                currentChar.info.salario = "";
-            }
+            if(options.includes(i.patente)) { selPatente.value = i.patente; } 
+            else { i.patente = options[0]; selPatente.value = options[0]; i.salario = ""; }
         }
+    } else {
+        document.getElementById('box-tripulacao').style.display = "none";
+        document.getElementById('box-patente-salario').style.display = "none";
     }
     
     let elSalario = document.getElementById('info-salario');
-    if (elSalario) elSalario.value = currentChar.info.salario || "";
+    if (elSalario) elSalario.value = i.salario || "";
 
     let D = currentChar.stats.d, F = currentChar.stats.f, R = currentChar.stats.r, V = currentChar.stats.v;
     let totalBase = D + F + R + V;
 
     let avisoBase = document.getElementById('avisoBase');
-    if(totalBase > 1000) { avisoBase.style.display = "block"; avisoBase.textContent = `Atenção: Você ultrapassou o limite inicial de 1.000 pontos! Total: ${totalBase.toLocaleString("pt-BR")}`; } else { avisoBase.style.display = "none"; }
+    if(totalBase > 1000) { avisoBase.style.display = "block"; avisoBase.textContent = `Atenção: Limite inicial de 1.000 pontos ultrapassado! Total: ${totalBase.toLocaleString("pt-BR")}`; } else { avisoBase.style.display = "none"; }
 
-    let html1 = "";
+    let html1 = '<option value="">-- Selecione --</option>';
     baseClassesList.forEach(c => {
-        let display = getClassDisplayName(`${c} 1`, currentChar.info.sexo);
+        let display = getClassDisplayName(`${c} 1`, i.sexo);
         html1 += `<option value="${c} 1">${display}</option>`;
     });
     let el1 = document.getElementById('info-classe');
     if(el1.innerHTML !== html1) el1.innerHTML = html1;
-    el1.value = currentChar.info.classe || "Arqueólogo 1";
-    currentChar.info.classe = el1.value;
+    if(i.classe && el1.querySelector(`option[value="${i.classe}"]`)) el1.value = i.classe;
+    else el1.value = ""; 
 
     const classSlots = [
-        {id: 'classe2', req: 5000, prev: [currentChar.info.classe]},
-        {id: 'classe3', req: 10000, prev: [currentChar.info.classe, currentChar.info.classe2]},
-        {id: 'classe4', req: 20000, prev: [currentChar.info.classe, currentChar.info.classe2, currentChar.info.classe3]},
-        {id: 'classe5', req: 35000, prev: [currentChar.info.classe, currentChar.info.classe2, currentChar.info.classe3, currentChar.info.classe4]}
+        {id: 'classe2', req: 5000, prev: [i.classe]},
+        {id: 'classe3', req: 10000, prev: [i.classe, i.classe2]},
+        {id: 'classe4', req: 20000, prev: [i.classe, i.classe2, i.classe3]},
+        {id: 'classe5', req: 35000, prev: [i.classe, i.classe2, i.classe3, i.classe4]}
     ];
 
     classSlots.forEach(slot => {
@@ -885,46 +877,41 @@ function updateUI() {
             let counts = {};
             baseClassesList.forEach(c => counts[c] = 1);
             slot.prev.forEach(p => {
-                if(p) {
-                    let match = p.match(/(.+) (\d+)/);
-                    if(match) counts[match[1]] = Math.max(counts[match[1]], parseInt(match[2]) + 1);
-                }
+                if(p) { let match = p.match(/(.+) (\d+)/); if(match) counts[match[1]] = Math.max(counts[match[1]], parseInt(match[2]) + 1); }
             });
             let html = `<option value="">-- Selecione --</option>`;
             baseClassesList.forEach(c => {
                 if(counts[c] <= 5) {
-                    let display = getClassDisplayName(`${c} ${counts[c]}`, currentChar.info.sexo);
+                    let display = getClassDisplayName(`${c} ${counts[c]}`, i.sexo);
                     html += `<option value="${c} ${counts[c]}">${display}</option>`;
                 }
             });
             if(el.innerHTML !== html) el.innerHTML = html;
-            
-            let currentVal = currentChar.info[slot.id];
-            let optionExists = Array.from(el.options).some(o => o.value === currentVal);
-            if(optionExists && currentVal !== "") { el.value = currentVal; } else { el.value = ""; currentChar.info[slot.id] = ""; }
+            let currentVal = i[slot.id];
+            if(Array.from(el.options).some(o => o.value === currentVal) && currentVal !== "") { el.value = currentVal; } else { el.value = ""; i[slot.id] = ""; }
         } else {
             el.innerHTML = `<option value="">🔒 Requer ${slot.req.toLocaleString('pt-BR')}</option>`;
-            el.disabled = true;
-            currentChar.info[slot.id] = "";
+            el.disabled = true; i[slot.id] = "";
         }
     });
 
     let combatenteLevel = 0;
-    [currentChar.info.classe, currentChar.info.classe2, currentChar.info.classe3, currentChar.info.classe4, currentChar.info.classe5].forEach(c => {
+    [i.classe, i.classe2, i.classe3, i.classe4, i.classe5].forEach(c => {
         if(c && c.startsWith("Combatente")) {
             let match = c.match(/Combatente (\d+)/);
             if(match) combatenteLevel = Math.max(combatenteLevel, parseInt(match[1]));
         }
     });
-    
     document.getElementById('box-selClasseDF').style.display = (combatenteLevel > 0) ? "block" : "none";
 
     const selLin = document.getElementById('info-linhagem');
-    let currentLin = currentChar.info.linhagem; selLin.innerHTML = "";
-    for(let l in linhagens) { if(!linhagens[l].req || linhagens[l].req.includes(currentChar.info.raca)) { selLin.innerHTML += `<option value="${l}">${l}</option>`; } }
-    if(Array.from(selLin.options).some(o => o.value === currentLin)) { selLin.value = currentLin; } else { currentChar.info.linhagem = "Nenhuma"; selLin.value = "Nenhuma"; currentLin = "Nenhuma"; }
+    let currentLin = i.linhagem; 
+    let htmlLin = '<option value="">-- Selecione --</option><option value="Nenhuma">Nenhuma</option>';
+    for(let l in linhagens) { if(l!=="Nenhuma" && (!linhagens[l].req || linhagens[l].req.includes(i.raca))) { htmlLin += `<option value="${l}">${l}</option>`; } }
+    if(selLin.innerHTML !== htmlLin) selLin.innerHTML = htmlLin;
+    if(Array.from(selLin.options).some(o => o.value === currentLin)) { selLin.value = currentLin; } else { i.linhagem = ""; selLin.value = ""; currentLin = ""; }
 
-    let rc = currentChar.info.raca; let rc2 = currentChar.info.raca2; let ln = currentLin;
+    let rc = i.raca, rc2 = i.raca2, ln = currentLin;
     let isLinhagemVisible = (rc && !["Bucaneiro","Oni","Lunariano"].includes(rc));
     document.getElementById('container-linhagem').style.display = isLinhagemVisible ? "block" : "none"; 
     
@@ -942,31 +929,23 @@ function updateUI() {
     let isMink = (rc === "Mink" || (ln === "Charlotte" && rc2 === "Mink"));
     document.getElementById('box-estilo-mink').style.display = isMink ? "flex" : "none";
 
-    let baseClass = (currentChar.info.classe || "Arqueólogo 1").split(" ")[0];
+    let baseClass = (i.classe || "Arqueólogo 1").split(" ")[0];
     let allowedEstilo1 = classStyles[baseClass] || ["Freestyle"];
     let elEst1 = document.getElementById('info-estilo1');
     if (elEst1) {
-        let htmlE1 = "";
+        let htmlE1 = '<option value="">-- Selecione --</option>';
         allowedEstilo1.forEach(e => htmlE1 += `<option value="${e}">${e}</option>`);
         if (elEst1.innerHTML !== htmlE1) elEst1.innerHTML = htmlE1;
-        if (!allowedEstilo1.includes(currentChar.info.estilo1)) {
-            currentChar.info.estilo1 = allowedEstilo1[0];
-        }
-        elEst1.value = currentChar.info.estilo1;
+        elEst1.value = i.estilo1;
     }
 
     [2, 3, 4].forEach(n => {
         let elEst = document.getElementById('info-estilo'+n);
         if (elEst) {
-            if (elEst.options.length === 0 || elEst.options[0].value !== "Nenhum") {
-                let htmlE = "";
-                allStyles.forEach(e => htmlE += `<option value="${e}">${e}</option>`);
-                elEst.innerHTML = htmlE;
-            }
-            if (!allStyles.includes(currentChar.info['estilo'+n])) {
-                currentChar.info['estilo'+n] = "Nenhum";
-            }
-            elEst.value = currentChar.info['estilo'+n];
+            let htmlE = '<option value="">-- Selecione --</option>';
+            allStyles.forEach(e => htmlE += `<option value="${e}">${e}</option>`);
+            if (elEst.innerHTML !== htmlE) elEst.innerHTML = htmlE;
+            elEst.value = i['estilo'+n];
         }
     });
 
@@ -976,8 +955,8 @@ function updateUI() {
     [1, 2, 3, 4].forEach(n => {
         let elFree = document.getElementById('info-freestyle'+n);
         if (elFree) {
-            elFree.style.display = currentChar.info['estilo'+n] === 'Freestyle' ? 'block' : 'none';
-            elFree.value = currentChar.info['freestyle'+n] || "";
+            elFree.style.display = i['estilo'+n] === 'Freestyle' ? 'block' : 'none';
+            elFree.value = i['freestyle'+n] || "";
         }
     });
 
@@ -994,7 +973,7 @@ function updateUI() {
     }
 
     let amiEl = document.getElementById('stat-ami');
-    let temFruta = (currentChar.info.akumaNome && currentChar.info.akumaNome !== "nenhuma" && currentChar.info.akumaNome !== "");
+    let temFruta = (i.akumaNome && i.akumaNome !== "nenhuma" && i.akumaNome !== "");
     if(ln === "Silvers") {
         amiEl.disabled = true; amiEl.placeholder = "🔒 Indisponível";
         currentChar.stats.ami = 0; currentChar.substats.amiAlc = 0; currentChar.substats.amiDur = 0; currentChar.substats.amiPot = 0; currentChar.substats.amiVel = 0;
@@ -1008,17 +987,17 @@ function updateUI() {
 
     let bonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0, refl:0, vcorp:0};
 
-    if(combatenteLevel > 0) { bonus[currentChar.info.selClasseDF] += combatenteLevel * 0.05; }
+    if(combatenteLevel > 0) { bonus[i.selClasseDF] += combatenteLevel * 0.05; }
 
     if(ln !== "Charlotte") {
         if(racas[rc]) { bonus.d += racas[rc].d || 0; bonus.f += racas[rc].f || 0; bonus.r += racas[rc].r || 0; bonus.v += racas[rc].v || 0; }
-        if(rc === "Humano") { bonus[currentChar.info.selDF] += 0.20; bonus[currentChar.info.selRV] += 0.20; } else if(rc === "Kuja") { bonus[currentChar.info.selDF] += 0.30; bonus[currentChar.info.selRV] += 0.20; } else if(rc === "Três-Olhos" || rc === "Mink") { bonus[currentChar.info.selDF] += 0.15; }
+        if(rc === "Humano") { bonus[i.selDF] += 0.20; bonus[i.selRV] += 0.20; } else if(rc === "Kuja") { bonus[i.selDF] += 0.30; bonus[i.selRV] += 0.20; } else if(rc === "Três-Olhos" || rc === "Mink") { bonus[i.selDF] += 0.15; }
     }
 
     if(document.getElementById('container-linhagem').style.display === "block" && linhagens[ln]) {
         bonus.d += linhagens[ln].d || 0; bonus.f += linhagens[ln].f || 0; bonus.r += linhagens[ln].r || 0; bonus.v += linhagens[ln].v || 0; bonus.esp += linhagens[ln].esp || 0; bonus.ha += linhagens[ln].ha || 0; bonus.ho += linhagens[ln].ho || 0; bonus.hr += linhagens[ln].hr || 0; bonus.ami += linhagens[ln].ami || 0;
         
-        if(ln === "Barnum") { bonus[currentChar.info.selLinDF] += 0.15; bonus[currentChar.info.selLinRV] += 0.15; } else if(ln === "Charlotte") { bonus[currentChar.info.selLinDF] += 0.20; bonus[currentChar.info.selLinRV] += 0.20; } else if(ln === "D.") { bonus[currentChar.info.selLin4] += 0.15; bonus[currentChar.info.selLinEspAmi] += 0.15; } else if(ln === "Gan") { bonus[currentChar.info.selLinDF] += 0.15; } else if(ln === "Kong") { bonus[currentChar.info.selLin4] += 0.10; } else if(ln === "Silvers") { bonus[currentChar.info.selLin4] += 0.15; }
+        if(ln === "Barnum") { bonus[i.selLinDF] += 0.15; bonus[i.selLinRV] += 0.15; } else if(ln === "Charlotte") { bonus[i.selLinDF] += 0.20; bonus[i.selLinRV] += 0.20; } else if(ln === "D.") { bonus[i.selLin4] += 0.15; bonus[i.selLinEspAmi] += 0.15; } else if(ln === "Gan") { bonus[i.selLinDF] += 0.15; } else if(ln === "Kong") { bonus[i.selLin4] += 0.10; } else if(ln === "Silvers") { bonus[i.selLin4] += 0.15; }
         
         if(ln === "Dracule") { if(totalBase >= 15000) bonus.d += 0.20; else if(totalBase >= 10000) bonus.d += 0.15; else if(totalBase >= 5000) bonus.d += 0.10; } else if(ln === "Capone") { if(totalBase >= 15000) bonus.d += 0.25; else if(totalBase >= 10000) bonus.d += 0.20; else if(totalBase >= 5000) bonus.d += 0.15; } else if(ln === "Augur") { if(totalBase >= 20000) bonus.d += 0.15; else if(totalBase >= 10000) bonus.d += 0.10; else if(totalBase >= 5000) bonus.d += 0.05; } else if(ln === "Newgate") { if(totalBase >= 10000) { bonus.f += 0.20; bonus.r += 0.20; } else if(totalBase >= 5000) { bonus.f += 0.10; bonus.r += 0.10; } } else if(ln === "Boa") { if(totalBase >= 10000) bonus.v += 0.20; else if(totalBase >= 5000) bonus.v += 0.10; } else if(ln === "Neptune") { if(totalBase >= 15000) { bonus.v += 0.20; bonus.refl += 0.15; bonus.r += 0.15; } else if(totalBase >= 10000) { bonus.v += 0.20; bonus.refl += 0.10; bonus.r += 0.10; } else if(totalBase >= 5000) { bonus.v += 0.10; bonus.refl += 0.05; bonus.r += 0.05; } } else if(ln === "Sakazuki") { if(totalBase >= 15000) { bonus.f += 0.15; } else if(totalBase >= 10000) { bonus.f += 0.10; } else if(totalBase >= 5000) { bonus.f += 0.05; } } else if(ln === "Silvers") { if(totalBase >= 20000) { bonus.ha += 0.15; bonus.ho += 0.15; bonus.hr += 0.15; } else if(totalBase >= 10000) { bonus.ha += 0.10; bonus.ho += 0.10; bonus.hr += 0.10; } else if(totalBase >= 5000) { bonus.ha += 0.05; bonus.ho += 0.05; bonus.hr += 0.05; } }
         
@@ -1033,7 +1012,7 @@ function updateUI() {
     let totalR = Math.round(R * (1 + bonus.r)); document.getElementById('total-r').innerText = "Total: " + totalR.toLocaleString("pt-BR");
     
     let totalV = Math.round(V * (1 + bonus.v)); document.getElementById('total-v').innerText = "Total: " + totalV.toLocaleString("pt-BR");
-    document.getElementById('box-velocidade').style.display = totalV > 0 ? "flex" : "none";
+    document.getElementById('container-boxVel').style.display = totalV > 0 ? "block" : "none";
     
     if(totalV === 0) { currentChar.substats.refl = 0; currentChar.substats.vcorp = 0; }
     
@@ -1043,23 +1022,17 @@ function updateUI() {
     if(totalVelSub > totalV) {
         let diff = totalVelSub - totalV;
         let active = document.activeElement;
-        
         if(active && active.id === 'sub-refl') { REF -= diff; currentChar.substats.refl = REF; }
         else if(active && active.id === 'sub-vcorp') { VCORP -= diff; currentChar.substats.vcorp = VCORP; }
         else {
             if(VCORP >= diff) { VCORP -= diff; currentChar.substats.vcorp = VCORP; }
             else if(REF >= diff) { REF -= diff; currentChar.substats.refl = REF; }
         }
-        
-        document.getElementById('avisoVel').style.display = "block"; 
-        document.getElementById('avisoVel').textContent = `Limite atingido!\n Máx: ${totalV.toLocaleString("pt-BR")}`;
+        document.getElementById('avisoVel').style.display = "block"; document.getElementById('avisoVel').textContent = `Limite atingido!\n Máx: ${totalV.toLocaleString("pt-BR")}`;
     } else if (totalVelSub < totalV && totalV > 0) {
         let diff = totalV - totalVelSub;
-        document.getElementById('avisoVel').style.display = "block"; 
-        document.getElementById('avisoVel').textContent = `Pontos não distribuídos: ${diff.toLocaleString("pt-BR")}`;
-    } else {
-        document.getElementById('avisoVel').style.display = "none";
-    }
+        document.getElementById('avisoVel').style.display = "block"; document.getElementById('avisoVel').textContent = `Pontos não distribuídos: ${diff.toLocaleString("pt-BR")}`;
+    } else { document.getElementById('avisoVel').style.display = "none"; }
     
     document.getElementById('sub-refl').value = currentChar.substats.refl ? currentChar.substats.refl.toLocaleString("pt-BR") : "";
     document.getElementById('sub-vcorp').value = currentChar.substats.vcorp ? currentChar.substats.vcorp.toLocaleString("pt-BR") : "";
@@ -1070,156 +1043,128 @@ function updateUI() {
     let totalHaki = HA + HO + HR;
     
     if(totalHaki > totalEsp) {
-        let diff = totalHaki - totalEsp;
-        let active = document.activeElement;
-        
+        let diff = totalHaki - totalEsp; let active = document.activeElement;
         if(active && active.id === 'sub-hArm') { HA -= diff; currentChar.substats.hArm = HA; }
         else if(active && active.id === 'sub-hObs') { HO -= diff; currentChar.substats.hObs = HO; }
         else if(active && active.id === 'sub-hRei') { HR -= diff; currentChar.substats.hRei = HR; }
         else {
-            if(HR >= diff) { HR -= diff; currentChar.substats.hRei = HR; }
-            else if(HO >= diff) { HO -= diff; currentChar.substats.hObs = HO; }
-            else if(HA >= diff) { HA -= diff; currentChar.substats.hArm = HA; }
+            if(HR >= diff) { HR -= diff; currentChar.substats.hRei = HR; } else if(HO >= diff) { HO -= diff; currentChar.substats.hObs = HO; } else if(HA >= diff) { HA -= diff; currentChar.substats.hArm = HA; }
         }
-        
-        document.getElementById('avisoEsp').style.display = "block"; 
-        document.getElementById('avisoEsp').textContent = `Limite atingido! Máx: ${totalEsp.toLocaleString("pt-BR")}`;
-    } else {
-        document.getElementById('avisoEsp').style.display = "none";
-    }
+        document.getElementById('avisoEsp').style.display = "block"; document.getElementById('avisoEsp').textContent = `Limite atingido! Máx: ${totalEsp.toLocaleString("pt-BR")}`;
+    } else { document.getElementById('avisoEsp').style.display = "none"; }
     
     document.getElementById('sub-hArm').value = currentChar.substats.hArm ? currentChar.substats.hArm.toLocaleString("pt-BR") : "";
     document.getElementById('sub-hObs').value = currentChar.substats.hObs ? currentChar.substats.hObs.toLocaleString("pt-BR") : "";
     document.getElementById('sub-hRei').value = currentChar.substats.hRei ? currentChar.substats.hRei.toLocaleString("pt-BR") : "";
 
     ['amiAlc', 'amiDur', 'amiPot', 'amiVel'].forEach(f => {
-        let chk = document.getElementById('chk-' + f);
-        let inp = document.getElementById('sub-' + f);
-        let key = 'has' + f.charAt(0).toUpperCase() + f.slice(1);
-        let has = currentChar.info[key];
-        if (chk) chk.checked = has;
-        if (inp) inp.disabled = !has || isReadOnly;
+        let chk = document.getElementById('chk-' + f); let inp = document.getElementById('sub-' + f); let key = 'has' + f.charAt(0).toUpperCase() + f.slice(1);
+        let has = i[key]; if (chk) chk.checked = has; if (inp) inp.disabled = !has || isReadOnly;
     });
 
     let AMI = currentChar.stats.ami; let totalAmi = Math.round(AMI * (1 + bonus.ami)); document.getElementById('total-ami').innerText = "Total: " + totalAmi.toLocaleString("pt-BR");
     document.getElementById('box-amiSub').style.display = AMI > 0 ? "block" : "none";
-    
     if(AMI === 0) { currentChar.substats.amiAlc = 0; currentChar.substats.amiDur = 0; currentChar.substats.amiPot = 0; currentChar.substats.amiVel = 0; }
     
+    let activeAmiStats = 0;
+    if(i.hasAmiAlc) activeAmiStats++; if(i.hasAmiDur) activeAmiStats++; if(i.hasAmiPot) activeAmiStats++; if(i.hasAmiVel) activeAmiStats++;
+
+    let maxAmiPoints = 10000;
+    if (bonus.ami > 0 && activeAmiStats > 0) {
+        maxAmiPoints = Math.max(10000, Math.floor(totalAmi / activeAmiStats));
+    }
+
     let aAlc = currentChar.substats.amiAlc || 0, aDur = currentChar.substats.amiDur || 0, aPot = currentChar.substats.amiPot || 0, aVel = currentChar.substats.amiVel || 0;
     
     let limitAmiExcedido = false;
-    if(aAlc > 10000) { aAlc = 10000; currentChar.substats.amiAlc = 10000; limitAmiExcedido = true; }
-    if(aDur > 10000) { aDur = 10000; currentChar.substats.amiDur = 10000; limitAmiExcedido = true; }
-    if(aPot > 10000) { aPot = 10000; currentChar.substats.amiPot = 10000; limitAmiExcedido = true; }
-    if(aVel > 10000) { aVel = 10000; currentChar.substats.amiVel = 10000; limitAmiExcedido = true; }
+    if(aAlc > maxAmiPoints) { aAlc = maxAmiPoints; currentChar.substats.amiAlc = maxAmiPoints; limitAmiExcedido = true; }
+    if(aDur > maxAmiPoints) { aDur = maxAmiPoints; currentChar.substats.amiDur = maxAmiPoints; limitAmiExcedido = true; }
+    if(aPot > maxAmiPoints) { aPot = maxAmiPoints; currentChar.substats.amiPot = maxAmiPoints; limitAmiExcedido = true; }
+    if(aVel > maxAmiPoints) { aVel = maxAmiPoints; currentChar.substats.amiVel = maxAmiPoints; limitAmiExcedido = true; }
     
     let totalAmiSub = aAlc + aDur + aPot + aVel;
     
     if(totalAmiSub > totalAmi) {
-        let diff = totalAmiSub - totalAmi;
-        let active = document.activeElement;
-        
+        let diff = totalAmiSub - totalAmi; let active = document.activeElement;
         if(active && active.id === 'sub-amiAlc') { aAlc -= diff; currentChar.substats.amiAlc = aAlc; }
         else if(active && active.id === 'sub-amiDur') { aDur -= diff; currentChar.substats.amiDur = aDur; }
         else if(active && active.id === 'sub-amiPot') { aPot -= diff; currentChar.substats.amiPot = aPot; }
         else if(active && active.id === 'sub-amiVel') { aVel -= diff; currentChar.substats.amiVel = aVel; }
         else {
-            if(aVel >= diff) { aVel -= diff; currentChar.substats.amiVel = aVel; }
-            else if(aPot >= diff) { aPot -= diff; currentChar.substats.amiPot = aPot; }
-            else if(aDur >= diff) { aDur -= diff; currentChar.substats.amiDur = aDur; }
-            else if(aAlc >= diff) { aAlc -= diff; currentChar.substats.amiAlc = aAlc; }
+            if(aVel >= diff) { aVel -= diff; currentChar.substats.amiVel = aVel; } else if(aPot >= diff) { aPot -= diff; currentChar.substats.amiPot = aPot; }
+            else if(aDur >= diff) { aDur -= diff; currentChar.substats.amiDur = aDur; } else if(aAlc >= diff) { aAlc -= diff; currentChar.substats.amiAlc = aAlc; }
         }
-        
-        document.getElementById('avisoAmi').style.display = "block"; 
-        document.getElementById('avisoAmi').textContent = `Limite atingido! Máx: ${totalAmi.toLocaleString("pt-BR")}`;
+        document.getElementById('avisoAmi').style.display = "block"; document.getElementById('avisoAmi').textContent = `Limite atingido! Máx: ${totalAmi.toLocaleString("pt-BR")}`;
     } else if (limitAmiExcedido) {
-        document.getElementById('avisoAmi').style.display = "block"; 
-        document.getElementById('avisoAmi').textContent = `Máximo de 10.000 pontos por atributo alcançado!`;
-    } else {
-        document.getElementById('avisoAmi').style.display = "none";
-    }
+        document.getElementById('avisoAmi').style.display = "block"; document.getElementById('avisoAmi').textContent = `Máximo de ${maxAmiPoints.toLocaleString("pt-BR")} pontos por atributo alcançado!`;
+    } else { document.getElementById('avisoAmi').style.display = "none"; }
     
     document.getElementById('sub-amiAlc').value = currentChar.substats.amiAlc ? currentChar.substats.amiAlc.toLocaleString("pt-BR") : "";
     document.getElementById('sub-amiDur').value = currentChar.substats.amiDur ? currentChar.substats.amiDur.toLocaleString("pt-BR") : "";
     document.getElementById('sub-amiPot').value = currentChar.substats.amiPot ? currentChar.substats.amiPot.toLocaleString("pt-BR") : "";
     document.getElementById('sub-amiVel').value = currentChar.substats.amiVel ? currentChar.substats.amiVel.toLocaleString("pt-BR") : "";
 
-    let techWrapper = document.getElementById('tecnicas-wrapper');
-    let techIcon = document.getElementById('tecnicas-toggle-icon');
-    if (techWrapper && techIcon) {
-        if (currentChar.info.tecnicasColapsado) {
-            techWrapper.style.display = 'none';
-            techIcon.textContent = '◀';
-        } else {
-            techWrapper.style.display = 'block';
-            techIcon.textContent = '▼';
-        }
-    }
-
-    let logsWrapper = document.getElementById('logs-wrapper');
-    let logsIcon = document.getElementById('logs-toggle-icon');
-    if (logsWrapper && logsIcon) {
-        if (currentChar.info.logsColapsado) {
-            logsWrapper.style.display = 'none';
-            logsIcon.textContent = '◀';
-        } else {
-            logsWrapper.style.display = 'block';
-            logsIcon.textContent = '▼';
-        }
-    }
-
-    let resumoWrapper = document.getElementById('resumo-wrapper');
-    let resumoIcon = document.getElementById('resumo-toggle-icon');
-    if (resumoWrapper && resumoIcon) {
-        if (currentChar.info.resumoColapsado) {
-            resumoWrapper.style.display = 'none';
-            resumoIcon.textContent = '◀';
-        } else {
-            resumoWrapper.style.display = 'block';
-            resumoIcon.textContent = '▼';
-        }
-    }
-
-    let activeAmiStats = 0;
-    if(currentChar.info.hasAmiAlc) activeAmiStats++;
-    if(currentChar.info.hasAmiDur) activeAmiStats++;
-    if(currentChar.info.hasAmiPot) activeAmiStats++;
-    if(currentChar.info.hasAmiVel) activeAmiStats++;
+    let amiResPctVal = parseInt(i.amiResPct) || 0;
+    if (amiResPctVal > 0 && aDur > 0) {
+        let totalDurCalc = aDur + Math.floor(aDur * (amiResPctVal / 100));
+        document.getElementById('ami-res-total').textContent = `(${aDur.toLocaleString("pt-BR")} + ${amiResPctVal}% = ${totalDurCalc.toLocaleString("pt-BR")})`;
+    } else { document.getElementById('ami-res-total').textContent = ""; }
 
     let controlePct = 0;
     if(activeAmiStats > 0) {
-        let maxPoints = activeAmiStats * 10000;
+        let maxPointsLimit = activeAmiStats * maxAmiPoints;
         let currentPoints = aAlc + aDur + aPot + aVel;
-        controlePct = Math.round((currentPoints / maxPoints) * 100);
+        controlePct = Math.round((currentPoints / maxPointsLimit) * 100);
         if(controlePct > 100) controlePct = 100;
     }
+
+    let calcAttrVal = (i.calcUseAttr === 'f') ? totalF : totalD;
+    let calcRes = parseInt(i.calcInimigoRes) || 0;
+    let K = 25000;
+    let calcFator = K / (K + calcRes);
+    let danoFisico = Math.floor(calcAttrVal * calcFator);
+    
+    let isParamecia = false;
+    if (typeof akumasFixas !== 'undefined' && i.akumaNome) {
+        if (akumasFixas['Paramecia'].includes(i.akumaNome) || akumasFixas['Paramecia Especial'].includes(i.akumaNome)) isParamecia = true;
+    }
+    let danoAmi = 0;
+    if (i.calcUseAmi !== 'nao' && isParamecia) {
+        danoAmi = Math.floor(aPot * (controlePct / 100));
+    }
+    let calcDanoFinal = danoFisico + danoAmi;
+    
+    document.getElementById('calc-dano-final').textContent = calcDanoFinal.toLocaleString("pt-BR");
+    let calcFormTexto = `Dano Básico: ${calcAttrVal.toLocaleString("pt-BR")} × (${K.toLocaleString("pt-BR")} / (${K.toLocaleString("pt-BR")} + ${calcRes.toLocaleString("pt-BR")})) = ${danoFisico.toLocaleString("pt-BR")}`;
+    if (danoAmi > 0) calcFormTexto += `<br><span style="color:var(--info);">+ Bônus Paramecia: ${aPot.toLocaleString("pt-BR")} × ${controlePct}% = ${danoAmi.toLocaleString("pt-BR")}</span>`;
+    document.getElementById('calc-formula').innerHTML = calcFormTexto;
+
+    let typeMin = { "Treino Padrão": 250, "Treino de Técnicas": 60, "Interação": 50, "Missão": 250, "Recrutar NPCs": 200, "Trabalho Tipo 1": 200, "Trabalho Tipo 2": 300, "Trabalho Tipo 3": 500, "Extra-Narrada": 2000 };
+    let sceneTxt = i.sceneText || "";
+    let sChars = sceneTxt.length;
+    let sParas = sceneTxt.trim() === "" ? 0 : sceneTxt.split(/\n+/).filter(p => p.trim().length > 0).length;
+    let sWords = sceneTxt.trim() === "" ? 0 : sceneTxt.trim().split(/\s+/).length;
+    let minW = typeMin[i.sceneType] || 0;
+    
+    document.getElementById('scene-chars').textContent = sChars;
+    document.getElementById('scene-paras').textContent = sParas;
+    document.getElementById('scene-words').textContent = sWords;
+    let statusEl = document.getElementById('scene-status');
+    if (sWords >= minW) { statusEl.textContent = `(✔️ Alcançou o mínimo de ${minW})`; statusEl.style.color = "var(--success)"; } 
+    else { statusEl.textContent = `(❌ Faltam ${minW - sWords})`; statusEl.style.color = "var(--danger)"; }
 
     let inWater = (rc === "Sereiano" || rc === "Tritão" || ln === "Neptune" || (ln === "Charlotte" && (rc2 === "Sereiano" || rc2 === "Tritão")));
     let totalHP = 10000 + Math.round(R * (1 + bonus.r));
 
-    let formatHistPers = (text) => {
-        return text.split('\n').map(l => {
-            let trimL = l.trim();
-            if (trimL === "") return "";
-            return '> ' + trimL.replace(/^>\s*/, '');
-        }).join('\n');
-    };
-
+    let formatHistPers = (text) => { return text.split('\n').map(l => { let trimL = l.trim(); if (trimL === "") return ""; return '> ' + trimL.replace(/^>\s*/, ''); }).join('\n'); };
     let histPersOut = "";
-    if(i.personalidade && i.personalidade.trim() !== "") {
-        histPersOut += `\n  : ᓩ _𝐏ᴇʀsᴏɴᴀʟɪᴅᴀᴅᴇ:_\n${formatHistPers(i.personalidade)}\n`;
-    }
-    if(i.historia && i.historia.trim() !== "") {
-        histPersOut += `\n  : ᓩ _𝐇ɪsᴛᴏ́ʀɪᴀ:_\n${formatHistPers(i.historia)}\n`;
-    }
+    if(i.personalidade && i.personalidade.trim() !== "") { histPersOut += `\n  : ᓩ _𝐏ᴇʀsᴏɴᴀʟɪᴅᴀᴅᴇ:_\n${formatHistPers(i.personalidade)}\n`; }
+    if(i.historia && i.historia.trim() !== "") { histPersOut += `\n  : ᓩ _𝐇ɪsᴛᴏ́ʀɪᴀ:_\n${formatHistPers(i.historia)}\n`; }
 
     let attrOut = "";
     if (D > 0) attrOut += `↠ *𝙳𝚎𝚜𝚝𝚛𝚎𝚣𝚊:* ${strCalc(D, bonus.d)}\n\n`;
     if (F > 0) attrOut += `↠ *𝙵𝚘𝚛𝚌̧𝚊:* ${strCalc(F, bonus.f)}\n\n`;
-    if (R > 0) {
-        attrOut += `↠ *𝚁𝚎𝚜𝚒𝚜𝚝𝚎̂𝚗𝚌𝚒𝚊:* ${strCalc(R, bonus.r)}\n> 𝙴𝚜𝚝𝚊𝚖𝚒𝚗𝚊: ${(Math.round(R * (1 + bonus.r)) * 2).toLocaleString("pt-BR")}\n\n`;
-    }
+    if (R > 0) { attrOut += `↠ *𝚁𝚎𝚜𝚒𝚜𝚝𝚎̂𝚗𝚌𝚒𝚊:* ${strCalc(R, bonus.r)}\n> 𝙴𝚜𝚝𝚊𝚖𝚒𝚗𝚊: ${(Math.round(R * (1 + bonus.r)) * 2).toLocaleString("pt-BR")}\n\n`; }
     if (V > 0) {
         attrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${strCalc(V, bonus.v) + (inWater ? " (dentro da água)" : "")}\n`;
         if (REF > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${strCalc(REF, bonus.refl)}\n`;
@@ -1237,111 +1182,51 @@ function updateUI() {
     
     if (AMI > 0) {
         attrOut += `↠ *𝙰𝚔𝚞𝚖𝚊 𝚗𝚘 𝙼𝚒:* ${strCalc(AMI, bonus.ami)}\n`;
-        if (currentChar.info.hasAmiAlc && aAlc > 0) attrOut += `> _𝙰𝚕𝚌𝚊𝚗𝚌𝚎:_ ${aAlc.toLocaleString("pt-BR")}\n`;
-        if (currentChar.info.hasAmiDur && aDur > 0) attrOut += `> _𝙳𝚞𝚛𝚊𝚋𝚒𝚕𝚒𝚍𝚊𝚍𝚎:_ ${aDur.toLocaleString("pt-BR")}\n`;
-        if (currentChar.info.hasAmiPot && aPot > 0) attrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${aPot.toLocaleString("pt-BR")}\n`;
-        if (currentChar.info.hasAmiVel && aVel > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${aVel.toLocaleString("pt-BR")}\n`;
+        if (i.hasAmiAlc && aAlc > 0) attrOut += `> _𝙰𝚕𝚌𝚊𝚗𝚌𝚎:_ ${aAlc.toLocaleString("pt-BR")}\n`;
+        if (i.hasAmiDur && aDur > 0) attrOut += `> _𝙳𝚞𝚛𝚊𝚋𝚒𝚕𝚒𝚍𝚊𝚍𝚎:_ ${aDur.toLocaleString("pt-BR")}\n`;
+        if (i.hasAmiPot && aPot > 0) attrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${aPot.toLocaleString("pt-BR")}\n`;
+        if (i.hasAmiVel && aVel > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${aVel.toLocaleString("pt-BR")}\n`;
         if (activeAmiStats > 0) attrOut += `> _𝙲𝚘𝚗𝚝𝚛ᴏ𝚕𝚎:_ ${controlePct}%\n`;
         attrOut += `\n`;
     }
 
-    let formatNpc = (text, defaultText) => {
-        if (!text || text.trim() === "") return `> ${defaultText}`;
-        return text.split('\n').map(l => {
-            let trimL = l.trim();
-            if (trimL === "") return "";
-            return '> ' + trimL.replace(/^>\s*/, '');
-        }).join('\n');
-    };
-    let outNpcsC = formatNpc(i.npcsC, "");
-    let outNpcsE = formatNpc(i.npcsE, "🔒");
+    let formatNpc = (text, defaultText) => { if (!text || text.trim() === "") return `> ${defaultText}`; return text.split('\n').map(l => { let trimL = l.trim(); if (trimL === "") return ""; return '> ' + trimL.replace(/^>\s*/, ''); }).join('\n'); };
+    let outNpcsC = formatNpc(i.npcsC, ""); let outNpcsE = formatNpc(i.npcsE, "🔒");
 
     let tecnicasOut = "";
     if (currentChar.tecnicasList && currentChar.tecnicasList.length > 0) {
         tecnicasOut += "▬▬▬▬  [ 𝐓ᴇ́ᴄɴɪᴄᴀs ]  ▬▬▬▬\n\n";
-        
-        let tecnicasOrdenadas = [...currentChar.tecnicasList].sort((a, b) => {
-            let nA = (a.nome || "").trim().toLowerCase();
-            let nB = (b.nome || "").trim().toLowerCase();
-            return nA.localeCompare(nB);
-        });
-
+        let tecnicasOrdenadas = [...currentChar.tecnicasList].sort((a, b) => { let nA = (a.nome || "").trim().toLowerCase(); let nB = (b.nome || "").trim().toLowerCase(); return nA.localeCompare(nB); });
         tecnicasOrdenadas.forEach(t => {
             if(t.nome || t.desc || t.efeito) {
                 if (t.nome) tecnicasOut += `* ${t.nome}\n`;
-                if (t.desc) {
-                    t.desc.split('\n').forEach(line => {
-                        let trimLine = line.trim();
-                        if(trimLine !== "") tecnicasOut += `> ${trimLine.replace(/^>\s*/, '')}\n`;
-                    });
-                }
-                if (t.efeito) {
-                    t.efeito.split('\n').forEach((line, idx) => {
-                        let trimLine = line.trim();
-                        if(trimLine !== "") {
-                            if (idx === 0) tecnicasOut += `> Efeito: ${trimLine.replace(/^>\s*/, '')}\n`;
-                            else tecnicasOut += `> ${trimLine.replace(/^>\s*/, '')}\n`;
-                        }
-                    });
-                }
+                if (t.desc) { t.desc.split('\n').forEach(line => { let trimLine = line.trim(); if(trimLine !== "") tecnicasOut += `> ${trimLine.replace(/^>\s*/, '')}\n`; }); }
+                if (t.efeito) { t.efeito.split('\n').forEach((line, idx) => { let trimLine = line.trim(); if(trimLine !== "") { if (idx === 0) tecnicasOut += `> Efeito: ${trimLine.replace(/^>\s*/, '')}\n`; else tecnicasOut += `> ${trimLine.replace(/^>\s*/, '')}\n`; } }); }
                 tecnicasOut += `\n`;
             }
         });
         tecnicasOut += `«▬▬▬▬▬▬  [ 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 𝙾𝙿 𝚁𝙿𝙶 ]  ▬▬▬▬▬▬»`;
-    } else {
-        tecnicasOut += `«▬▬▬▬▬▬  [ 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 𝙾𝙿 𝚁𝙿𝙶 ]  ▬▬▬▬▬▬»`;
-    }
+    } else { tecnicasOut += `«▬▬▬▬▬▬  [ 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 𝙾𝙿 𝚁𝙿𝙶 ]  ▬▬▬▬▬▬»`; }
 
     let orgOut = "";
     if(i.orgTipo === "Pirata") {
-        if(i.tripulacao && i.tripulacao.trim() !== "") {
-            orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ:_\n* Pirata: ${i.tripulacao}\n`;
-        } else {
-            orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ:_\n* Pirata\n`;
-        }
-    } else {
+        if(i.tripulacao && i.tripulacao.trim() !== "") { orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ:_\n* Pirata: ${i.tripulacao}\n`; } else { orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ:_\n* Pirata\n`; }
+    } else if (i.orgTipo !== "") {
         let displayPatente = i.patente || '';
-        if (displayPatente !== "") {
-            let gKey = i.sexo === 'Feminino' ? 'f' : 'm';
-            displayPatente = patenteGender[displayPatente] ? patenteGender[displayPatente][gKey] : displayPatente;
-        }
+        if (displayPatente !== "") { let gKey = i.sexo === 'Feminino' ? 'f' : 'm'; displayPatente = patenteGender[displayPatente] ? patenteGender[displayPatente][gKey] : displayPatente; }
         orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ | 𝐏ᴀᴛᴇɴᴛᴇ | 𝐒ᴀʟᴀ́ʀɪᴏ:_\n* ${i.orgTipo}\n* ${displayPatente}\n* ${i.salario ? '฿' + i.salario : ''}\n`;
     }
 
     let outRecompensa = i.recompensa ? `฿${i.recompensa.toLocaleString("pt-BR")}` : '🔒';
     let outBerries = i.berries ? `฿${i.berries.toLocaleString("pt-BR")}` : '฿0';
-
-    let estilosText = "";
-    if(isMink) estilosText += "* Electro\n";
+    let estilosText = ""; if(isMink) estilosText += "* Electro\n";
     
-    let formatStyle = (n) => {
-        let st = i['estilo'+n];
-        if (!st || st === "Nenhum") return null;
-        if (st === "Freestyle") return i['freestyle'+n] && i['freestyle'+n].trim() !== "" ? `Freestyle: ${i['freestyle'+n]}` : "Freestyle";
-        return st;
-    };
+    let formatStyle = (n) => { let st = i['estilo'+n]; if (!st || st === "Nenhum") return null; if (st === "Freestyle") return i['freestyle'+n] && i['freestyle'+n].trim() !== "" ? `Freestyle: ${i['freestyle'+n]}` : "Freestyle"; return st; };
+    let e1 = formatStyle(1); if (e1) estilosText += `* ${e1}\n`;
+    let e2 = formatStyle(2); if (e2) estilosText += `* ${e2}\n`;
 
-    let e1 = formatStyle(1);
-    if (e1) estilosText += `* ${e1}\n`;
-    
-    let e2 = formatStyle(2);
-    if (e2) estilosText += `* ${e2}\n`;
-
-    if (totalBase >= 5000) {
-        let e3 = formatStyle(3);
-        if (e3) estilosText += `* ${e3}\n`;
-        else estilosText += `* (Vazio)\n`;
-    } else {
-        estilosText += `* 🔒 (Libera com 5.000)\n`;
-    }
-
-    if (totalBase >= 10000) {
-        let e4 = formatStyle(4);
-        if (e4) estilosText += `* ${e4}\n`;
-        else estilosText += `* (Vazio)\n`;
-    } else {
-        estilosText += `* 🔒 (Libera com 10.000)\n`;
-    }
+    if (totalBase >= 5000) { let e3 = formatStyle(3); if (e3) estilosText += `* ${e3}\n`; else estilosText += `* (Vazio)\n`; } else { estilosText += `* 🔒 (Libera com 5.000)\n`; }
+    if (totalBase >= 10000) { let e4 = formatStyle(4); if (e4) estilosText += `* ${e4}\n`; else estilosText += `* (Vazio)\n`; } else { estilosText += `* 🔒 (Libera com 10.000)\n`; }
 
     let c1Out = i.classe ? getClassDisplayName(i.classe, i.sexo) : '🔒';
     let c2Out = i.classe2 ? getClassDisplayName(i.classe2, i.sexo) : '5.000';
@@ -1349,26 +1234,16 @@ function updateUI() {
     let c4Out = i.classe4 ? getClassDisplayName(i.classe4, i.sexo) : '20.000';
     let c5Out = i.classe5 ? getClassDisplayName(i.classe5, i.sexo) : '35.000';
 
-    let racaOutput = formatRaceStr(i.raca, i.animal, i.sexo === "Feminino");
-    if (i.linhagem === "Charlotte") {
-        let raca2Output = formatRaceStr(i.raca2, i.animal2, i.sexo === "Feminino");
-        racaOutput += ` / ${raca2Output}`;
-    }
+    let racaOutput = formatRaceStr(i.raca, i.animal, i.sexo === "Feminino") || '🔒';
+    if (i.linhagem === "Charlotte") { let raca2Output = formatRaceStr(i.raca2, i.animal2, i.sexo === "Feminino"); racaOutput += ` / ${raca2Output}`; }
 
-    let displayLinhagem = i.linhagem.replace("Tenryūbito: Família ", "");
-    
+    let displayLinhagem = i.linhagem ? i.linhagem.replace("Tenryūbito: Família ", "") : 'Nenhuma';
     let recompensaOutText = `\n  : ᓩ _𝐑ᴇᴄᴏᴍᴘᴇɴsᴀ:_\n> ${outRecompensa}\n`;
     let berriesOutText = !isNPC ? `\n : ᓩ _𝐁ᴇʀʀɪᴇs:_\n> ${outBerries}\n` : "";
     let npcsOutText = !isNPC ? `\n  : ᓩ _𝐍𝐏𝐂s ᴄᴏᴍᴜɴꜱ:_\n${outNpcsC}\n\n  : ᓩ _𝐍𝐏𝐂s ᴇꜱᴘᴇᴄɪᴀɪꜱ:_\n${outNpcsE}\n` : "";
 
     let inventarioFormatado = "";
-    if (i.inventario && i.inventario.trim() !== "") {
-        inventarioFormatado = i.inventario.split('\n').map(l => {
-            let t = l.trim();
-            if (t === "") return "";
-            return t.startsWith("*") ? t : "* " + t;
-        }).filter(l => l !== "").join('\n');
-    }
+    if (i.inventario && i.inventario.trim() !== "") { inventarioFormatado = i.inventario.split('\n').map(l => { let t = l.trim(); if (t === "") return ""; return t.startsWith("*") ? t : "* " + t; }).filter(l => l !== "").join('\n'); }
 
     let out = `*Nᴇᴡ sᴇᴀs*
 — ロールプレイングゲーム - 𝚁𝙿𝙶 [𝙾𝙽𝙴 𝙿𝙸𝙴𝙲𝙴]
@@ -1376,28 +1251,28 @@ function updateUI() {
                           ᖴIᑕᕼᗩ
 Iີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊
   : ᓩ _𝐍ᴏᴍᴇ:_
-> ${currentChar.name}
+> ${currentChar.name || '🔒'}
 
   : ᓩ _𝐀ʟᴄᴜɴʜᴀ:_
 > ${i.alcunha || '🔒'}
 ${recompensaOutText}
   : ᓩ _𝐀ʟᴛᴜʀᴀ:_
-> ${i.altura}
+> ${i.altura || '🔒'}
 
   : ᓩ _𝐈ᴅᴀᴅᴇ:_
 > ${i.idade || '(Mínimo: 15)'}
 
-  : ᓩ _${i.linhagem !== "Nenhuma" ? "𝐑ᴀᴄ̧ᴀ | 𝐋ɪɴʜᴀɢᴇᴍ" : "𝐑ᴀᴄ̧ᴀ"}:_
-> ${i.linhagem !== "Nenhuma" ? racaOutput + " | " + displayLinhagem : racaOutput}
+  : ᓩ _${(i.linhagem && i.linhagem !== "Nenhuma") ? "𝐑ᴀᴄ̧ᴀ | 𝐋ɪɴʜᴀɢᴇᴍ" : "𝐑ᴀᴄ̧ᴀ"}:_
+> ${(i.linhagem && i.linhagem !== "Nenhuma") ? racaOutput + " | " + displayLinhagem : racaOutput}
 
   : ᓩ _𝐒ᴇxᴏ:_
-> ${i.sexo}
+> ${i.sexo || '🔒'}
 
   : ᓩ _𝐒ᴀɴɢᴜᴇ:_
-> ${i.sangue}
+> ${i.sangue || '🔒'}
 ${histPersOut}
   : ᓩ _𝐀ᴘᴀʀᴇ̂ɴᴄɪᴀ:_
-> ${i.aparencia}
+> ${i.aparencia || '🔒'}
 
   : ᓩ _𝐍ᴀᴄɪᴏɴᴀʟɪᴅᴀᴅᴇ:_
 > ${i.nacionalidade || 'Desconhecida'}
@@ -1434,7 +1309,6 @@ ${attrOut}${tecnicasOut}`;
 
     window.copyDataAtributos = `▬▬▬▬  [ 𝐒ᴛᴀᴛᴜs ]  ▬▬▬▬\nHP: ${totalHP.toLocaleString("pt-BR")}\n\n↠  *𝐀ᴛʀɪʙᴜᴛᴏs*\n* ${totalBase.toLocaleString("pt-BR")}\n\n${attrOut}`.trim();
     window.copyDataTecnicas = tecnicasOut.trim();
-
     document.getElementById('resBox').textContent = out.trim();
 
     let logOut = "*Log de Atualizações:*Iີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊\n";
@@ -1442,9 +1316,7 @@ ${attrOut}${tecnicasOut}`;
         currentChar.logList.forEach(l => {
             if (l.titulo || l.conteudo) {
                 if (l.titulo) logOut += `> ${l.titulo}\n`;
-                if (l.conteudo) {
-                    logOut += `${l.conteudo}\n`;
-                }
+                if (l.conteudo) logOut += `${l.conteudo}\n`;
                 logOut += `\n`;
             }
         });
@@ -1454,112 +1326,57 @@ ${attrOut}${tecnicasOut}`;
 
 async function copyFicha() {
     let text = document.getElementById('resBox').textContent;
-    let tempArea = document.createElement("textarea");
-    tempArea.value = text;
-    document.body.appendChild(tempArea);
-    tempArea.select();
-    document.execCommand("copy");
-    document.body.removeChild(tempArea);
+    let tempArea = document.createElement("textarea"); tempArea.value = text;
+    document.body.appendChild(tempArea); tempArea.select(); document.execCommand("copy"); document.body.removeChild(tempArea);
     await customAlert("Ficha copiada para a área de transferência!");
 }
 
 async function copyAtributos() {
     let text = window.copyDataAtributos || "";
     if(!text) { await customAlert("Nada para copiar!"); return; }
-    let tempArea = document.createElement("textarea");
-    tempArea.value = text;
-    document.body.appendChild(tempArea);
-    tempArea.select();
-    document.execCommand("copy");
-    document.body.removeChild(tempArea);
+    let tempArea = document.createElement("textarea"); tempArea.value = text;
+    document.body.appendChild(tempArea); tempArea.select(); document.execCommand("copy"); document.body.removeChild(tempArea);
     await customAlert("Atributos copiados para a área de transferência!");
 }
 
 async function copyTecnicas() {
     let text = window.copyDataTecnicas || "";
     if(!text) { await customAlert("Nada para copiar!"); return; }
-    let tempArea = document.createElement("textarea");
-    tempArea.value = text;
-    document.body.appendChild(tempArea);
-    tempArea.select();
-    document.execCommand("copy");
-    document.body.removeChild(tempArea);
+    let tempArea = document.createElement("textarea"); tempArea.value = text;
+    document.body.appendChild(tempArea); tempArea.select(); document.execCommand("copy"); document.body.removeChild(tempArea);
     await customAlert("Técnicas copiadas para a área de transferência!");
 }
 
 async function copyLog() {
     let text = document.getElementById('logBox').textContent;
-    let tempArea = document.createElement("textarea");
-    tempArea.value = text;
-    document.body.appendChild(tempArea);
-    tempArea.select();
-    document.execCommand("copy");
-    document.body.removeChild(tempArea);
+    let tempArea = document.createElement("textarea"); tempArea.value = text;
+    document.body.appendChild(tempArea); tempArea.select(); document.execCommand("copy"); document.body.removeChild(tempArea);
     await customAlert("Log copiado para a área de transferência!");
 }
 
 async function copyPartialLog() {
-    if (!currentChar || !currentChar.logList || currentChar.logList.length === 0) {
-        await customAlert("Não há logs para copiar.");
-        return;
-    }
-    
+    if (!currentChar || !currentChar.logList || currentChar.logList.length === 0) { await customAlert("Não há logs para copiar."); return; }
     let numToCopy = parseInt(document.getElementById('num-logs-copy').value, 10);
     if (isNaN(numToCopy) || numToCopy < 1) numToCopy = 1;
     if (numToCopy > currentChar.logList.length) numToCopy = currentChar.logList.length;
-    
     let logsToCopy = currentChar.logList.slice(-numToCopy);
-    
     let logOut = "*Log de Atualizações:*Iີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊\n";
-    if (logsToCopy && logsToCopy.length > 0) {
-        logsToCopy.forEach(l => {
-            if (l.titulo || l.conteudo) {
-                if (l.titulo) logOut += `> ${l.titulo}\n`;
-                if (l.conteudo) {
-                    logOut += `${l.conteudo}\n`;
-                }
-                logOut += `\n`;
-            }
-        });
-    }
-    
+    if (logsToCopy && logsToCopy.length > 0) { logsToCopy.forEach(l => { if (l.titulo || l.conteudo) { if (l.titulo) logOut += `> ${l.titulo}\n`; if (l.conteudo) logOut += `${l.conteudo}\n`; logOut += `\n`; } }); }
     let text = logOut.trim();
-    let tempArea = document.createElement("textarea");
-    tempArea.value = text;
-    document.body.appendChild(tempArea);
-    tempArea.select();
-    document.execCommand("copy");
-    document.body.removeChild(tempArea);
-    
+    let tempArea = document.createElement("textarea"); tempArea.value = text;
+    document.body.appendChild(tempArea); tempArea.select(); document.execCommand("copy"); document.body.removeChild(tempArea);
     await customAlert(numToCopy === 1 ? "Última entrada copiada com sucesso!" : `As últimas ${numToCopy} entradas foram copiadas com sucesso!`);
 }
 
 async function changeFichaID() {
     if (!isFirebaseReady || !db) return;
-    
-    if (currentDocId === '') {
-        await customAlert("Você precisa carregar ou salvar uma ficha primeiro para poder mudar o ID dela.");
-        return;
-    }
-    
-    if (isReadOnly) {
-        await customAlert("Você está no modo de leitura. Insira a senha da ficha atual para provar que é o dono e poder mudar o ID.");
-        return;
-    }
+    if (currentDocId === '') { await customAlert("Você precisa carregar ou salvar uma ficha primeiro para poder mudar o ID dela."); return; }
+    if (isReadOnly) { await customAlert("Você está no modo de leitura. Insira a senha da ficha atual para provar que é o dono e poder mudar o ID."); return; }
 
     let novoId = await customPrompt(`O ID atual é "${currentDocId}". Digite o NOVO ID desejado (Exatamente 4 números):`);
-    
-    if (!novoId || novoId.trim() === "" || novoId.trim() === currentDocId) {
-        return; 
-    }
-    
+    if (!novoId || novoId.trim() === "" || novoId.trim() === currentDocId) { return; }
     novoId = novoId.trim();
-    
-    if (!/^\d{4}$/.test(novoId)) {
-        await customAlert("O NOVO ID deve conter EXATAMENTE 4 NÚMEROS (ex: 1234).");
-        return;
-    }
-
+    if (!/^\d{4}$/.test(novoId)) { await customAlert("O NOVO ID deve conter EXATAMENTE 4 NÚMEROS (ex: 1234)."); return; }
     document.getElementById('db-status').classList.add('syncing');
 
     try {
@@ -1572,17 +1389,11 @@ async function changeFichaID() {
                 return;
             }
         }
-
         await db.collection("fichas_op").doc(novoId).set(charData);
-        
         await db.collection("fichas_op").doc(currentDocId).delete();
-
-        currentDocId = novoId;
-        document.getElementById('doc-id').value = currentDocId;
-        
+        currentDocId = novoId; document.getElementById('doc-id').value = currentDocId;
         document.getElementById('db-status').classList.remove('syncing');
         await customAlert(`Sucesso! O ID da ficha agora é "${novoId}".`);
-        
     } catch (e) {
         document.getElementById('db-status').classList.remove('syncing');
         await customAlert("Erro de conexão ao tentar mudar o ID.");
@@ -1598,67 +1409,33 @@ document.body.addEventListener('input', function(e) {
 
 async function deleteFichaID() {
     if (!isFirebaseReady || !db) return;
-    
-    if (currentDocId === '') {
-        await customAlert("Nenhuma ficha foi carregada para ser apagada.");
-        return;
-    }
-
+    if (currentDocId === '') { await customAlert("Nenhuma ficha foi carregada para ser apagada."); return; }
     let conf = await customPrompt(`ATENÇÃO: Você está prestes a apagar COMPLETAMENTE o ID "${currentDocId}" do banco de dados. Digite a SENHA DE ADM para confirmar:`);
-    
-    if (conf !== ADMIN_PASSWORD) {
-        if (conf !== null) await customAlert("Senha de ADM incorreta! Operação cancelada.");
-        return;
-    }
+    if (conf !== ADMIN_PASSWORD) { if (conf !== null) await customAlert("Senha de ADM incorreta! Operação cancelada."); return; }
 
     document.getElementById('db-status').classList.add('syncing');
-
     try {
         await db.collection("fichas_op").doc(currentDocId).delete();
-        
-        currentDocId = '';
-        document.getElementById('doc-id').value = '';
-        charData = { password: "", pcs: [] };
-        isReadOnly = false;
-        
-        runFallbackChecks();
-        currentChar = charData.pcs[0].pc;
-        renderTabs();
-        renderTecnicas();
-        renderLogs();
-        updateUI();
-        toggleEditability();
-        
+        currentDocId = ''; document.getElementById('doc-id').value = ''; charData = { password: "", pcs: [] }; isReadOnly = false;
+        runFallbackChecks(); currentChar = charData.pcs[0].pc;
+        renderTabs(); renderTecnicas(); renderLogs(); updateUI(); toggleEditability();
         document.getElementById('db-status').classList.remove('syncing');
         await customAlert(`Sucesso! O ID foi completamente apagado.`);
-    } catch (e) {
-        document.getElementById('db-status').classList.remove('syncing');
-        await customAlert("Erro de conexão ao tentar apagar o ID.");
-    }
+    } catch (e) { document.getElementById('db-status').classList.remove('syncing'); await customAlert("Erro de conexão ao tentar apagar o ID."); }
 }
 
 window.onload = init;
 
 window.selecionarAkuma = function(novoAkumaNome) {
     if (!currentChar.info) currentChar.info = {};
-    
-    if(novoAkumaNome === "nenhuma" || !novoAkumaNome) {
-        currentChar.info.akumaNome = "";
-        currentChar.info.akumaId = "nenhuma";
-    } else {
-        currentChar.info.akumaNome = novoAkumaNome;
-        currentChar.info.akumaId = novoAkumaNome;
-    }
-
+    if(novoAkumaNome === "nenhuma" || !novoAkumaNome) { currentChar.info.akumaNome = ""; currentChar.info.akumaId = "nenhuma"; } 
+    else { currentChar.info.akumaNome = novoAkumaNome; currentChar.info.akumaId = novoAkumaNome; }
     if(typeof saveData === 'function') saveData();
     if(typeof updateUI === 'function') updateUI();
 };
 
 function iniciarMonitoramentoBancoDeDados() {
-    let selectAkuma = document.getElementById('select-akuma');
-    let selectNac = document.getElementById('info-nacionalidade');
-    let selectLoc = document.getElementById('info-localizacao');
-    
+    let selectAkuma = document.getElementById('select-akuma'); let selectNac = document.getElementById('info-nacionalidade'); let selectLoc = document.getElementById('info-localizacao');
     let currentAkumaVal = (currentChar && currentChar.info && currentChar.info.akumaNome) ? currentChar.info.akumaNome : "nenhuma";
     let currentNacVal = (currentChar && currentChar.info) ? currentChar.info.nacionalidade : "";
     let currentLocVal = (currentChar && currentChar.info) ? currentChar.info.localizacao : "";
@@ -1668,66 +1445,44 @@ function iniciarMonitoramentoBancoDeDados() {
         ['Paramecia', 'Paramecia Especial', 'Logia', 'Zoan', 'Zoan Ancestral', 'Zoan Mítica'].forEach(tipo => {
             if (akumasFixas[tipo] && akumasFixas[tipo].length > 0) {
                 akumaHTML += `<optgroup label="${tipo}">`;
-                akumasFixas[tipo].forEach(nome => {
-                    akumaHTML += `<option value="${nome}">${nome}</option>`;
-                });
+                akumasFixas[tipo].forEach(nome => { akumaHTML += `<option value="${nome}">${nome}</option>`; });
                 akumaHTML += `</optgroup>`;
             }
         });
     }
-    if (selectAkuma) {
-        selectAkuma.innerHTML = akumaHTML;
-        selectAkuma.value = currentAkumaVal;
-    }
+    if (selectAkuma) { selectAkuma.innerHTML = akumaHTML; selectAkuma.value = currentAkumaVal; }
 
-    let ilhasHTML = '<option value="">Desconhecida / Nenhuma</option>';
+    let ilhasHTML = '<option value="">-- Selecione --</option>';
     if (typeof ilhasFixas !== 'undefined') {
         const ordemMares = ['East Blue', 'West Blue', 'North Blue', 'South Blue', 'Paraíso', 'Novo Mundo', 'Calm Belt', 'Localização Desconhecida'];
         ordemMares.forEach(mar => {
             if (ilhasFixas[mar] && ilhasFixas[mar].length > 0) {
                 ilhasHTML += `<optgroup label="${mar}">`;
-                ilhasFixas[mar].forEach(ilha => {
-                    ilhasHTML += `<option value="${ilha}">${ilha}</option>`;
-                });
+                ilhasFixas[mar].forEach(ilha => { ilhasHTML += `<option value="${ilha}">${ilha}</option>`; });
                 ilhasHTML += `</optgroup>`;
             }
         });
     }
-    if (selectNac) {
-        selectNac.innerHTML = ilhasHTML;
-        selectNac.value = currentNacVal;
-    }
-    if (selectLoc) {
-        selectLoc.innerHTML = ilhasHTML;
-        selectLoc.value = currentLocVal;
-    }
+    if (selectNac) { selectNac.innerHTML = ilhasHTML; selectNac.value = currentNacVal; }
+    if (selectLoc) { selectLoc.innerHTML = ilhasHTML; selectLoc.value = currentLocVal; }
 }
 
 setInterval(() => {
     if(!currentChar || !currentChar.info) return;
-    
     let selectAkuma = document.getElementById('select-akuma');
     if(selectAkuma) {
         let expectedAkuma = (currentChar.info.akumaNome && currentChar.info.akumaNome !== "") ? currentChar.info.akumaNome : "nenhuma";
         currentChar.info.akumaId = expectedAkuma;
-        if(selectAkuma.value !== expectedAkuma && selectAkuma.querySelector(`option[value="${expectedAkuma}"]`)) {
-            selectAkuma.value = expectedAkuma;
-        }
+        if(selectAkuma.value !== expectedAkuma && selectAkuma.querySelector(`option[value="${expectedAkuma}"]`)) selectAkuma.value = expectedAkuma;
     }
-    
     let selectNac = document.getElementById('info-nacionalidade');
     if(selectNac) {
         let expectedNac = currentChar.info.nacionalidade || "";
-        if(selectNac.value !== expectedNac && selectNac.querySelector(`option[value="${expectedNac}"]`)) {
-            selectNac.value = expectedNac;
-        }
+        if(selectNac.value !== expectedNac && selectNac.querySelector(`option[value="${expectedNac}"]`)) selectNac.value = expectedNac;
     }
-    
     let selectLoc = document.getElementById('info-localizacao');
     if(selectLoc) {
         let expectedLoc = currentChar.info.localizacao || "";
-        if(selectLoc.value !== expectedLoc && selectLoc.querySelector(`option[value="${expectedLoc}"]`)) {
-            selectLoc.value = expectedLoc;
-        }
+        if(selectLoc.value !== expectedLoc && selectLoc.querySelector(`option[value="${expectedLoc}"]`)) selectLoc.value = expectedLoc;
     }
 }, 1000);

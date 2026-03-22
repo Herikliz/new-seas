@@ -65,8 +65,11 @@ textarea { overflow: hidden; resize: none; min-height: 80px; text-align: justify
 .box-title, label { font-family: 'Cinzel', serif; color: #b3b3b3; }
 .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;}
 .three-col-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; align-items: start; margin-bottom: 20px;}
-.box { border: 1px solid #444; padding: 15px; border-radius: 8px; margin-bottom: 20px; background-color: rgba(0,0,0,0.2); display: flex; flex-direction: column; }
-.box-title { font-size: 13px; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; border-bottom: 1px dashed #444; padding-bottom: 8px;}
+.box { border: 1px solid #444; padding: 15px; border-radius: 8px; margin-bottom: 20px; background-color: rgba(0,0,0,0.2); display: flex; flex-direction: column; transition: all 0.3s ease; }
+.box-title { cursor: pointer; user-select: none; font-size: 13px; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 0; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
+.box-title span { flex-grow: 1; text-align: center; }
+.box-title .toggle-icon { flex-grow: 0; font-size: 14px; }
+.box-content { margin-top: 15px; border-top: 1px dashed #444; padding-top: 15px; }
 .input-group { margin-bottom: 10px; }
 .input-group label { font-size: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 3px; display: block;}
 .input-row { display: flex; gap: 10px; margin-bottom: 10px; }
