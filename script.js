@@ -651,6 +651,12 @@ function updateField(category, field, value) {
     } else { 
         currentChar[category][field] = value; 
     } 
+    
+    if (field === 'sceneText' && currentChar.info.sceneType !== "Extra-Narrada") {
+        updateUI();
+        return;
+    }
+    
     saveData(); updateUI(); 
 }
 
