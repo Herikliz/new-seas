@@ -994,8 +994,12 @@ function updateUI() {
     }
 
     let amiEl = document.getElementById('stat-ami');
+    let temFruta = (currentChar.info.akumaNome && currentChar.info.akumaNome !== "nenhuma" && currentChar.info.akumaNome !== "");
     if(ln === "Silvers") {
         amiEl.disabled = true; amiEl.placeholder = "🔒 Indisponível";
+        currentChar.stats.ami = 0; currentChar.substats.amiAlc = 0; currentChar.substats.amiDur = 0; currentChar.substats.amiPot = 0; currentChar.substats.amiVel = 0;
+    } else if(!temFruta) {
+        amiEl.disabled = true; amiEl.placeholder = "🔒 Requer Fruta";
         currentChar.stats.ami = 0; currentChar.substats.amiAlc = 0; currentChar.substats.amiDur = 0; currentChar.substats.amiPot = 0; currentChar.substats.amiVel = 0;
     } else { 
         amiEl.disabled = isReadOnly ? true : false; 
