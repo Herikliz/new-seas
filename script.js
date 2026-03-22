@@ -380,7 +380,18 @@ function saveData() {
 
   if (isFirebaseReady && db && currentDocId !== '') {
       document.getElementById('db-status').classList.add('syncing');
-      db.collection('fichas_op').doc(currentDocId).set(charData)
+      
+      let dataToSave = JSON.parse(JSON.stringify(charData));
+      dataToSave.pcs.forEach(p => {
+          if (p.pc && p.pc.info && p.pc.info.sceneType !== "Extra-Narrada") p.pc.info.sceneText = "";
+          if (p.npcs) {
+              p.npcs.forEach(n => {
+                  if (n.info && n.info.sceneType !== "Extra-Narrada") n.info.sceneText = "";
+              });
+          }
+      });
+
+      db.collection('fichas_op').doc(currentDocId).set(dataToSave)
         .then(() => { 
             setTimeout(() => document.getElementById('db-status').classList.remove('syncing'), 300); 
             let toast = document.getElementById('save-toast');
