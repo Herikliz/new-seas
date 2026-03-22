@@ -16,6 +16,26 @@ const ADMIN_PASSWORD = "Ben10";
 let currentDocId = ''; 
 document.getElementById('doc-id').value = currentDocId;
 
+const ilhasFixas = {
+  "East Blue": ["Base da Marinha G-03", "Clockwork", "Conomi", "Cozia", "Dawn", "Gecko", "Goat", "Ilha dos Animais Raros", "Ilha Navio de Guerra", "Ilha Shimotsuki", "Kumate", "Mirrorball", "Organ", "Oykot", "Polestar", "Tequila Wolf", "Yotsuba"],
+  "West Blue": ["Ballywood", "Base da Marinha G-12", "God Valley", "Ilusia", "Kano", "Las Camp", "Ohara", "Soja", "Thriller Bark", "Toroa"],
+  "North Blue": ["Base da Marinha G-11", "Deul", "Downs", "Flevance", "Kuen", "Lvneel", "Minion", "Notice", "Polo Norte", "Rakesh", "Rubeck", "Spider Miles", "Swallow", "Welbems", "Whiteland"],
+  "South Blue": ["Base da Marinha G-10", "Baterilla", "Briss", "Centaurea", "Karate", "Kutsukku", "Reino Negro de Drum", "Roshwan", "Samba", "Samuwanai", "Sorbet", "Taya", "Torino", "Tumi", "Vespa"],
+  "Paraíso": ["Baltigo", "Banaro", "Base da Marinha G-02", "Base da Marinha G-08", "Boin", "Cactus", "Corrente Tarai", "Base da Marinha G-01", "Enies Lobby", "Drum", "Foolshout", "Ilha Spa", "Jaya", "Skypiea", "Karakuri", "Kenzan", "Kuraigana", "Kyuka", "Little Garden", "Long Ring Long Land", "Lulusia", "Mary Geoise", "Merveille", "Momoiro", "Namakura", "Nanimonai", "Pucci", "Sabaody", "Ilha dos Homens-Peixe", "San Faldo", "Sandy", "Water 7"],
+  "Novo Mundo": ["Applenine", "Green Bit", "Mystoria", "Prodence", "Whole Cake", "Yukiryu", "Base da Marinha G-09", "Base da Marinha G-13", "Base da Marinha G-14", "Base da Marinha G-15", "Dressrosa", "Egghead", "Punk Hazard", "Elbaf", "Foodvalten", "Hachinosu", "Raijin", "Risky Red", "Wano"],
+  "Calm Belt": ["Amazon Lily", "Rusukaina", "Shitsurakujima", "Base da Marinha G-04", "Base da Marinha G-05", "Base da Marinha G-06", "Base da Marinha G-07", "Impel Down"],
+  "Localização Desconhecida": ["Arkham Island", "Gran Tesoro", "Ilha do Sol", "Atlantis", "Zou"],
+};
+
+const akumasFixas = {
+  "Paramecia": ["Awa Awa no Mi", "Baku Baku no Mi", "Bane Bane no Mi", "Bara Bara no Mi", "Bari Bari no Mi", "Bata Bata no Mi", "Beri Beri no Mi", "Beta Beta no Mi", "Bijo Bijo no Mi", "Bisu Bisu no Mi", "Bomu Bomu no Mi", "Buki Buki no Mi", "Buku Buku no Mi", "Chiyu Chiyu no Mi", "Choki Choki no Mi", "Deka Deka no Mi", "Dero Dero no Mi", "Doa Doa no Mi", "Doku Doku no Mi", "Doru Doru no Mi", "Fude Fude no Mi", "Fuku Fuku no Mi", "Fuwa Fuwa no Mi", "Gabu Gabu no Mi", "Gasha Gasha no Mi", "Gatsu Gatsu no Mi", "Genso Genso no Mi", "Giro Giro no Mi", "Gocha Gocha no Mi", "Goe Goe no Mi", "Gomu Gomu no Mi", "Goru Goru no Mi", "Gura Gura no Mi", "Guru Guru no Mi", "Gutsu Gutsu no Mi", "Hana Hana no Mi", "Hemo Hemo no Mi", "Hira Hira no Mi", "Hiso Hiso no Mi", "Hone Hone no Mi", "Horo Horo no Mi", "Horu Horu no Mi", "Hoya Hoya no Mi", "Iro Iro no Mi", "Ishi Ishi no Mi", "Ito Ito no Mi", "Jake Jake no Mi", "Jara Jara no Mi", "Jiki Jiki no Mi", "Juku Juku no Mi", "Kachi Kachi no Mi", "Kage Kage no Mi", "Kama Kama no Mi", "Kegawa Kegawa no Mi", "Kesshō Kesshō no Mi", "Kibi Kibi no Mi", "Kira Kira no Mi", "Kiro Kiro no Mi", "Kobu Kobu no Mi", "Kon Kon no Mi", "Koro Koro no Mi", "Kuku Kuku no Mi", "Kuri Kuri no Mi", "Kyubu Kyubu no Mi", "Maki Maki no Mi", "Mane Mane no Mi", "Mato Mato no Mi", "Memo Memo no Mi", "Mini Mini no Mi", "Mira Mira no Mi", "Moa Moa no Mi", "Mosa Mosa no Mi", "Muchi Muchi no Mi", "Nagi Nagi no Mi", "Nemu Nemu no Mi", "Netsu Netsu no Mi", "Nikyu Nikyu no Mi", "Noko Noko no Mi", "Noku Noku no Mi", "Nomi Nomi no Mi", "Nori Nori no Mi", "Noro Noro no Mi", "Nui Nui no Mi", "Nuke Nuke no Mi", "Ope Ope no Mi", "Ori Ori no Mi", "Oshi Oshi no Mi", "Oto Oto no Mi", "Pamu Pamu no Mi", "Pero Pero no Mi", "Peto Peto no Mi", "Poke Poke no Mi", "Rashin Rashin no Mi", "Riki Riki no Mi", "Sabi Sabi no Mi", "Shari Shari no Mi", "Shibo Shibo no Mi", "Shiku Shiku no Mi", "Shima Shima no Mi", "Shiro Shiro no Mi", "Soru Soru no Mi", "Sube Sube no Mi", "Sui Sui no Mi", "Suji Suji no Mi", "Suke Suke no Mi", "Supa Supa no Mi", "Toge Toge no Mi", "Ton Ton no Mi", "Toshi Toshi no Mi", "Tsutsu Tsutsu no Mi", "Uta Uta no Mi", "Wapu Wapu no Mi", "Wara Wara no Mi", "Woshu Woshu no Mi", "Yomi Yomi no Mi", "Zushi Zushi no Mi"],
+  "Paramecia Especial": ["Karan Karan no Mi", "Mochi Mochi no Mi"],
+  "Logia": ["Ame Ame no Mi", "Chikyū Chikyū no Mi", "Gasu Gasu no Mi", "Goro Goro no Mi", "Kaze Kaze no Mi", "Kumo Kumo no Mi", "Magu Magu no Mi", "Mera Mera no Mi", "Moku Moku no Mi", "Mori Mori no Mi", "Numa Numa no Mi", "Pasa Pasa no Mi", "Pika Pika no Mi", "Suna Suna no Mi", "Toro Toro no Mi", "Yuki Yuki no Mi"],
+  "Zoan": ["Batto Batto no Mi", "Gama Gama no Mi", "Hebi Hebi no Mi, Modelo: Anaconda", "Hebi Hebi no Mi, Modelo: Cobra-Real", "Hito Hito no Mi", "Inu Inu no Mi, Modelo: Cão de Caça", "Inu Inu no Mi, Modelo: Cão-Guaxinim", "Inu Inu no Mi, Modelo: Chacal", "Inu Inu no Mi, Modelo: Dachshund", "Inu Inu no Mi, Modelo: Lobo", "Kame Kame no Mi", "Mogu Mogu no Mi", "Mushi Mushi no Mi, Modelo: Besouro-Rinoceronte", "Mushi Mushi no Mi, Modelo: Vespa-Mandarina", "Neko Neko no Mi, Modelo: Leão", "Neko Neko no Mi, Modelo: Leopardo", "Neko Neko no Mi, Modelo: Pantera Negra", "Neko Neko no Mi, Modelo: Tigre de Bengala", "Sara Sara no Mi, Modelo: Axolote", "Tama Tama no Mi", "Tori Tori no Mi, Modelo: Águia", "Tori Tori no Mi, Modelo: Albatroz", "Tori Tori no Mi, Modelo: Falcão", "Uma Uma no Mi", "Usagi Usagi no Mi", "Ushi Ushi no Mi, Modelo: Bisão", "Ushi Ushi no Mi, Modelo: Girafa", "Ushi Ushi no Mi, Modelo: Rinoceronte", "Zou Zou no Mi"],
+  "Zoan Ancestral": ["Kumo Kumo no Mi, Modelo: Rosamygale grauvogeli", "Neko Neko no Mi, Modelo: Tigre Dentes de Sabre", "Ryū Ryū no Mi, Modelo: Alossauro", "Ryū Ryū no Mi, Modelo: Braquiossauro", "Ryū Ryū no Mi, Modelo: Espinossauro", "Ryū Ryū no Mi, Modelo: Paquicefalossauro", "Ryū Ryū no Mi, Modelo: Pteranodonte", "Ryū Ryū no Mi, Modelo: Triceratops", "Zou Zou no Mi, Modelo: Mamute"],
+  "Zoan Mítica": ["Hebi Hebi no Mi, Modelo: Kaijū", "Hebi Hebi no Mi, Modelo: Yamata no Orochi", "Hito Hito no Mi, Modelo: O Anfitrião", "Hito Hito no Mi, Modelo: Ōnyūdō", "Inu Inu no Mi, Modelo: Bake-Danuki", "Inu Inu no Mi, Modelo: Cérbero", "Inu Inu no Mi, Modelo: Ōkuchi no Makami", "Inu Inu no Mi, Modelo: Raposa de Nove Caudas", "Ryū Ryū no Mi, Modelo: Dragão Ocidental", "Ryū Ryū no Mi, Modelo: Kirin", "Saru Saru no Mi, Modelo: Sun Wukong", "Tori Tori no Mi, Modelo: Fênix", "Tori Tori no Mi, Modelo: Nue", "Tori Tori no Mi, Modelo: Pássaro de Cinzas", "Tori Tori no Mi, Modelo: Pássaro de Gelo", "Tori Tori no Mi, Modelo: Thunderbird", "Uma Uma no Mi, Modelo: Pégaso", "Uo Uo no Mi, Modelo: Carpa Seiryū"],
+};
+
 const baseClassesList = ["Arqueólogo", "Artista", "Atirador", "Carpinteiro", "Cientista", "Combatente", "Cozinheiro", "Ferreiro", "Inventor", "Médico", "Musicista", "Navegador"];
 const racas = { "Braços Longos":{f:.40}, "Bucaneiro":{f:.40,r:.40}, "Gigante":{f:.30,r:.30,v:-.20}, "Humano":{}, "Kuja":{}, "Kumate":{d:.40}, "Lunariano":{v:.35,r:.45}, "Meio-Gigante":{f:.25,r:.25}, "Mink":{v:.15,r:.15}, "Oni":{f:.35,r:.45}, "Pernas Longas":{v:.40}, "Povo do Céu: Birkan":{d:.20,v:.20}, "Povo do Céu: Shandia":{d:.20,v:.20}, "Povo do Céu: Skypieano":{d:.20,v:.20}, "Sereiano":{v:.40}, "Tontatta":{f:.20,v:.20}, "Três-Olhos":{v:.15,r:.15}, "Tritão":{f:.20,r:.20,v:.30}, "Wotan":{f:.25,r:.25} };
 const linhagens = { "Nenhuma":{}, "Augur":{v:.10,d:.20,req:["Humano"]}, "Barnum":{req:["Braços Longos","Pernas Longas","Kumate","Três-Olhos"]}, "Boa":{f:.15,ha:.15,req:["Kuja"]}, "Capone":{v:.10,d:.15,req:["Humano"]}, "Charlotte":{charlotte:true}, "Chinjao":{f:.15,r:.15,req:["Humano"]}, "D.":{}, "Dracule":{d:.20,ho:.10,req:["Humano"]}, "Drole":{f:.20,r:.10,v:.10,req:["Gigante","Meio-Gigante","Wotan"]}, "Família do Sol":{f:.15,r:.15,req:["Tritão","Sereiano","Wotan"]}, "Gan":{esp:.15,req:["Povo do Céu: Birkan","Povo do Céu: Shandia","Povo do Céu: Skypieano"]}, "Kong":{req:["Humano"]}, "Kozuki":{v:.10,d:.10,esp:.10,req:["Humano"]}, "Kurozumi":{v:.10,d:.20,req:["Humano"]}, "Laufey":{r:.20,f:.10,v:-.20,req:["Gigante"]}, "Mokomo":{v:.10,req:["Mink"]}, "Nefertari":{d:.15,v:.15,req:["Humano"]}, "Neptune":{v:.25,req:["Sereiano"]}, "Newgate":{f:.10,r:.20,req:["Humano","Meio-Gigante"]}, "Sakazuki":{r:.10,f:.20,req:["Humano"]}, "Silvers":{esp:.15,req:["Humano"]}, "Tenryūbito: Família Donquixote":{d:.15,ami:.15,req:["Humano"]}, "Tenryūbito: Família Figarland":{d:.15,esp:.15,req:["Humano"]} };
@@ -1615,35 +1635,15 @@ async function deleteFichaID() {
 
 window.onload = init;
 
-window.selecionarAkuma = async function(novoAkumaId) {
+window.selecionarAkuma = function(novoAkumaNome) {
     if (!currentChar.info) currentChar.info = {};
-    let oldAkumaId = currentChar.info.akumaId;
-    let selectEl = document.getElementById('select-akuma');
     
-    if(novoAkumaId === "nenhuma" || !novoAkumaId) {
+    if(novoAkumaNome === "nenhuma" || !novoAkumaNome) {
         currentChar.info.akumaNome = "";
-        currentChar.info.akumaId = "";
+        currentChar.info.akumaId = "nenhuma";
     } else {
-        let textoOpcao = selectEl.options[selectEl.selectedIndex].text;
-        let novoNome = textoOpcao.replace(' [Pendente]', '').replace(' [Aprovada]', '').split(' - ฿')[0].trim();
-        currentChar.info.akumaNome = novoNome;
-        currentChar.info.akumaId = novoAkumaId;
-        
-        try {
-            await db.collection("lista_one_piece_db").doc(novoAkumaId).update({
-                pedidoPor: currentDocId,
-                pedidoNome: currentDocId
-            });
-        } catch(e) {}
-    }
-
-    if(oldAkumaId && oldAkumaId !== "nenhuma" && oldAkumaId !== novoAkumaId) {
-        try {
-            await db.collection("lista_one_piece_db").doc(oldAkumaId).update({
-                pedidoPor: null,
-                pedidoNome: null
-            });
-        } catch(e) {}
+        currentChar.info.akumaNome = novoAkumaNome;
+        currentChar.info.akumaId = novoAkumaNome;
     }
 
     if(typeof saveData === 'function') saveData();
@@ -1651,120 +1651,52 @@ window.selecionarAkuma = async function(novoAkumaId) {
 };
 
 function iniciarMonitoramentoBancoDeDados() {
-    db.collection("lista_one_piece_db").onSnapshot((snapshot) => {
-        let selectAkuma = document.getElementById('select-akuma');
-        let selectNac = document.getElementById('info-nacionalidade');
-        let selectLoc = document.getElementById('info-localizacao');
-        
-        let currentAkumaVal = (currentChar && currentChar.info) ? currentChar.info.akumaId : "nenhuma";
-        let currentNacVal = (currentChar && currentChar.info) ? currentChar.info.nacionalidade : "";
-        let currentLocVal = (currentChar && currentChar.info) ? currentChar.info.localizacao : "";
+    let selectAkuma = document.getElementById('select-akuma');
+    let selectNac = document.getElementById('info-nacionalidade');
+    let selectLoc = document.getElementById('info-localizacao');
+    
+    let currentAkumaVal = (currentChar && currentChar.info && currentChar.info.akumaNome) ? currentChar.info.akumaNome : "nenhuma";
+    let currentNacVal = (currentChar && currentChar.info) ? currentChar.info.nacionalidade : "";
+    let currentLocVal = (currentChar && currentChar.info) ? currentChar.info.localizacao : "";
 
-        let akumasArray = [];
-        let ilhasArray = [];
-        let frutaDoJogador = null;
-
-        snapshot.forEach(documento => {
-            if (documento.id === currentAkumaVal) frutaDoJogador = documento.data();
-        });
-
-        if (currentAkumaVal !== "nenhuma" && currentAkumaVal) {
-            if (!frutaDoJogador || (frutaDoJogador.pedidoPor !== currentDocId && frutaDoJogador.donoId !== currentDocId)) {
-                if (currentChar && currentChar.info) {
-                    currentChar.info.akumaId = "nenhuma";
-                    currentChar.info.akumaNome = "";
-                    currentAkumaVal = "nenhuma";
-                    if (selectAkuma) selectAkuma.value = "nenhuma";
-                    if (typeof saveData === 'function') saveData();
-                    if (typeof updateUI === 'function') updateUI();
-                }
-            }
-        }
-
-        snapshot.forEach(documento => {
-            let d = documento.data();
-            d.id = documento.id;
-            
-            if (d.type === 'Akuma no Mi') {
-                if (!d.ocupada && !d.pedidoPor) {
-                    akumasArray.push(d);
-                } else if (documento.id === currentAkumaVal || d.donoId === currentDocId || d.pedidoPor === currentDocId) {
-                    akumasArray.push(d);
-                }
-            } else if (d.type === 'Ilha') {
-                ilhasArray.push(d);
-            }
-        });
-
-        let akumasPorTipo = { 'Paramecia': [], 'Zoan': [], 'Logia': [] };
-        
-        akumasArray.forEach(a => {
-            let st = a.subtype || "";
-            if (st.includes('Paramecia')) akumasPorTipo['Paramecia'].push(a);
-            else if (st.includes('Zoan')) akumasPorTipo['Zoan'].push(a);
-            else if (st.includes('Logia')) akumasPorTipo['Logia'].push(a);
-        });
-
-        akumasPorTipo['Paramecia'].sort((a, b) => a.name.localeCompare(b.name));
-        akumasPorTipo['Logia'].sort((a, b) => a.name.localeCompare(b.name));
-        
-        const ordemZoan = { 'Zoan': 1, 'Zoan Ancestral': 2, 'Zoan Mítica': 3 };
-        akumasPorTipo['Zoan'].sort((a, b) => {
-            let oA = ordemZoan[a.subtype] || 99;
-            let oB = ordemZoan[b.subtype] || 99;
-            if (oA !== oB) return oA - oB;
-            return a.name.localeCompare(b.name);
-        });
-
-        let akumaHTML = '<option value="nenhuma">Nenhuma</option>';
-        
-        ['Paramecia', 'Zoan', 'Logia'].forEach(tipo => {
-            if (akumasPorTipo[tipo].length > 0) {
+    let akumaHTML = '<option value="nenhuma">Nenhuma</option>';
+    if (typeof akumasFixas !== 'undefined') {
+        ['Paramecia', 'Paramecia Especial', 'Logia', 'Zoan', 'Zoan Ancestral', 'Zoan Mítica'].forEach(tipo => {
+            if (akumasFixas[tipo] && akumasFixas[tipo].length > 0) {
                 akumaHTML += `<optgroup label="${tipo}">`;
-                akumasPorTipo[tipo].forEach(a => {
-                    let txtPreco = a.preco ? ` - ฿ ${Number(a.preco).toLocaleString('pt-BR')}` : "";
-                    akumaHTML += `<option value="${a.id}">${a.name} (${a.subtype})${txtPreco}</option>`;
+                akumasFixas[tipo].forEach(nome => {
+                    akumaHTML += `<option value="${nome}">${nome}</option>`;
                 });
                 akumaHTML += `</optgroup>`;
             }
         });
+    }
+    if (selectAkuma) {
+        selectAkuma.innerHTML = akumaHTML;
+        selectAkuma.value = currentAkumaVal;
+    }
 
-        if (selectAkuma) {
-            selectAkuma.innerHTML = akumaHTML;
-            selectAkuma.value = currentAkumaVal;
-        }
-
-        ilhasArray.sort((a, b) => a.name.localeCompare(b.name));
-
-        let mares = {};
-        ilhasArray.forEach(ilha => {
-            let mar = ilha.mar || "Outros";
-            if (!mares[mar]) mares[mar] = [];
-            mares[mar].push(ilha);
-        });
-
-        let ilhasHTML = '<option value="">Desconhecida / Nenhuma</option>';
-        const ordemMares = ['East Blue', 'West Blue', 'North Blue', 'South Blue', 'Paraíso', 'Novo Mundo', 'Calm Belt', 'Localização Desconhecida', 'Outros'];
-        
+    let ilhasHTML = '<option value="">Desconhecida / Nenhuma</option>';
+    if (typeof ilhasFixas !== 'undefined') {
+        const ordemMares = ['East Blue', 'West Blue', 'North Blue', 'South Blue', 'Paraíso', 'Novo Mundo', 'Calm Belt', 'Localização Desconhecida'];
         ordemMares.forEach(mar => {
-            if (mares[mar] && mares[mar].length > 0) {
+            if (ilhasFixas[mar] && ilhasFixas[mar].length > 0) {
                 ilhasHTML += `<optgroup label="${mar}">`;
-                mares[mar].forEach(ilha => {
-                    ilhasHTML += `<option value="${ilha.name}">${ilha.name}</option>`;
+                ilhasFixas[mar].forEach(ilha => {
+                    ilhasHTML += `<option value="${ilha}">${ilha}</option>`;
                 });
                 ilhasHTML += `</optgroup>`;
             }
         });
-
-        if (selectNac) {
-            selectNac.innerHTML = ilhasHTML;
-            selectNac.value = currentNacVal;
-        }
-        if (selectLoc) {
-            selectLoc.innerHTML = ilhasHTML;
-            selectLoc.value = currentLocVal;
-        }
-    });
+    }
+    if (selectNac) {
+        selectNac.innerHTML = ilhasHTML;
+        selectNac.value = currentNacVal;
+    }
+    if (selectLoc) {
+        selectLoc.innerHTML = ilhasHTML;
+        selectLoc.value = currentLocVal;
+    }
 }
 
 setInterval(() => {
@@ -1772,7 +1704,8 @@ setInterval(() => {
     
     let selectAkuma = document.getElementById('select-akuma');
     if(selectAkuma) {
-        let expectedAkuma = currentChar.info.akumaId || "nenhuma";
+        let expectedAkuma = (currentChar.info.akumaNome && currentChar.info.akumaNome !== "") ? currentChar.info.akumaNome : "nenhuma";
+        currentChar.info.akumaId = expectedAkuma;
         if(selectAkuma.value !== expectedAkuma && selectAkuma.querySelector(`option[value="${expectedAkuma}"]`)) {
             selectAkuma.value = expectedAkuma;
         }
