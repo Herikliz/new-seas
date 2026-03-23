@@ -300,10 +300,54 @@ function customAlert(msg) {
     });
 }
 
+function setupSumButtons() {
+    const inputs = document.querySelectorAll("input[oninput*='formatAndSave'], input[oninput*='formatCurrency']");
+    inputs.forEach(inp => {
+        if (inp.parentNode.classList.contains('sum-wrapper')) return;
+
+        let wrapper = document.createElement('div');
+        wrapper.className = 'sum-wrapper';
+        wrapper.style.display = "flex";
+        wrapper.style.alignItems = "stretch";
+        wrapper.style.gap = "4px";
+        wrapper.style.width = "100%";
+        
+        inp.parentNode.insertBefore(wrapper, inp);
+        wrapper.appendChild(inp);
+
+        let btn = document.createElement('button');
+        btn.type = "button";
+        btn.textContent = '+';
+        btn.className = 'btn btn-outline';
+        btn.style.cssText = 'padding: 0 8px; margin: 0; font-size: 16px; font-weight: bold; border-color: var(--success); color: var(--success); cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center;';
+        btn.title = "Somar ou Subtrair";
+
+        btn.onclick = async () => {
+            if(inp.disabled || isReadOnly) {
+                await customAlert("Campo bloqueado ou em modo de leitura.");
+                return;
+            }
+            let val = await customPrompt("Digite o valor para SOMAR (use '-' antes do número para SUBTRAIR):");
+            if(val !== null && val.trim() !== "") {
+                let numToAdd = parseInt(val.replace(/[^0-9-]/g, ''), 10);
+                if(!isNaN(numToAdd)) {
+                    let currentVal = parseInt(inp.value.replace(/\D/g, ''), 10) || 0;
+                    let newVal = currentVal + numToAdd;
+                    if(newVal < 0) newVal = 0;
+                    inp.value = newVal;
+                    inp.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            }
+        };
+        wrapper.appendChild(btn);
+    });
+}
+
 function init() {
   populateSelects();
   runFallbackChecks();
   currentChar = activeNpcIndex === -1 ? charData.pcs[activePcIndex].pc : charData.pcs[activePcIndex].npcs[activeNpcIndex];
+  setupSumButtons();
   renderTabs();
   renderTecnicas();
   renderLogs();
