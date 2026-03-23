@@ -315,31 +315,57 @@ function setupSumButtons() {
         inp.parentNode.insertBefore(wrapper, inp);
         wrapper.appendChild(inp);
 
-        let btn = document.createElement('button');
-        btn.type = "button";
-        btn.textContent = '+';
-        btn.className = 'btn btn-outline';
-        btn.style.cssText = 'padding: 0 8px; margin: 0; font-size: 16px; font-weight: bold; border-color: var(--success); color: var(--success); cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center;';
-        btn.title = "Somar ou Subtrair";
+        let btnMinus = document.createElement('button');
+        btnMinus.type = "button";
+        btnMinus.textContent = '-';
+        btnMinus.className = 'btn btn-outline';
+        btnMinus.style.cssText = 'padding: 0 8px; margin: 0; font-size: 16px; font-weight: bold; border-color: var(--danger); color: var(--danger); cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center;';
+        btnMinus.title = "Subtrair";
 
-        btn.onclick = async () => {
+        btnMinus.onclick = async () => {
             if(inp.disabled || isReadOnly) {
                 await customAlert("Campo bloqueado ou em modo de leitura.");
                 return;
             }
-            let val = await customPrompt("Digite o valor para SOMAR (use '-' antes do número para SUBTRAIR):");
+            let val = await customPrompt("Digite o valor para SUBTRAIR:");
             if(val !== null && val.trim() !== "") {
-                let numToAdd = parseInt(val.replace(/[^0-9-]/g, ''), 10);
-                if(!isNaN(numToAdd)) {
+                let numToSub = parseInt(val.replace(/\D/g, ''), 10);
+                if(!isNaN(numToSub)) {
                     let currentVal = parseInt(inp.value.replace(/\D/g, ''), 10) || 0;
-                    let newVal = currentVal + numToAdd;
+                    let newVal = currentVal - numToSub;
                     if(newVal < 0) newVal = 0;
                     inp.value = newVal;
                     inp.dispatchEvent(new Event('input', { bubbles: true }));
                 }
             }
         };
-        wrapper.appendChild(btn);
+
+        let btnPlus = document.createElement('button');
+        btnPlus.type = "button";
+        btnPlus.textContent = '+';
+        btnPlus.className = 'btn btn-outline';
+        btnPlus.style.cssText = 'padding: 0 8px; margin: 0; font-size: 16px; font-weight: bold; border-color: var(--success); color: var(--success); cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center;';
+        btnPlus.title = "Somar";
+
+        btnPlus.onclick = async () => {
+            if(inp.disabled || isReadOnly) {
+                await customAlert("Campo bloqueado ou em modo de leitura.");
+                return;
+            }
+            let val = await customPrompt("Digite o valor para SOMAR:");
+            if(val !== null && val.trim() !== "") {
+                let numToAdd = parseInt(val.replace(/\D/g, ''), 10);
+                if(!isNaN(numToAdd)) {
+                    let currentVal = parseInt(inp.value.replace(/\D/g, ''), 10) || 0;
+                    let newVal = currentVal + numToAdd;
+                    inp.value = newVal;
+                    inp.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            }
+        };
+
+        wrapper.appendChild(btnMinus);
+        wrapper.appendChild(btnPlus);
     });
 }
 
