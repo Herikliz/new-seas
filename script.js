@@ -805,34 +805,6 @@ function formatRaceStr(rName, aName, isFem) {
     return res;
 }
 
-window.handleDespertarInput = async function(el) {
-    if (isReadOnly) return;
-    let cleanVal = el.value.replace(/\D/g, "");
-    let num = cleanVal ? parseInt(cleanVal, 10) : 0;
-    let currentVal = currentChar.substats.amiDesp || 0;
-
-    if (currentVal === 0 && num > 0) {
-        let pwd = await customPrompt("Acesso Restrito: Digite a Senha de ADM para liberar o Despertar:");
-        if (pwd !== ADMIN_PASSWORD) {
-            await customAlert("Senha incorreta!");
-            el.value = "";
-            currentChar.substats.amiDesp = 0;
-            saveData();
-            updateUI();
-            return;
-        }
-    }
-    
-    currentChar.substats.amiDesp = num;
-    let cursor = el.selectionStart; 
-    let oldLength = el.value.length; 
-    el.value = cleanVal ? num.toLocaleString("pt-BR") : "";
-    let newLength = el.value.length; 
-    try { el.setSelectionRange(cursor + (newLength - oldLength), cursor + (newLength - oldLength)); } catch(e){}
-    saveData(); 
-    updateUI();
-}
-
 function toggleAmi(field, isChecked) {
     let key = 'has' + field.charAt(0).toUpperCase() + field.slice(1);
     currentChar.info[key] = isChecked;
@@ -1193,12 +1165,24 @@ function updateUI() {
         let has = i[key]; if (chk) chk.checked = has; if (inp) inp.disabled = !has || isReadOnly;
     });
 
-    let AMI = currentChar.stats.ami; let totalAmi = Math.round(AMI * (1 + bonus.ami)); document.getElementById('total-ami').innerText = "Total: " + totalAmi.toLocaleString("pt-BR");
+    let AMI = currentChar.stats.ami;
+    
+    let baseAmiStats = 0;
+    if(i.hasAmiAlc) baseAmiStats++; if(i.hasAmiDur) baseAmiStats++; if(i.hasAmiPot) baseAmiStats++; if(i.hasAmiVel) baseAmiStats++;
+    
+    let maxStatAmiInput = (baseAmiStats * 10000) + (i.hasAmiDesp ? 10000 : 0);
+    if (AMI > maxStatAmiInput) {
+        AMI = maxStatAmiInput;
+        currentChar.stats.ami = AMI;
+        let amiElUpdate = document.getElementById('stat-ami');
+        if (amiElUpdate) amiElUpdate.value = AMI.toLocaleString("pt-BR");
+    }
+
+    let totalAmi = Math.round(AMI * (1 + bonus.ami)); document.getElementById('total-ami').innerText = "Total: " + totalAmi.toLocaleString("pt-BR");
     document.getElementById('box-amiSub').style.display = AMI > 0 ? "block" : "none";
     if(AMI === 0) { currentChar.substats.amiAlc = 0; currentChar.substats.amiDur = 0; currentChar.substats.amiPot = 0; currentChar.substats.amiVel = 0; currentChar.substats.amiDesp = 0; }
     
-    let activeAmiStats = 0;
-    if(i.hasAmiAlc) activeAmiStats++; if(i.hasAmiDur) activeAmiStats++; if(i.hasAmiPot) activeAmiStats++; if(i.hasAmiVel) activeAmiStats++;
+    let activeAmiStats = baseAmiStats + (i.hasAmiDesp ? 1 : 0);
 
     let maxAmiPoints = 10000;
     if (bonus.ami > 0 && activeAmiStats > 0) {
@@ -1208,11 +1192,9 @@ function updateUI() {
     let aAlc = currentChar.substats.amiAlc || 0, aDur = currentChar.substats.amiDur || 0, aPot = currentChar.substats.amiPot || 0, aVel = currentChar.substats.amiVel || 0, aDesp = currentChar.substats.amiDesp || 0;
     
     let controlePct = 0;
-    if(activeAmiStats > 0) {
-        let maxPointsLimit = activeAmiStats * maxAmiPoints;
-        let currentPoints = aAlc + aDur + aPot + aVel;
-        controlePct = Math.round((currentPoints / maxPointsLimit) * 100);
-        if(controlePct > 100) controlePct = 100;
+    if(baseAmiStats > 0) {
+        let currentBasePoints = aAlc + aDur + aPot + aVel;
+        controlePct = Math.round((currentBasePoints / (baseAmiStats * 10000)) * 100);
     }
 
     let despContainer = document.getElementById('box-despertar');
@@ -1229,6 +1211,17 @@ function updateUI() {
                 aDesp = 0;
                 let chkDesp = document.getElementById('chk-amiDesp'); if(chkDesp) chkDesp.checked = false;
                 let subDesp = document.getElementById('sub-amiDesp'); if(subDesp) subDesp.value = "";
+                
+                maxStatAmiInput = baseAmiStats * 10000;
+                if (AMI > maxStatAmiInput) {
+                    AMI = maxStatAmiInput;
+                    currentChar.stats.ami = AMI;
+                    let amiElUpdate = document.getElementById('stat-ami');
+                    if (amiElUpdate) amiElUpdate.value = AMI.toLocaleString("pt-BR");
+                    totalAmi = Math.round(AMI * (1 + bonus.ami)); document.getElementById('total-ami').innerText = "Total: " + totalAmi.toLocaleString("pt-BR");
+                }
+                activeAmiStats = baseAmiStats;
+                maxAmiPoints = Math.max(10000, Math.floor(totalAmi / activeAmiStats));
             }
         }
     }
