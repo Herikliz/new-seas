@@ -271,34 +271,60 @@
                 <span>Akuma no Mi</span><span id="icon-boxAmi" class="toggle-icon">▼</span>
             </div>
             <div id="wrapper-boxAmi" class="box-content">
-                <div class="input-group"><label>Fruta Consumida</label><select id="select-akuma" onchange="selecionarAkuma(this.value)" style="width: 100%; padding: 10px; background-color: #1a1a1a; color: var(--text); border: 1px solid #444; border-radius: 4px;"></select></div>
-                <div style="margin-bottom: 10px;">
-                    <label style="font-size: 10px;">Pontos da Akuma</label>
-                    <input type="text" id="stat-ami" placeholder="0" oninput="formatAndSave('stats', 'ami', this)" style="font-size: 16px; font-weight: bold; font-family: 'Cinzel', serif; text-align: right;">
-                    <span id="total-ami" class="attr-total" style="display:block; text-align:right;">Total: 0</span>
+                <div class="input-group">
+                    <label style="color: var(--danger); font-family: 'Cinzel', serif;">Fruta Consumida</label>
+                    <select id="select-akuma" onchange="selecionarAkuma(this.value)" style="width: 100%; padding: 10px; background-color: #1a1a1a; color: var(--text); border: 1px solid var(--danger); border-radius: 4px; font-weight: bold;"></select>
                 </div>
-                <div id="box-amiSub" style="display:none; padding-top:10px; border-top: 1px dashed #444;">
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div>
-                            <label style="font-size: 10px; display:flex; align-items:center; gap:3px;"><input type="checkbox" id="chk-amiAlc" onchange="toggleAmi('amiAlc', this.checked)"> Alcance</label>
-                            <input type="text" id="sub-amiAlc" placeholder="0" oninput="formatAndSave('substats', 'amiAlc', this)">
-                            <div style="display:flex; align-items:center; gap:5px; margin-top:5px;">
-                              <label style="font-size:9px; margin:0; text-transform:none;">Multiplicador (m):</label>
-                              <input type="text" id="info-amiAlcMult" placeholder="Ex: 1.8" oninput="updateField('info', 'amiAlcMult', this.value)" style="width:40px; padding:2px; font-size:10px; text-align:center;">
-                            </div>
-                        </div>
-                        <div>
-                            <label style="font-size: 10px; display:flex; align-items:center; gap:3px;"><input type="checkbox" id="chk-amiDur" onchange="toggleAmi('amiDur', this.checked)"> Durabilidade</label>
-                            <input type="text" id="sub-amiDur" placeholder="0" oninput="formatAndSave('substats', 'amiDur', this)">
-                            <div style="display:flex; align-items:center; gap:5px; margin-top:5px;">
-                              <label style="font-size:9px; margin:0; text-transform:none;">Bônus Resistência (%):</label>
-                              <input type="text" id="info-amiResPct" placeholder="Ex: 50" oninput="formatAndSave('info', 'amiResPct', this)" style="width:40px; padding:2px; font-size:10px; text-align:center;">
-                            </div>
-                            <span id="ami-res-total" style="font-size:10px; color:#aaa; display:block; margin-top:3px;"></span>
-                        </div>
-                        <div><label style="font-size: 10px; display:flex; align-items:center; gap:3px;"><input type="checkbox" id="chk-amiPot" onchange="toggleAmi('amiPot', this.checked)"> Potência</label><input type="text" id="sub-amiPot" placeholder="0" oninput="formatAndSave('substats', 'amiPot', this)"></div>
-                        <div><label style="font-size: 10px; display:flex; align-items:center; gap:3px;"><input type="checkbox" id="chk-amiVel" onchange="toggleAmi('amiVel', this.checked)"> Velocidade (Fruta)</label><input type="text" id="sub-amiVel" placeholder="0" oninput="formatAndSave('substats', 'amiVel', this)"></div>
+                
+                <div style="margin-bottom: 15px; background: rgba(220, 53, 69, 0.1); padding: 10px; border-radius: 6px; border: 1px dashed var(--danger);">
+                    <label style="font-size: 11px; color: var(--danger); text-transform: uppercase; font-weight: bold;">Pontos da Akuma</label>
+                    <input type="text" id="stat-ami" placeholder="0" oninput="formatAndSave('stats', 'ami', this)" style="font-size: 18px; font-weight: bold; font-family: 'Cinzel', serif; text-align: right; color: var(--danger); border-color: var(--danger);">
+                    <div style="display:flex; justify-content:space-between; margin-top:5px;">
+                        <span id="ami-distribuiveis" style="font-size: 12px; font-weight: bold; color: var(--info);">Disponível: 0</span>
+                        <span id="total-ami" class="attr-total" style="color: var(--danger); font-weight: bold;">Total: 0</span>
                     </div>
+                </div>
+
+                <div id="box-amiSub" style="display:none; padding-top:10px;">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid #444;">
+                            <label style="font-size: 11px; display:flex; align-items:center; gap:5px; color: #ddd; margin-bottom: 5px;"><input type="checkbox" id="chk-amiAlc" onchange="toggleAmi('amiAlc', this.checked)"> Alcance</label>
+                            <input type="text" id="sub-amiAlc" placeholder="0" oninput="formatAndSave('substats', 'amiAlc', this)" style="font-size: 14px; text-align: right; font-weight: bold;">
+                            <div style="display:flex; align-items:center; justify-content: space-between; margin-top:5px;">
+                              <label style="font-size:9px; margin:0; text-transform:none; color:#aaa;">Multiplicador (m):</label>
+                              <input type="text" id="info-amiAlcMult" placeholder="Ex: 1.8" oninput="updateField('info', 'amiAlcMult', this.value)" style="width:45px; padding:2px; font-size:10px; text-align:center; background: #222; border: 1px solid #555;">
+                            </div>
+                        </div>
+
+                        <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid #444;">
+                            <label style="font-size: 11px; display:flex; align-items:center; gap:5px; color: #ddd; margin-bottom: 5px;"><input type="checkbox" id="chk-amiDur" onchange="toggleAmi('amiDur', this.checked)"> Durabilidade</label>
+                            <input type="text" id="sub-amiDur" placeholder="0" oninput="formatAndSave('substats', 'amiDur', this)" style="font-size: 14px; text-align: right; font-weight: bold;">
+                            <div style="display:flex; align-items:center; justify-content: space-between; margin-top:5px;">
+                              <label style="font-size:9px; margin:0; text-transform:none; color:#aaa;">Bônus Res (%):</label>
+                              <input type="text" id="info-amiResPct" placeholder="Ex: 50" oninput="formatAndSave('info', 'amiResPct', this)" style="width:45px; padding:2px; font-size:10px; text-align:center; background: #222; border: 1px solid #555;">
+                            </div>
+                            <span id="ami-res-total" style="font-size:10px; color:var(--warning); display:block; margin-top:3px; text-align:right;"></span>
+                        </div>
+
+                        <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid #444;">
+                            <label style="font-size: 11px; display:flex; align-items:center; gap:5px; color: #ddd; margin-bottom: 5px;"><input type="checkbox" id="chk-amiPot" onchange="toggleAmi('amiPot', this.checked)"> Potência</label>
+                            <input type="text" id="sub-amiPot" placeholder="0" oninput="formatAndSave('substats', 'amiPot', this)" style="font-size: 14px; text-align: right; font-weight: bold;">
+                        </div>
+
+                        <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid #444;">
+                            <label style="font-size: 11px; display:flex; align-items:center; gap:5px; color: #ddd; margin-bottom: 5px;"><input type="checkbox" id="chk-amiVel" onchange="toggleAmi('amiVel', this.checked)"> Velocidade</label>
+                            <input type="text" id="sub-amiVel" placeholder="0" oninput="formatAndSave('substats', 'amiVel', this)" style="font-size: 14px; text-align: right; font-weight: bold;">
+                        </div>
+                    </div>
+
+                    <div id="box-despertar" style="margin-top: 12px; background: rgba(164, 97, 255, 0.1); padding: 10px; border-radius: 6px; border: 1px dashed #a461ff; transition: opacity 0.3s;">
+                        <label style="font-size: 12px; display:flex; align-items:center; gap:5px; color: #a461ff; font-weight:bold; margin-bottom: 5px; font-family: 'Cinzel', serif;">
+                            <input type="checkbox" id="chk-amiDesp" onchange="toggleAmi('amiDesp', this.checked)"> 🌟 Despertar
+                        </label>
+                        <input type="text" id="sub-amiDesp" placeholder="0" oninput="handleDespertarInput(this)" style="font-size: 16px; text-align: right; font-weight: bold; border-color: #a461ff; color: #a461ff;">
+                        <div style="font-size: 10px; color: #aaa; text-align: right; margin-top: 4px;">Requer 100% de Controle</div>
+                    </div>
+
                     <div id="avisoAmi" class="avisoErro"></div>
                 </div>
             </div>

@@ -600,15 +600,15 @@ function runFallbackChecks() {
               alcunha: "", recompensa: "", altura: "", idade: "", sexo: "", sangue: "", nacionalidade: "", localizacao: "", 
               telefone: "", orgTipo: "", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", 
               estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", 
-              personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, 
-              amiResPct: "", calcUseAttr: "d", calcInimigoRes: "", sceneType: "Treino Padrão", sceneText: "",
+              personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, hasAmiDesp: false,
+              amiResPct: "", amiAlcMult: "1", calcUseAttr: "d", calcInimigoRes: "", calcUseAmi: "sim", sceneType: "Treino Padrão", sceneText: "",
               boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxVel: false, boxEsp: false, boxAmi: false, boxHist: false, 
               boxInv: false, boxCalc: false, boxScene: false, akumaId: "" 
           };
           for(let k in defInfo) if (typeof c.info[k] === 'undefined') c.info[k] = defInfo[k];
           
           if (!c.stats) c.stats = { f: 0, d: 0, r: 0, v: 0, esp: 0, ami: 0 };
-          if (!c.substats) c.substats = { refl: 0, vcorp: 0, hArm: 0, hObs: 0, hRei: 0, amiAlc: 0, amiDur: 0, amiPot: 0, amiVel: 0 };
+          if (!c.substats) c.substats = { refl: 0, vcorp: 0, hArm: 0, hObs: 0, hRei: 0, amiAlc: 0, amiDur: 0, amiPot: 0, amiVel: 0, amiDesp: 0 };
           if (!c.tecnicasList) c.tecnicasList = [];
           if (!c.logList) c.logList = [];
       });
@@ -803,6 +803,34 @@ function formatRaceStr(rName, aName, isFem) {
         if (aName && aName.trim() !== "") res += `: ${aName.trim()}`;
     }
     return res;
+}
+
+window.handleDespertarInput = async function(el) {
+    if (isReadOnly) return;
+    let cleanVal = el.value.replace(/\D/g, "");
+    let num = cleanVal ? parseInt(cleanVal, 10) : 0;
+    let currentVal = currentChar.substats.amiDesp || 0;
+
+    if (currentVal === 0 && num > 0) {
+        let pwd = await customPrompt("Acesso Restrito: Digite a Senha de ADM para liberar o Despertar:");
+        if (pwd !== ADMIN_PASSWORD) {
+            await customAlert("Senha incorreta!");
+            el.value = "";
+            currentChar.substats.amiDesp = 0;
+            saveData();
+            updateUI();
+            return;
+        }
+    }
+    
+    currentChar.substats.amiDesp = num;
+    let cursor = el.selectionStart; 
+    let oldLength = el.value.length; 
+    el.value = cleanVal ? num.toLocaleString("pt-BR") : "";
+    let newLength = el.value.length; 
+    try { el.setSelectionRange(cursor + (newLength - oldLength), cursor + (newLength - oldLength)); } catch(e){}
+    saveData(); 
+    updateUI();
 }
 
 function toggleAmi(field, isChecked) {
@@ -1160,14 +1188,14 @@ function updateUI() {
     document.getElementById('sub-hObs').value = currentChar.substats.hObs ? currentChar.substats.hObs.toLocaleString("pt-BR") : "";
     document.getElementById('sub-hRei').value = currentChar.substats.hRei ? currentChar.substats.hRei.toLocaleString("pt-BR") : "";
 
-    ['amiAlc', 'amiDur', 'amiPot', 'amiVel'].forEach(f => {
+    ['amiAlc', 'amiDur', 'amiPot', 'amiVel', 'amiDesp'].forEach(f => {
         let chk = document.getElementById('chk-' + f); let inp = document.getElementById('sub-' + f); let key = 'has' + f.charAt(0).toUpperCase() + f.slice(1);
         let has = i[key]; if (chk) chk.checked = has; if (inp) inp.disabled = !has || isReadOnly;
     });
 
     let AMI = currentChar.stats.ami; let totalAmi = Math.round(AMI * (1 + bonus.ami)); document.getElementById('total-ami').innerText = "Total: " + totalAmi.toLocaleString("pt-BR");
     document.getElementById('box-amiSub').style.display = AMI > 0 ? "block" : "none";
-    if(AMI === 0) { currentChar.substats.amiAlc = 0; currentChar.substats.amiDur = 0; currentChar.substats.amiPot = 0; currentChar.substats.amiVel = 0; }
+    if(AMI === 0) { currentChar.substats.amiAlc = 0; currentChar.substats.amiDur = 0; currentChar.substats.amiPot = 0; currentChar.substats.amiVel = 0; currentChar.substats.amiDesp = 0; }
     
     let activeAmiStats = 0;
     if(i.hasAmiAlc) activeAmiStats++; if(i.hasAmiDur) activeAmiStats++; if(i.hasAmiPot) activeAmiStats++; if(i.hasAmiVel) activeAmiStats++;
@@ -1177,25 +1205,59 @@ function updateUI() {
         maxAmiPoints = Math.max(10000, Math.floor(totalAmi / activeAmiStats));
     }
 
-    let aAlc = currentChar.substats.amiAlc || 0, aDur = currentChar.substats.amiDur || 0, aPot = currentChar.substats.amiPot || 0, aVel = currentChar.substats.amiVel || 0;
+    let aAlc = currentChar.substats.amiAlc || 0, aDur = currentChar.substats.amiDur || 0, aPot = currentChar.substats.amiPot || 0, aVel = currentChar.substats.amiVel || 0, aDesp = currentChar.substats.amiDesp || 0;
     
+    let controlePct = 0;
+    if(activeAmiStats > 0) {
+        let maxPointsLimit = activeAmiStats * maxAmiPoints;
+        let currentPoints = aAlc + aDur + aPot + aVel;
+        controlePct = Math.round((currentPoints / maxPointsLimit) * 100);
+        if(controlePct > 100) controlePct = 100;
+    }
+
+    let despContainer = document.getElementById('box-despertar');
+    if (despContainer) {
+        if (controlePct >= 100) {
+            despContainer.style.opacity = '1';
+            despContainer.style.pointerEvents = 'auto';
+        } else {
+            despContainer.style.opacity = '0.5';
+            despContainer.style.pointerEvents = 'none';
+            if (aDesp > 0 || i.hasAmiDesp) {
+                currentChar.substats.amiDesp = 0;
+                i.hasAmiDesp = false;
+                aDesp = 0;
+                let chkDesp = document.getElementById('chk-amiDesp'); if(chkDesp) chkDesp.checked = false;
+                let subDesp = document.getElementById('sub-amiDesp'); if(subDesp) subDesp.value = "";
+            }
+        }
+    }
+
     let limitAmiExcedido = false;
     if(aAlc > maxAmiPoints) { aAlc = maxAmiPoints; currentChar.substats.amiAlc = maxAmiPoints; limitAmiExcedido = true; }
     if(aDur > maxAmiPoints) { aDur = maxAmiPoints; currentChar.substats.amiDur = maxAmiPoints; limitAmiExcedido = true; }
     if(aPot > maxAmiPoints) { aPot = maxAmiPoints; currentChar.substats.amiPot = maxAmiPoints; limitAmiExcedido = true; }
     if(aVel > maxAmiPoints) { aVel = maxAmiPoints; currentChar.substats.amiVel = maxAmiPoints; limitAmiExcedido = true; }
+    if(aDesp > maxAmiPoints) { aDesp = maxAmiPoints; currentChar.substats.amiDesp = maxAmiPoints; limitAmiExcedido = true; }
     
-    let totalAmiSub = aAlc + aDur + aPot + aVel;
+    let totalAmiSub = aAlc + aDur + aPot + aVel + aDesp;
+    let pontosDisponiveis = totalAmi - totalAmiSub;
+    let elDisp = document.getElementById('ami-distribuiveis');
+    if(elDisp) elDisp.textContent = `Disponível: ${Math.max(0, pontosDisponiveis).toLocaleString("pt-BR")}`;
     
     if(totalAmiSub > totalAmi) {
         let diff = totalAmiSub - totalAmi; let active = document.activeElement;
-        if(active && active.id === 'sub-amiAlc') { aAlc -= diff; currentChar.substats.amiAlc = aAlc; }
-        else if(active && active.id === 'sub-amiDur') { aDur -= diff; currentChar.substats.amiDur = aDur; }
-        else if(active && active.id === 'sub-amiPot') { aPot -= diff; currentChar.substats.amiPot = aPot; }
-        else if(active && active.id === 'sub-amiVel') { aVel -= diff; currentChar.substats.amiVel = aVel; }
+        if(active && active.id === 'sub-amiAlc') { aAlc -= diff; currentChar.substats.amiAlc = Math.max(0, aAlc); }
+        else if(active && active.id === 'sub-amiDur') { aDur -= diff; currentChar.substats.amiDur = Math.max(0, aDur); }
+        else if(active && active.id === 'sub-amiPot') { aPot -= diff; currentChar.substats.amiPot = Math.max(0, aPot); }
+        else if(active && active.id === 'sub-amiVel') { aVel -= diff; currentChar.substats.amiVel = Math.max(0, aVel); }
+        else if(active && active.id === 'sub-amiDesp') { aDesp -= diff; currentChar.substats.amiDesp = Math.max(0, aDesp); }
         else {
-            if(aVel >= diff) { aVel -= diff; currentChar.substats.amiVel = aVel; } else if(aPot >= diff) { aPot -= diff; currentChar.substats.amiPot = aPot; }
-            else if(aDur >= diff) { aDur -= diff; currentChar.substats.amiDur = aDur; } else if(aAlc >= diff) { aAlc -= diff; currentChar.substats.amiAlc = aAlc; }
+            if(aDesp >= diff) { aDesp -= diff; currentChar.substats.amiDesp = Math.max(0, aDesp); }
+            else if(aVel >= diff) { aVel -= diff; currentChar.substats.amiVel = Math.max(0, aVel); } 
+            else if(aPot >= diff) { aPot -= diff; currentChar.substats.amiPot = Math.max(0, aPot); }
+            else if(aDur >= diff) { aDur -= diff; currentChar.substats.amiDur = Math.max(0, aDur); } 
+            else if(aAlc >= diff) { aAlc -= diff; currentChar.substats.amiAlc = Math.max(0, aAlc); }
         }
         document.getElementById('avisoAmi').style.display = "block"; document.getElementById('avisoAmi').textContent = `Limite atingido! Máx: ${totalAmi.toLocaleString("pt-BR")}`;
     } else if (limitAmiExcedido) {
@@ -1206,20 +1268,14 @@ function updateUI() {
     document.getElementById('sub-amiDur').value = currentChar.substats.amiDur ? currentChar.substats.amiDur.toLocaleString("pt-BR") : "";
     document.getElementById('sub-amiPot').value = currentChar.substats.amiPot ? currentChar.substats.amiPot.toLocaleString("pt-BR") : "";
     document.getElementById('sub-amiVel').value = currentChar.substats.amiVel ? currentChar.substats.amiVel.toLocaleString("pt-BR") : "";
+    let despEl = document.getElementById('sub-amiDesp');
+    if (despEl) despEl.value = currentChar.substats.amiDesp ? currentChar.substats.amiDesp.toLocaleString("pt-BR") : "";
 
     let amiResPctVal = parseInt(i.amiResPct) || 0;
     if (amiResPctVal > 0 && aDur > 0) {
         let totalDurCalc = aDur + Math.floor(aDur * (amiResPctVal / 100));
         document.getElementById('ami-res-total').textContent = `(${aDur.toLocaleString("pt-BR")} + ${amiResPctVal}% = ${totalDurCalc.toLocaleString("pt-BR")})`;
     } else { document.getElementById('ami-res-total').textContent = ""; }
-
-    let controlePct = 0;
-    if(activeAmiStats > 0) {
-        let maxPointsLimit = activeAmiStats * maxAmiPoints;
-        let currentPoints = aAlc + aDur + aPot + aVel;
-        controlePct = Math.round((currentPoints / maxPointsLimit) * 100);
-        if(controlePct > 100) controlePct = 100;
-    }
 
     let calcAttrVal = (i.calcUseAttr === 'f') ? totalF : totalD;
     let calcRes = parseInt(i.calcInimigoRes) || 0;
@@ -1290,9 +1346,13 @@ function updateUI() {
             let metros = (aAlc / 20) * mult;
             attrOut += `> _𝙰𝚕𝚌𝚊𝚗𝚌𝚎:_ ${aAlc.toLocaleString("pt-BR")} (${metros.toLocaleString("pt-BR", {maximumFractionDigits: 1})}m)\n`;
         }
-        if (i.hasAmiDur && aDur > 0) attrOut += `> _𝙳𝚞𝚛𝚊𝚋𝚒𝚕𝚒𝚍𝚊𝚍𝚎:_ ${aDur.toLocaleString("pt-BR")}\n`;
+        if (i.hasAmiDur && aDur > 0) {
+            let cenas = Math.floor(aDur / 500);
+            attrOut += `> _𝙳𝚞𝚛𝚊𝚋𝚒𝚕𝚒𝚍𝚊𝚍𝚎:_ ${aDur.toLocaleString("pt-BR")} (${cenas} cena${cenas !== 1 ? 's' : ''})\n`;
+        }
         if (i.hasAmiPot && aPot > 0) attrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${aPot.toLocaleString("pt-BR")}\n`;
         if (i.hasAmiVel && aVel > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${aVel.toLocaleString("pt-BR")}\n`;
+        if (i.hasAmiDesp && aDesp > 0) attrOut += `> _𝙳𝚎𝚜𝚙𝚎𝚛𝚝𝚊𝚛:_ ${aDesp.toLocaleString("pt-BR")}\n`;
         if (activeAmiStats > 0) attrOut += `> _𝙲𝚘𝚗𝚝𝚛ᴏ𝚕𝚎:_ ${controlePct}%\n`;
         attrOut += `\n`;
     }
