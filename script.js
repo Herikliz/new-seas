@@ -229,7 +229,7 @@ function getClassDisplayName(baseClassWithLevel, sexo) {
     return `${cName}: ${cTitle}`;
 }
 
-function customPrompt(msg) {
+function customPrompt(msg, numericOnly = false) {
     return new Promise((resolve) => {
         const overlay = document.getElementById('custom-prompt-overlay');
         const msgEl = document.getElementById('custom-prompt-msg');
@@ -239,6 +239,15 @@ function customPrompt(msg) {
 
         msgEl.textContent = msg;
         inputEl.value = '';
+        
+        if (numericOnly) {
+            inputEl.setAttribute('inputmode', 'numeric');
+            inputEl.oninput = function() { this.value = this.value.replace(/[^0-9]/g, ''); };
+        } else {
+            inputEl.removeAttribute('inputmode');
+            inputEl.oninput = null;
+        }
+        
         overlay.style.display = 'flex';
         inputEl.focus();
 
@@ -327,7 +336,7 @@ function setupSumButtons() {
                 await customAlert("Campo bloqueado ou em modo de leitura.");
                 return;
             }
-            let val = await customPrompt("Digite o valor para SUBTRAIR:");
+            let val = await customPrompt("Digite o valor para SUBTRAIR:", true);
             if(val !== null && val.trim() !== "") {
                 let numToSub = parseInt(val.replace(/\D/g, ''), 10);
                 if(!isNaN(numToSub)) {
@@ -352,7 +361,7 @@ function setupSumButtons() {
                 await customAlert("Campo bloqueado ou em modo de leitura.");
                 return;
             }
-            let val = await customPrompt("Digite o valor para SOMAR:");
+            let val = await customPrompt("Digite o valor para SOMAR:", true);
             if(val !== null && val.trim() !== "") {
                 let numToAdd = parseInt(val.replace(/\D/g, ''), 10);
                 if(!isNaN(numToAdd)) {
