@@ -266,7 +266,7 @@
             </div>
         </div>
 
-        <div class="box">
+        <div class="box" id="container-boxAmi">
             <div class="box-title" id="title-boxAmi" style="color: var(--danger);" onclick="toggleBox('boxAmi')">
                 <span>Akuma no Mi</span><span id="icon-boxAmi" class="toggle-icon">▼</span>
             </div>
@@ -279,7 +279,14 @@
                 </div>
                 <div id="box-amiSub" style="display:none; padding-top:10px; border-top: 1px dashed #444;">
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div><label style="font-size: 10px; display:flex; align-items:center; gap:3px;"><input type="checkbox" id="chk-amiAlc" onchange="toggleAmi('amiAlc', this.checked)"> Alcance</label><input type="text" id="sub-amiAlc" placeholder="0" oninput="formatAndSave('substats', 'amiAlc', this)"></div>
+                        <div>
+                            <label style="font-size: 10px; display:flex; align-items:center; gap:3px;"><input type="checkbox" id="chk-amiAlc" onchange="toggleAmi('amiAlc', this.checked)"> Alcance</label>
+                            <input type="text" id="sub-amiAlc" placeholder="0" oninput="formatAndSave('substats', 'amiAlc', this)">
+                            <div style="display:flex; align-items:center; gap:5px; margin-top:5px;">
+                              <label style="font-size:9px; margin:0; text-transform:none;">Multiplicador (m):</label>
+                              <input type="text" id="info-amiAlcMult" placeholder="Ex: 1.8" oninput="updateField('info', 'amiAlcMult', this.value)" style="width:40px; padding:2px; font-size:10px; text-align:center;">
+                            </div>
+                        </div>
                         <div>
                             <label style="font-size: 10px; display:flex; align-items:center; gap:3px;"><input type="checkbox" id="chk-amiDur" onchange="toggleAmi('amiDur', this.checked)"> Durabilidade</label>
                             <input type="text" id="sub-amiDur" placeholder="0" oninput="formatAndSave('substats', 'amiDur', this)">
@@ -310,7 +317,7 @@
                             <option value="f">Força</option>
                         </select>
                     </div>
-                    <div class="input-group">
+                    <div class="input-group" id="box-calcUseAmi">
                         <label>Somar Akuma no Mi?</label>
                         <select id="info-calcUseAmi" onchange="updateField('info', 'calcUseAmi', this.value)">
                             <option value="sim">Sim</option>

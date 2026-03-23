@@ -885,7 +885,7 @@ function updateUI() {
     } else { anim2.style.display = "none"; }
 
     document.getElementById('pc-name').value = currentChar.name;
-    const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'alcunha', 'altura', 'idade', 'sexo', 'sangue', 'telefone', 'nacionalidade', 'localizacao', 'tripulacao', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2', 'sceneType', 'sceneText', 'calcUseAttr', 'calcUseAmi'];
+    const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'alcunha', 'altura', 'idade', 'sexo', 'sangue', 'telefone', 'nacionalidade', 'localizacao', 'tripulacao', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2', 'sceneType', 'sceneText', 'calcUseAttr', 'calcUseAmi', 'amiAlcMult'];
     textFields.forEach(f => { let el = document.getElementById('info-'+f); if(el) el.value = i[f] || ""; });
 
     let calcResEl = document.getElementById('info-calcInimigoRes');
@@ -1070,6 +1070,13 @@ function updateUI() {
 
     let amiEl = document.getElementById('stat-ami');
     let temFruta = (i.akumaNome && i.akumaNome !== "nenhuma" && i.akumaNome !== "");
+    
+    let boxCalcAmi = document.getElementById('box-calcUseAmi');
+    if (boxCalcAmi) boxCalcAmi.style.display = (temFruta && ln !== "Silvers") ? "block" : "none";
+    
+    let containerBoxAmi = document.getElementById('container-boxAmi');
+    if (containerBoxAmi) containerBoxAmi.style.display = (ln === "Silvers") ? "none" : "flex";
+
     if(ln === "Silvers") {
         amiEl.disabled = true; amiEl.placeholder = "🔒 Indisponível";
         currentChar.stats.ami = 0; currentChar.substats.amiAlc = 0; currentChar.substats.amiDur = 0; currentChar.substats.amiPot = 0; currentChar.substats.amiVel = 0;
@@ -1278,7 +1285,11 @@ function updateUI() {
     
     if (AMI > 0) {
         attrOut += `↠ *𝙰𝚔𝚞𝚖𝚊 𝚗𝚘 𝙼𝚒:* ${strCalc(AMI, bonus.ami)}\n`;
-        if (i.hasAmiAlc && aAlc > 0) attrOut += `> _𝙰𝚕𝚌𝚊𝚗𝚌𝚎:_ ${aAlc.toLocaleString("pt-BR")}\n`;
+        if (i.hasAmiAlc && aAlc > 0) {
+            let mult = parseFloat((i.amiAlcMult || "1").toString().replace(',', '.')) || 1;
+            let metros = (aAlc / 20) * mult;
+            attrOut += `> _𝙰𝚕𝚌𝚊𝚗𝚌𝚎:_ ${aAlc.toLocaleString("pt-BR")} (${metros.toLocaleString("pt-BR", {maximumFractionDigits: 1})}m)\n`;
+        }
         if (i.hasAmiDur && aDur > 0) attrOut += `> _𝙳𝚞𝚛𝚊𝚋𝚒𝚕𝚒𝚍𝚊𝚍𝚎:_ ${aDur.toLocaleString("pt-BR")}\n`;
         if (i.hasAmiPot && aPot > 0) attrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${aPot.toLocaleString("pt-BR")}\n`;
         if (i.hasAmiVel && aVel > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${aVel.toLocaleString("pt-BR")}\n`;
