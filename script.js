@@ -603,7 +603,7 @@ function runFallbackChecks() {
               personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, hasAmiDesp: false,
               amiResPct: "", amiAlcMult: "1", calcUseAttr: "d", calcInimigoRes: "", calcBuffFlat: "", calcBuffPct: "", calcUseAmi: "sim", sceneType: "Treino Padrão", sceneText: "",
               boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxEsp: false, boxAmi: false, boxHist: false, 
-              boxInv: false, boxCalc: false, boxScene: false, akumaId: "", selCharR1: "", selCharR2: "" 
+              boxInv: false, boxCalc: false, boxScene: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0 
           };
           for(let k in defInfo) if (typeof c.info[k] === 'undefined') c.info[k] = defInfo[k];
           
@@ -934,6 +934,9 @@ function updateUI() {
 
     let recEl = document.getElementById('info-recompensa');
     if(recEl) recEl.value = i.recompensa ? i.recompensa.toLocaleString("pt-BR") : "";
+
+    let elTreinos = document.getElementById('info-treinosAcumulados');
+    if(elTreinos) elTreinos.value = i.treinosAcumulados ? i.treinosAcumulados.toLocaleString("pt-BR") : "";
 
     if(isNPC) {
         document.getElementById('info-berries').value = "Bloqueado";
@@ -1424,8 +1427,9 @@ function updateUI() {
     let outNpcsC = formatNpc(i.npcsC, ""); let outNpcsE = formatNpc(i.npcsE, "🔒");
 
     let tecnicasOut = "";
-    if (currentChar.tecnicasList && currentChar.tecnicasList.length > 0) {
+    if ((currentChar.tecnicasList && currentChar.tecnicasList.length > 0) || i.treinosAcumulados > 0) {
         tecnicasOut += "▬▬▬▬  [ 𝐓ᴇ́ᴄɴɪᴄᴀs ]  ▬▬▬▬\n\n";
+        if (i.treinosAcumulados > 0) tecnicasOut += `Treinos Acumulados: ${i.treinosAcumulados.toLocaleString("pt-BR")}\n\n`;
         let tecnicasOrdenadas = [...currentChar.tecnicasList].sort((a, b) => { let nA = (a.nome || "").trim().toLowerCase(); let nB = (b.nome || "").trim().toLowerCase(); return nA.localeCompare(nB); });
         tecnicasOrdenadas.forEach(t => {
             if(t.nome || t.desc || t.efeito) {
