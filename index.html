@@ -94,6 +94,10 @@
                       <select id="info-raca" onchange="updateField('info', 'raca', this.value)"></select>
                       <input type="text" id="info-animal" placeholder="Qual animal?" style="display:none; margin-top:5px;" oninput="updateField('info', 'animal', this.value)">
                       <select id="info-raca2" style="display:none; margin-top:5px;" onchange="updateField('info', 'raca2', this.value)"></select>
+                      <div id="box-charlotteRacas" class="conditional-selects" style="display: none; flex-direction: row; gap: 5px;">
+                          <select id="info-selCharR1" onchange="updateField('info', 'selCharR1', this.value)" style="flex: 1;"><option value="">- Buff Raça 1 -</option></select>
+                          <select id="info-selCharR2" onchange="updateField('info', 'selCharR2', this.value)" style="flex: 1;"><option value="">- Buff Raça 2 -</option></select>
+                      </div>
                       <input type="text" id="info-animal2" placeholder="Qual animal?" style="display:none; margin-top:5px;" oninput="updateField('info', 'animal2', this.value)">
                       
                       <div id="box-extraRaca" class="conditional-selects" style="display: none; flex-direction: row; gap: 5px;">

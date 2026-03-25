@@ -603,7 +603,7 @@ function runFallbackChecks() {
               personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, hasAmiDesp: false,
               amiResPct: "", amiAlcMult: "1", calcUseAttr: "d", calcInimigoRes: "", calcUseAmi: "sim", sceneType: "Treino Padrão", sceneText: "",
               boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxVel: false, boxEsp: false, boxAmi: false, boxHist: false, 
-              boxInv: false, boxCalc: false, boxScene: false, akumaId: "" 
+              boxInv: false, boxCalc: false, boxScene: false, akumaId: "", selCharR1: "", selCharR2: "" 
           };
           for(let k in defInfo) if (typeof c.info[k] === 'undefined') c.info[k] = defInfo[k];
           
@@ -874,6 +874,43 @@ function updateUI() {
         sRaca2.style.display = "none";
     }
 
+    let boxCharRacas = document.getElementById('box-charlotteRacas');
+    if (boxCharRacas) {
+        if (i.linhagem === "Charlotte") {
+            boxCharRacas.style.display = "flex";
+            let nomes = {d: "Destreza", f: "Força", r: "Resistência", v: "Velocidade"};
+            let buildOpts = (racaName) => {
+                let html = '<option value="">-- Escolher Buff --</option>';
+                if (racaName === "Humano" || racaName === "Kuja") {
+                    for (let s in nomes) html += `<option value="${s}">${nomes[s]} (+${racaName === "Kuja" && (s === "f" || s === "d") ? "30" : "20"}%)</option>`;
+                } else if (racas[racaName]) {
+                    for (let s in racas[racaName]) {
+                        if (racas[racaName][s] > 0) {
+                            html += `<option value="${s}">${nomes[s]} (+${(racas[racaName][s]*100).toFixed(0)}%)</option>`;
+                        }
+                    }
+                }
+                return html;
+            };
+
+            let sC1 = document.getElementById('info-selCharR1');
+            if (sC1) {
+                let h1 = buildOpts(i.raca);
+                if (sC1.innerHTML !== h1) sC1.innerHTML = h1;
+                if (Array.from(sC1.options).some(o => o.value === i.selCharR1)) sC1.value = i.selCharR1; else { sC1.value = ""; i.selCharR1 = ""; }
+            }
+
+            let sC2 = document.getElementById('info-selCharR2');
+            if (sC2) {
+                let h2 = buildOpts(i.raca2);
+                if (sC2.innerHTML !== h2) sC2.innerHTML = h2;
+                if (Array.from(sC2.options).some(o => o.value === i.selCharR2)) sC2.value = i.selCharR2; else { sC2.value = ""; i.selCharR2 = ""; }
+            }
+        } else {
+            boxCharRacas.style.display = "none";
+        }
+    }
+
     let anim1 = document.getElementById('info-animal');
     if (["Tritão", "Wotan", "Mink"].includes(i.raca)) {
         anim1.style.display = "block"; anim1.placeholder = i.raca === "Mink" ? "Mamífero" : "Animal Marinho";
@@ -1017,8 +1054,8 @@ function updateUI() {
 
     let showExtraLin = isLinhagemVisible && ["Barnum","Charlotte","D.","Gan","Kong","Silvers"].includes(ln);
     document.getElementById('box-extraLin').style.display = showExtraLin ? "flex" : "none";
-    document.getElementById('info-selLinDF').style.display = ["Barnum","Charlotte","Gan"].includes(ln) ? "block" : "none";
-    document.getElementById('info-selLinRV').style.display = ["Barnum","Charlotte"].includes(ln) ? "block" : "none";
+    document.getElementById('info-selLinDF').style.display = ["Barnum","Gan"].includes(ln) ? "block" : "none";
+    document.getElementById('info-selLinRV').style.display = ["Barnum"].includes(ln) ? "block" : "none";
     document.getElementById('info-selLin4').style.display = ["D.","Kong","Silvers"].includes(ln) ? "block" : "none";
     document.getElementById('info-selLinEspAmi').style.display = ["D."].includes(ln) ? "block" : "none";
 
@@ -1095,12 +1132,25 @@ function updateUI() {
     if(ln !== "Charlotte") {
         if(racas[rc]) { bonus.d += racas[rc].d || 0; bonus.f += racas[rc].f || 0; bonus.r += racas[rc].r || 0; bonus.v += racas[rc].v || 0; }
         if(rc === "Humano") { bonus[i.selDF] += 0.20; bonus[i.selRV] += 0.20; } else if(rc === "Kuja") { bonus[i.selDF] += 0.30; bonus[i.selRV] += 0.20; } else if(rc === "Três-Olhos" || rc === "Mink") { bonus[i.selDF] += 0.15; }
+    } else {
+        let applyCharlotteBuff = (rName, selVal) => {
+            if (racas[rName]) {
+                for (let s in racas[rName]) { if (racas[rName][s] < 0) bonus[s] += racas[rName][s]; }
+            }
+            if (selVal) {
+                if (rName === "Humano") bonus[selVal] += 0.20;
+                else if (rName === "Kuja") bonus[selVal] += (selVal === "f" || selVal === "d") ? 0.30 : 0.20;
+                else if (racas[rName] && racas[rName][selVal] > 0) bonus[selVal] += racas[rName][selVal];
+            }
+        };
+        applyCharlotteBuff(rc, i.selCharR1);
+        applyCharlotteBuff(rc2, i.selCharR2);
     }
 
     if(document.getElementById('container-linhagem').style.display === "block" && linhagens[ln]) {
         bonus.d += linhagens[ln].d || 0; bonus.f += linhagens[ln].f || 0; bonus.r += linhagens[ln].r || 0; bonus.v += linhagens[ln].v || 0; bonus.esp += linhagens[ln].esp || 0; bonus.ha += linhagens[ln].ha || 0; bonus.ho += linhagens[ln].ho || 0; bonus.hr += linhagens[ln].hr || 0; bonus.ami += linhagens[ln].ami || 0;
         
-        if(ln === "Barnum") { bonus[i.selLinDF] += 0.15; bonus[i.selLinRV] += 0.15; } else if(ln === "Charlotte") { bonus[i.selLinDF] += 0.20; bonus[i.selLinRV] += 0.20; } else if(ln === "D.") { bonus[i.selLin4] += 0.15; bonus[i.selLinEspAmi] += 0.15; } else if(ln === "Gan") { bonus[i.selLinDF] += 0.15; } else if(ln === "Kong") { bonus[i.selLin4] += 0.10; } else if(ln === "Silvers") { bonus[i.selLin4] += 0.15; }
+        if(ln === "Barnum") { bonus[i.selLinDF] += 0.15; bonus[i.selLinRV] += 0.15; } else if(ln === "D.") { bonus[i.selLin4] += 0.15; bonus[i.selLinEspAmi] += 0.15; } else if(ln === "Gan") { bonus[i.selLinDF] += 0.15; } else if(ln === "Kong") { bonus[i.selLin4] += 0.10; } else if(ln === "Silvers") { bonus[i.selLin4] += 0.15; }
         
         if(ln === "Dracule") { if(totalBase >= 15000) bonus.d += 0.20; else if(totalBase >= 10000) bonus.d += 0.15; else if(totalBase >= 5000) bonus.d += 0.10; } else if(ln === "Capone") { if(totalBase >= 15000) bonus.d += 0.25; else if(totalBase >= 10000) bonus.d += 0.20; else if(totalBase >= 5000) bonus.d += 0.15; } else if(ln === "Augur") { if(totalBase >= 20000) bonus.d += 0.15; else if(totalBase >= 10000) bonus.d += 0.10; else if(totalBase >= 5000) bonus.d += 0.05; } else if(ln === "Newgate") { if(totalBase >= 10000) { bonus.f += 0.20; bonus.r += 0.20; } else if(totalBase >= 5000) { bonus.f += 0.10; bonus.r += 0.10; } } else if(ln === "Boa") { if(totalBase >= 10000) bonus.v += 0.20; else if(totalBase >= 5000) bonus.v += 0.10; } else if(ln === "Neptune") { if(totalBase >= 15000) { bonus.v += 0.20; bonus.refl += 0.15; bonus.r += 0.15; } else if(totalBase >= 10000) { bonus.v += 0.20; bonus.refl += 0.10; bonus.r += 0.10; } else if(totalBase >= 5000) { bonus.v += 0.10; bonus.refl += 0.05; bonus.r += 0.05; } } else if(ln === "Sakazuki") { if(totalBase >= 15000) { bonus.f += 0.15; } else if(totalBase >= 10000) { bonus.f += 0.10; } else if(totalBase >= 5000) { bonus.f += 0.05; } } else if(ln === "Silvers") { if(totalBase >= 20000) { bonus.ha += 0.15; bonus.ho += 0.15; bonus.hr += 0.15; } else if(totalBase >= 10000) { bonus.ha += 0.10; bonus.ho += 0.10; bonus.hr += 0.10; } else if(totalBase >= 5000) { bonus.ha += 0.05; bonus.ho += 0.05; bonus.hr += 0.05; } }
         
