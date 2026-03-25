@@ -601,7 +601,7 @@ function runFallbackChecks() {
               telefone: "", orgTipo: "", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", 
               estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", 
               personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, hasAmiDesp: false,
-              amiResPct: "", amiAlcMult: "1", calcUseAttr: "d", calcInimigoRes: "", calcUseAmi: "sim", sceneType: "Treino Padrão", sceneText: "",
+              amiResPct: "", amiAlcMult: "1", calcUseAttr: "d", calcInimigoRes: "", calcBuffFlat: "", calcBuffPct: "", calcUseAmi: "sim", sceneType: "Treino Padrão", sceneText: "",
               boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxEsp: false, boxAmi: false, boxHist: false, 
               boxInv: false, boxCalc: false, boxScene: false, akumaId: "", selCharR1: "", selCharR2: "" 
           };
@@ -927,6 +927,10 @@ function updateUI() {
 
     let calcResEl = document.getElementById('info-calcInimigoRes');
     if(calcResEl) calcResEl.value = i.calcInimigoRes ? i.calcInimigoRes.toLocaleString("pt-BR") : "";
+    let calcBuffFlatEl = document.getElementById('info-calcBuffFlat');
+    if(calcBuffFlatEl) calcBuffFlatEl.value = i.calcBuffFlat ? i.calcBuffFlat.toLocaleString("pt-BR") : "";
+    let calcBuffPctEl = document.getElementById('info-calcBuffPct');
+    if(calcBuffPctEl) calcBuffPctEl.value = i.calcBuffPct ? i.calcBuffPct.toLocaleString("pt-BR") : "";
 
     let recEl = document.getElementById('info-recompensa');
     if(recEl) recEl.value = i.recompensa ? i.recompensa.toLocaleString("pt-BR") : "";
@@ -1320,7 +1324,15 @@ function updateUI() {
         document.getElementById('ami-res-total').textContent = `(${aDur.toLocaleString("pt-BR")} + ${amiResPctVal}% = ${totalDurCalc.toLocaleString("pt-BR")})`;
     } else { document.getElementById('ami-res-total').textContent = ""; }
 
-    let calcAttrVal = (i.calcUseAttr === 'f') ? totalF : totalD;
+    let baseCalcAttr = (i.calcUseAttr === 'f') ? totalF : totalD;
+    let buffFlat = parseInt(i.calcBuffFlat) || 0;
+    let buffPct = parseInt(i.calcBuffPct) || 0;
+    let step1Attr = baseCalcAttr + buffFlat;
+    let calcAttrVal = step1Attr;
+    if (buffPct !== 0) {
+        calcAttrVal = step1Attr + Math.floor(step1Attr * (buffPct / 100));
+    }
+
     let calcRes = parseInt(i.calcInimigoRes) || 0;
     let K = 25000;
     let calcFator = K / (K + calcRes);
@@ -1337,7 +1349,15 @@ function updateUI() {
     let calcDanoFinal = danoFisico + danoAmi;
     
     document.getElementById('calc-dano-final').textContent = calcDanoFinal.toLocaleString("pt-BR");
-    let calcFormTexto = `Dano Básico: ${calcAttrVal.toLocaleString("pt-BR")} × (${K.toLocaleString("pt-BR")} / (${K.toLocaleString("pt-BR")} + ${calcRes.toLocaleString("pt-BR")})) = ${danoFisico.toLocaleString("pt-BR")}`;
+    
+    let calcFormTexto = "";
+    if (buffFlat > 0 || buffPct !== 0) {
+        calcFormTexto += `Atributo: ${baseCalcAttr.toLocaleString("pt-BR")}`;
+        if (buffFlat > 0) calcFormTexto += ` + ${buffFlat.toLocaleString("pt-BR")} (Bônus Fixo) = ${step1Attr.toLocaleString("pt-BR")}`;
+        if (buffPct !== 0) calcFormTexto += ` + ${buffPct}% (Buff Ativo) = ${calcAttrVal.toLocaleString("pt-BR")}`;
+        calcFormTexto += `<br>`;
+    }
+    calcFormTexto += `Dano Básico: ${calcAttrVal.toLocaleString("pt-BR")} × (${K.toLocaleString("pt-BR")} / (${K.toLocaleString("pt-BR")} + ${calcRes.toLocaleString("pt-BR")})) = ${danoFisico.toLocaleString("pt-BR")}`;
     if (danoAmi > 0) calcFormTexto += `<br><span style="color:var(--info);">+ Bônus Paramecia: ${aPot.toLocaleString("pt-BR")} × ${controlePct}% = ${danoAmi.toLocaleString("pt-BR")}</span>`;
     document.getElementById('calc-formula').innerHTML = calcFormTexto;
 
