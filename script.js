@@ -1426,10 +1426,11 @@ function updateUI() {
     let formatNpc = (text, defaultText) => { if (!text || text.trim() === "") return `> ${defaultText}`; return text.split('\n').map(l => { let trimL = l.trim(); if (trimL === "") return ""; return '> ' + trimL.replace(/^>\s*/, ''); }).join('\n'); };
     let outNpcsC = formatNpc(i.npcsC, ""); let outNpcsE = formatNpc(i.npcsE, "🔒");
 
-    let tecnicasOut = "";
-    if ((currentChar.tecnicasList && currentChar.tecnicasList.length > 0) || i.treinosAcumulados > 0) {
-        tecnicasOut += "▬▬▬▬  [ 𝐓ᴇ́ᴄɴɪᴄᴀs ]  ▬▬▬▬\n\n";
-        if (i.treinosAcumulados > 0) tecnicasOut += `Treinos Acumulados: ${i.treinosAcumulados.toLocaleString("pt-BR")}\n\n`;
+    let tecnicasOut = "▬▬▬▬  [ 𝐓ᴇ́ᴄɴɪᴄᴀs ]  ▬▬▬▬\n\n";
+    let trAcum = i.treinosAcumulados ? i.treinosAcumulados : 0;
+    tecnicasOut += `Treinos Acumulados: ${trAcum.toLocaleString("pt-BR")}\n\n`;
+
+    if (currentChar.tecnicasList && currentChar.tecnicasList.length > 0) {
         let tecnicasOrdenadas = [...currentChar.tecnicasList].sort((a, b) => { let nA = (a.nome || "").trim().toLowerCase(); let nB = (b.nome || "").trim().toLowerCase(); return nA.localeCompare(nB); });
         tecnicasOrdenadas.forEach(t => {
             if(t.nome || t.desc || t.efeito) {
@@ -1439,8 +1440,8 @@ function updateUI() {
                 tecnicasOut += `\n`;
             }
         });
-        tecnicasOut += `«▬▬▬▬▬▬  [ 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 𝙾𝙿 𝚁𝙿𝙶 ]  ▬▬▬▬▬▬»`;
-    } else { tecnicasOut += `«▬▬▬▬▬▬  [ 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 𝙾𝙿 𝚁𝙿𝙶 ]  ▬▬▬▬▬▬»`; }
+    }
+    tecnicasOut += `«▬▬▬▬▬▬  [ 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 𝙾𝙿 𝚁𝙿𝙶 ]  ▬▬▬▬▬▬»`;
 
     let orgOut = "";
     if(i.orgTipo === "Pirata") {
