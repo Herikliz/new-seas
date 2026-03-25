@@ -1184,7 +1184,7 @@ function updateUI() {
         document.getElementById('avisoVel').style.display = "block"; document.getElementById('avisoVel').textContent = `Limite atingido!\n Máx: ${totalV.toLocaleString("pt-BR")}`;
     } else if (totalVelSub < totalV && totalV > 0) {
         let diff = totalV - totalVelSub;
-        document.getElementById('avisoVel').style.display = "block"; document.getElementById('avisoVel').textContent = `Pontos não distribuídos: ${diff.toLocaleString("pt-BR")}`;
+        document.getElementById('avisoVel').style.display = "block"; document.getElementById('avisoVel').textContent = `Pontos não distribuídos nos sub-atributos de Velocidade: ${diff.toLocaleString("pt-BR")}`;
     } else { document.getElementById('avisoVel').style.display = "none"; }
     
     document.getElementById('sub-refl').value = currentChar.substats.refl ? currentChar.substats.refl.toLocaleString("pt-BR") : "";
