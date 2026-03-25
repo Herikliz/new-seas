@@ -232,20 +232,14 @@
                     <span class="attr-label">Velocidade</span>
                     <div class="attr-input-group"><input type="text" class="attr-input" id="stat-v" placeholder="0" oninput="formatAndSave('stats', 'v', this)"><span class="attr-total" id="total-v">Total: 0</span></div>
                 </div>
-                <div id="avisoBase" class="avisoErro"></div>
-            </div>
-        </div>
-
-        <div class="box" id="container-boxVel" style="display:none;">
-            <div class="box-title" id="title-boxVel" style="color: var(--info);" onclick="toggleBox('boxVel')">
-                <span>Sub-Atributos Velocidade</span><span id="icon-boxVel" class="toggle-icon">▼</span>
-            </div>
-            <div id="wrapper-boxVel" class="box-content">
-                <div style="display:flex; gap: 10px;">
-                    <div style="flex:1"><label style="font-size: 10px;">Reflexo</label><input type="text" id="sub-refl" placeholder="0" oninput="formatAndSave('substats', 'refl', this)"></div>
-                    <div style="flex:1"><label style="font-size: 10px;">Velocidade Corporal</label><input type="text" id="sub-vcorp" placeholder="0" oninput="formatAndSave('substats', 'vcorp', this)"></div>
+                <div id="container-boxVel" style="display:none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #444;">
+                    <div style="display:flex; gap: 10px;">
+                        <div style="flex:1"><label style="font-size: 10px;">Reflexo</label><input type="text" id="sub-refl" placeholder="0" oninput="formatAndSave('substats', 'refl', this)"></div>
+                        <div style="flex:1"><label style="font-size: 10px;">Velocidade Corporal</label><input type="text" id="sub-vcorp" placeholder="0" oninput="formatAndSave('substats', 'vcorp', this)"></div>
+                    </div>
+                    <div id="avisoVel" class="avisoErro"></div>
                 </div>
-                <div id="avisoVel" class="avisoErro"></div>
+                <div id="avisoBase" class="avisoErro"></div>
             </div>
         </div>
 

@@ -602,7 +602,7 @@ function runFallbackChecks() {
               estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", 
               personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, hasAmiDesp: false,
               amiResPct: "", amiAlcMult: "1", calcUseAttr: "d", calcInimigoRes: "", calcUseAmi: "sim", sceneType: "Treino Padrão", sceneText: "",
-              boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxVel: false, boxEsp: false, boxAmi: false, boxHist: false, 
+              boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxEsp: false, boxAmi: false, boxHist: false, 
               boxInv: false, boxCalc: false, boxScene: false, akumaId: "", selCharR1: "", selCharR2: "" 
           };
           for(let k in defInfo) if (typeof c.info[k] === 'undefined') c.info[k] = defInfo[k];
@@ -629,7 +629,7 @@ window.toggleBox = function(id) {
 
 window.toggleAllBoxes = function(state) {
     if (!currentChar) return;
-    const boxKeys = ['boxIden', 'boxMec', 'boxSoc', 'boxBase', 'boxVel', 'boxEsp', 'boxAmi', 'boxHist', 'boxLog', 'boxInv', 'boxTec', 'boxRes', 'boxCalc', 'boxScene'];
+    const boxKeys = ['boxIden', 'boxMec', 'boxSoc', 'boxBase', 'boxEsp', 'boxAmi', 'boxHist', 'boxLog', 'boxInv', 'boxTec', 'boxRes', 'boxCalc', 'boxScene'];
     boxKeys.forEach(k => currentChar.info[k] = state);
     saveData();
     updateUI();
@@ -821,7 +821,7 @@ function updateUI() {
     let i = currentChar.info;
     let isNPC = currentChar.isNPC;
 
-    ['boxIden', 'boxMec', 'boxSoc', 'boxBase', 'boxVel', 'boxEsp', 'boxAmi', 'boxHist', 'boxLog', 'boxInv', 'boxTec', 'boxRes', 'boxCalc', 'boxScene'].forEach(id => {
+    ['boxIden', 'boxMec', 'boxSoc', 'boxBase', 'boxEsp', 'boxAmi', 'boxHist', 'boxLog', 'boxInv', 'boxTec', 'boxRes', 'boxCalc', 'boxScene'].forEach(id => {
         let wrapper = document.getElementById('wrapper-' + id);
         let icon = document.getElementById('icon-' + id);
         let titleBlock = document.getElementById('title-' + id);
