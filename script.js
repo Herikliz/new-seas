@@ -1399,7 +1399,7 @@ function updateUI() {
         calcFormTexto += `<br>`;
     }
     calcFormTexto += `Dano Básico: ${calcAttrVal.toLocaleString("pt-BR")} × (${K.toLocaleString("pt-BR")} / (${K.toLocaleString("pt-BR")} + ${calcRes.toLocaleString("pt-BR")})) = ${danoFisico.toLocaleString("pt-BR")}`;
-    if (danoAmi > 0) calcFormTexto += `<br><span style="color:var(--info);">+ Bônus Paramecia: ${aPot.toLocaleString("pt-BR")} × ${controlePct}% = ${danoAmi.toLocaleString("pt-BR")}</span>`;
+    if (danoAmi > 0) calcFormTexto += `<br><span style="color:var(--info);">+ Bônus Paramecia: ${aPot.toLocaleString("pt-BR")} × ${controlePct}% = ${danoAmi.toLocaleString("pt-BR")}</span><br><b style="color:var(--danger);">Dano Total (Físico + Akuma): ${calcDanoFinal.toLocaleString("pt-BR")}</b>`;
     document.getElementById('calc-formula').innerHTML = calcFormTexto;
 
     let typeMin = { "Treino Padrão": 250, "Treino de Técnicas": 60, "Interação": 50, "Missão": 250, "Recrutar NPCs": 200, "Trabalho Tipo 1": 200, "Trabalho Tipo 2": 300, "Trabalho Tipo 3": 500, "Extra-Narrada": 2000 };
