@@ -603,7 +603,7 @@ function runFallbackChecks() {
               personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, hasAmiDesp: false,
               amiResPct: "", amiAlcMult: "1", calcUseAttr: "d", calcInimigoRes: "", calcBuffFlat: "", calcBuffPct: "", calcUseAmi: "sim", sceneType: "Treino Padrão", sceneText: "",
               boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxEsp: false, boxAmi: false, boxHist: false, 
-              boxInv: false, boxCalc: false, boxScene: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0 
+              boxInv: false, boxCalc: false, boxScene: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0, ordemTecnicas: "alfabetica" 
           };
           for(let k in defInfo) if (typeof c.info[k] === 'undefined') c.info[k] = defInfo[k];
           
@@ -657,6 +657,21 @@ function updateTecnica(idx, field, val) {
     updateUI();
 }
 
+function moveTecnica(idx, dir) {
+    if (dir === -1 && idx > 0) {
+        let temp = currentChar.tecnicasList[idx];
+        currentChar.tecnicasList[idx] = currentChar.tecnicasList[idx - 1];
+        currentChar.tecnicasList[idx - 1] = temp;
+    } else if (dir === 1 && idx < currentChar.tecnicasList.length - 1) {
+        let temp = currentChar.tecnicasList[idx];
+        currentChar.tecnicasList[idx] = currentChar.tecnicasList[idx + 1];
+        currentChar.tecnicasList[idx + 1] = temp;
+    }
+    saveData();
+    renderTecnicas();
+    updateUI();
+}
+
 function renderTecnicas() {
     const container = document.getElementById('tecnicas-container');
     container.innerHTML = '';
@@ -665,7 +680,11 @@ function renderTecnicas() {
             <div style="background: rgba(0,0,0,0.3); padding: 10px; border: 1px dashed #555; border-radius: 6px; margin-bottom: 10px;">
                 <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
                     <label style="color:var(--info);">Técnica ${idx + 1}</label>
-                    <button type="button" class="btn btn-outline" style="color:var(--danger); border-color:var(--danger); font-size:10px; padding:2px 6px;" onclick="removeTecnica(${idx})">Remover</button>
+                    <div style="display:flex; gap: 5px;">
+                        <button type="button" class="btn btn-outline" style="font-size:10px; padding:2px 6px;" onclick="moveTecnica(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>⬆️</button>
+                        <button type="button" class="btn btn-outline" style="font-size:10px; padding:2px 6px;" onclick="moveTecnica(${idx}, 1)" ${idx === currentChar.tecnicasList.length - 1 ? 'disabled' : ''}>⬇️</button>
+                        <button type="button" class="btn btn-outline" style="color:var(--danger); border-color:var(--danger); font-size:10px; padding:2px 6px;" onclick="removeTecnica(${idx})">Remover</button>
+                    </div>
                 </div>
                 <textarea placeholder="Nome da Técnica (Ex: Golpe Rápido)" oninput="updateTecnica(${idx}, 'nome', this.value)" style="min-height:38px; margin-bottom:5px; text-align:justify; padding-top:8px;">${t.nome}</textarea>
                 <textarea placeholder="Descrição da Técnica" oninput="updateTecnica(${idx}, 'desc', this.value)" style="min-height:50px; margin-bottom:5px; text-align:justify;">${t.desc}</textarea>
@@ -922,7 +941,7 @@ function updateUI() {
     } else { anim2.style.display = "none"; }
 
     document.getElementById('pc-name').value = currentChar.name;
-    const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'alcunha', 'altura', 'idade', 'sexo', 'sangue', 'telefone', 'nacionalidade', 'localizacao', 'tripulacao', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2', 'sceneType', 'sceneText', 'calcUseAttr', 'calcUseAmi', 'amiAlcMult'];
+    const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'alcunha', 'altura', 'idade', 'sexo', 'sangue', 'telefone', 'nacionalidade', 'localizacao', 'tripulacao', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2', 'sceneType', 'sceneText', 'calcUseAttr', 'calcUseAmi', 'amiAlcMult', 'ordemTecnicas'];
     textFields.forEach(f => { let el = document.getElementById('info-'+f); if(el) el.value = i[f] || ""; });
 
     let calcResEl = document.getElementById('info-calcInimigoRes');
@@ -1434,7 +1453,10 @@ function updateUI() {
         let trAcum = i.treinosAcumulados ? i.treinosAcumulados : 0;
         tecnicasOut += `Treinos Acumulados: ${trAcum.toLocaleString("pt-BR")}\n\n`;
 
-        let tecnicasOrdenadas = [...currentChar.tecnicasList].sort((a, b) => { let nA = (a.nome || "").trim().toLowerCase(); let nB = (b.nome || "").trim().toLowerCase(); return nA.localeCompare(nB); });
+        let tecnicasOrdenadas = [...currentChar.tecnicasList];
+        if (i.ordemTecnicas !== "manual") {
+            tecnicasOrdenadas.sort((a, b) => { let nA = (a.nome || "").trim().toLowerCase(); let nB = (b.nome || "").trim().toLowerCase(); return nA.localeCompare(nB); });
+        }
         tecnicasOrdenadas.forEach(t => {
             if(t.nome || t.desc || t.efeito) {
                 if (t.nome) tecnicasOut += `* ${t.nome}\n`;
