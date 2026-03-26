@@ -657,7 +657,26 @@ function updateTecnica(idx, field, val) {
     updateUI();
 }
 
+function changeOrdemTecnicas(val) {
+    currentChar.info.ordemTecnicas = val;
+    if (val === 'alfabetica') {
+        currentChar.tecnicasList.sort((a, b) => {
+            let nA = (a.nome || "").trim().toLowerCase();
+            let nB = (b.nome || "").trim().toLowerCase();
+            return nA.localeCompare(nB);
+        });
+        renderTecnicas();
+    }
+    saveData();
+    updateUI();
+}
+
 function moveTecnica(idx, dir) {
+    if (currentChar.info.ordemTecnicas === 'alfabetica') {
+        currentChar.info.ordemTecnicas = 'manual';
+        let selectOrdem = document.getElementById('info-ordemTecnicas');
+        if (selectOrdem) selectOrdem.value = 'manual';
+    }
     if (dir === -1 && idx > 0) {
         let temp = currentChar.tecnicasList[idx];
         currentChar.tecnicasList[idx] = currentChar.tecnicasList[idx - 1];
