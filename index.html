@@ -360,6 +360,13 @@
                         <label>Buff Ativo (%)</label>
                         <input type="text" id="info-calcBuffPct" placeholder="0" oninput="formatAndSave('info', 'calcBuffPct', this)">
                     </div>
+                    <div class="input-group" id="box-calcUseHaki">
+                        <label>Somar Haki (Arm)?</label>
+                        <select id="info-calcUseHaki" onchange="updateField('info', 'calcUseHaki', this.value)">
+                            <option value="nao">Não</option>
+                            <option value="sim">Sim</option>
+                        </select>
+                    </div>
                 </div>
                 <div style="background: rgba(0,0,0,0.3); padding: 15px; border: 1px dashed #555; border-radius: 6px; text-align: center; margin-top: 5px;">
                     <div style="font-size: 18px; font-family: 'Cinzel', serif; font-weight: bold; color: var(--danger);">Dano Final: <span id="calc-dano-final">0</span></div>

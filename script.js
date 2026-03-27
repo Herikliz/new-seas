@@ -601,7 +601,7 @@ function runFallbackChecks() {
               telefone: "", orgTipo: "", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", 
               estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", 
               personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, hasAmiDesp: false,
-              amiResPct: "", amiAlcMult: "1", calcUseAttr: "d", calcInimigoRes: "", calcBuffFlat: "", calcBuffPct: "", calcUseAmi: "sim", sceneType: "Treino Padrão", sceneText: "",
+              amiResPct: "", amiAlcMult: "1", calcUseAttr: "d", calcInimigoRes: "", calcBuffFlat: "", calcBuffPct: "", calcUseAmi: "sim", calcUseHaki: "nao", sceneType: "Treino Padrão", sceneText: "",
               boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxEsp: false, boxAmi: false, boxHist: false, 
               boxInv: false, boxCalc: false, boxScene: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0, ordemTecnicas: "alfabetica" 
           };
@@ -960,7 +960,7 @@ function updateUI() {
     } else { anim2.style.display = "none"; }
 
     document.getElementById('pc-name').value = currentChar.name;
-    const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'alcunha', 'altura', 'idade', 'sexo', 'sangue', 'telefone', 'nacionalidade', 'localizacao', 'tripulacao', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2', 'sceneType', 'sceneText', 'calcUseAttr', 'calcUseAmi', 'amiAlcMult', 'ordemTecnicas'];
+    const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'alcunha', 'altura', 'idade', 'sexo', 'sangue', 'telefone', 'nacionalidade', 'localizacao', 'tripulacao', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2', 'sceneType', 'sceneText', 'calcUseAttr', 'calcUseAmi', 'calcUseHaki', 'amiAlcMult', 'ordemTecnicas'];
     textFields.forEach(f => { let el = document.getElementById('info-'+f); if(el) el.value = i[f] || ""; });
 
     let calcResEl = document.getElementById('info-calcInimigoRes');
@@ -1084,7 +1084,7 @@ function updateUI() {
 
     const selLin = document.getElementById('info-linhagem');
     let currentLin = i.linhagem; 
-    let htmlLin = '<option value="">-- Selecione --</option><option value="Nenhuma">Nenhuma</option>';
+    let htmlLin = '<option value="">-- Selecione --</option>';
     for(let l in linhagens) { if(l!=="Nenhuma" && (!linhagens[l].req || linhagens[l].req.includes(i.raca))) { htmlLin += `<option value="${l}">${l}</option>`; } }
     if(selLin.innerHTML !== htmlLin) selLin.innerHTML = htmlLin;
     if(Array.from(selLin.options).some(o => o.value === currentLin)) { selLin.value = currentLin; } else { i.linhagem = ""; selLin.value = ""; currentLin = ""; }
@@ -1386,8 +1386,13 @@ function updateUI() {
         danoAmi = Math.floor(aPot * (controlePct / 100));
     }
 
+    let danoHaki = 0;
+    if (i.calcUseHaki === 'sim' && HA > 0) {
+        danoHaki = HA;
+    }
+
     let calcAttrSemAmi = calcAttrVal;
-    calcAttrVal += danoAmi;
+    calcAttrVal += danoHaki + danoAmi;
 
     let calcFator = K / (K + calcRes);
     let danoFisico = Math.floor(calcAttrVal * calcFator);
@@ -1396,11 +1401,20 @@ function updateUI() {
     document.getElementById('calc-dano-final').textContent = calcDanoFinal.toLocaleString("pt-BR");
     
     let calcFormTexto = "";
-    if (buffFlat > 0 || buffPct !== 0 || danoAmi > 0) {
-        calcFormTexto += `${baseCalcAttr.toLocaleString("pt-BR")} (Atributo)`;
-        if (buffFlat > 0) calcFormTexto += ` + ${buffFlat.toLocaleString("pt-BR")} (Bônus de Estilo) = ${step1Attr.toLocaleString("pt-BR")}`;
-        if (buffPct !== 0) calcFormTexto += ` + ${buffPct}% (Buff Ativo) = ${calcAttrSemAmi.toLocaleString("pt-BR")}`;
-        if (danoAmi > 0) calcFormTexto += ` <span style="color:var(--info);">+ Bônus Paramecia: ${aPot.toLocaleString("pt-BR")} × ${controlePct}% (${danoAmi.toLocaleString("pt-BR")}) = ${calcAttrVal.toLocaleString("pt-BR")}</span>`;
+    if (buffFlat > 0 || buffPct !== 0 || danoAmi > 0 || danoHaki > 0) {
+        calcFormTexto += `<span style="color:#0dcaf0;">${baseCalcAttr.toLocaleString("pt-BR")} (Atributo)</span>`;
+        if (buffFlat > 0) calcFormTexto += ` <span style="color:#ffc107;">+ ${buffFlat.toLocaleString("pt-BR")} (Bônus de Estilo) = ${step1Attr.toLocaleString("pt-BR")}</span>`;
+        if (buffPct !== 0) calcFormTexto += ` <span style="color:#198754;">+ ${buffPct}% (Buff Ativo) = ${calcAttrSemAmi.toLocaleString("pt-BR")}</span>`;
+        
+        let somaAtual = calcAttrSemAmi;
+        if (danoHaki > 0) {
+            somaAtual += danoHaki;
+            calcFormTexto += ` <span style="color:#a461ff;">+ ${danoHaki.toLocaleString("pt-BR")} (Haki) = ${somaAtual.toLocaleString("pt-BR")}</span>`;
+        }
+        if (danoAmi > 0) {
+            somaAtual += danoAmi;
+            calcFormTexto += ` <span style="color:#dc3545;">+ Bônus Paramecia: ${aPot.toLocaleString("pt-BR")} × ${controlePct}% (${danoAmi.toLocaleString("pt-BR")}) = ${somaAtual.toLocaleString("pt-BR")}</span>`;
+        }
         calcFormTexto += `<br>`;
     }
     calcFormTexto += `Dano Básico: ${calcAttrVal.toLocaleString("pt-BR")} × (${K.toLocaleString("pt-BR")} / (${K.toLocaleString("pt-BR")} + ${calcRes.toLocaleString("pt-BR")})) = ${danoFisico.toLocaleString("pt-BR")}`;
