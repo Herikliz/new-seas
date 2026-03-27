@@ -936,10 +936,10 @@ function formatPhone(el) {
 
 function strCalc(base, bonus, flat = 0) {
     if(bonus === 0 && flat === 0) return base.toLocaleString("pt-BR");
-    let total = Math.round(base * (1 + bonus)) + flat; 
+    let total = Math.round((base + flat) * (1 + bonus)); 
     let parts = [base.toLocaleString("pt-BR")];
-    if (bonus !== 0) parts.push(`${bonus >= 0 ? "+" : ""}${(bonus * 100).toFixed(0)}%`);
     if (flat !== 0) parts.push(`${flat >= 0 ? "+" : ""}${flat.toLocaleString("pt-BR")}`);
+    if (bonus !== 0) parts.push(`${bonus >= 0 ? "+" : ""}${(bonus * 100).toFixed(0)}%`);
     return `${parts.join("")} = ${total.toLocaleString("pt-BR")}`;
 }
 
@@ -1343,11 +1343,11 @@ function updateUI() {
     const statFields = ['f', 'd', 'r', 'v', 'esp', 'ami'];
     statFields.forEach(f => { let el = document.getElementById('stat-'+f); if(el) el.value = currentChar.stats[f] ? currentChar.stats[f].toLocaleString("pt-BR") : ""; });
 
-    let totalD = Math.round(D * (1 + bonus.d)) + flatBonus.d; document.getElementById('total-d').innerText = "Total: " + totalD.toLocaleString("pt-BR");
-    let totalF = Math.round(F * (1 + bonus.f)) + flatBonus.f; document.getElementById('total-f').innerText = "Total: " + totalF.toLocaleString("pt-BR");
-    let totalR = Math.round(R * (1 + bonus.r)) + flatBonus.r; document.getElementById('total-r').innerText = "Total: " + totalR.toLocaleString("pt-BR");
+    let totalD = Math.round((D + flatBonus.d) * (1 + bonus.d)); document.getElementById('total-d').innerText = "Total: " + totalD.toLocaleString("pt-BR");
+    let totalF = Math.round((F + flatBonus.f) * (1 + bonus.f)); document.getElementById('total-f').innerText = "Total: " + totalF.toLocaleString("pt-BR");
+    let totalR = Math.round((R + flatBonus.r) * (1 + bonus.r)); document.getElementById('total-r').innerText = "Total: " + totalR.toLocaleString("pt-BR");
     
-    let totalV = Math.round(V * (1 + bonus.v)) + flatBonus.v; document.getElementById('total-v').innerText = "Total: " + totalV.toLocaleString("pt-BR");
+    let totalV = Math.round((V + flatBonus.v) * (1 + bonus.v)); document.getElementById('total-v').innerText = "Total: " + totalV.toLocaleString("pt-BR");
     document.getElementById('container-boxVel').style.display = totalV > 0 ? "block" : "none";
     
     if(totalV === 0) { currentChar.substats.refl = 0; currentChar.substats.vcorp = 0; }
@@ -1373,7 +1373,7 @@ function updateUI() {
     document.getElementById('sub-refl').value = currentChar.substats.refl ? currentChar.substats.refl.toLocaleString("pt-BR") : "";
     document.getElementById('sub-vcorp').value = currentChar.substats.vcorp ? currentChar.substats.vcorp.toLocaleString("pt-BR") : "";
 
-    let ESP = currentChar.stats.esp; let totalEsp = Math.round(ESP * (1 + bonus.esp)) + flatBonus.esp; document.getElementById('total-esp').innerText = "Total: " + totalEsp.toLocaleString("pt-BR");
+    let ESP = currentChar.stats.esp; let totalEsp = Math.round((ESP + flatBonus.esp) * (1 + bonus.esp)); document.getElementById('total-esp').innerText = "Total: " + totalEsp.toLocaleString("pt-BR");
     
     let HA = currentChar.substats.hArm || 0, HO = currentChar.substats.hObs || 0, HR = currentChar.substats.hRei || 0;
     let totalHaki = HA + HO + HR;
@@ -1411,7 +1411,7 @@ function updateUI() {
         if (amiElUpdate) amiElUpdate.value = AMI.toLocaleString("pt-BR");
     }
 
-    let totalAmi = Math.round(AMI * (1 + bonus.ami)) + flatBonus.ami; document.getElementById('total-ami').innerText = "Total: " + totalAmi.toLocaleString("pt-BR");
+    let totalAmi = Math.round((AMI + flatBonus.ami) * (1 + bonus.ami)); document.getElementById('total-ami').innerText = "Total: " + totalAmi.toLocaleString("pt-BR");
     document.getElementById('box-amiSub').style.display = AMI > 0 ? "block" : "none";
     if(AMI === 0) { currentChar.substats.amiAlc = 0; currentChar.substats.amiDur = 0; currentChar.substats.amiPot = 0; currentChar.substats.amiVel = 0; currentChar.substats.amiDesp = 0; }
     
@@ -1451,7 +1451,7 @@ function updateUI() {
                     currentChar.stats.ami = AMI;
                     let amiElUpdate = document.getElementById('stat-ami');
                     if (amiElUpdate) amiElUpdate.value = AMI.toLocaleString("pt-BR");
-                    totalAmi = Math.round(AMI * (1 + bonus.ami)); document.getElementById('total-ami').innerText = "Total: " + totalAmi.toLocaleString("pt-BR");
+                    totalAmi = Math.round((AMI + flatBonus.ami) * (1 + bonus.ami)); document.getElementById('total-ami').innerText = "Total: " + totalAmi.toLocaleString("pt-BR");
                 }
                 activeAmiStats = baseAmiStats;
                 maxAmiPoints = Math.max(10000, Math.floor(totalAmi / activeAmiStats));
@@ -1520,13 +1520,13 @@ function updateUI() {
         if (akumasFixas['Paramecia'].includes(i.akumaNome) || akumasFixas['Paramecia Especial'].includes(i.akumaNome)) isParamecia = true;
     }
     
-    let calcAPot = Math.round(aPot * (1 + bonus.amiPot)) + flatBonus.amiPot;
+    let calcAPot = Math.round((aPot + flatBonus.amiPot) * (1 + bonus.amiPot));
     let danoAmi = 0;
     if (i.calcUseAmi !== 'nao' && isParamecia) {
         danoAmi = Math.floor(calcAPot * (controlePct / 100));
     }
 
-    let calcHA = Math.round(HA * (1 + bonus.ha)) + flatBonus.ha;
+    let calcHA = Math.round((HA + flatBonus.ha) * (1 + bonus.ha));
     let danoHaki = 0;
     if (i.calcUseHaki === 'sim' && calcHA > 0) {
         danoHaki = calcHA;
@@ -1576,7 +1576,7 @@ function updateUI() {
     else { statusEl.textContent = `(❌ Faltam ${minW - sWords})`; statusEl.style.color = "var(--danger)"; }
 
     let inWater = (rc === "Sereiano" || rc === "Tritão" || ln === "Neptune" || (ln === "Charlotte" && (rc2 === "Sereiano" || rc2 === "Tritão")));
-    let totalHP = 10000 + Math.round(R * (1 + bonus.r));
+    let totalHP = 10000 + Math.round((R + flatBonus.r) * (1 + bonus.r));
 
     let formatHistPers = (text) => { return text.split('\n').map(l => { let trimL = l.trim(); if (trimL === "") return ""; return '> ' + trimL.replace(/^>\s*/, ''); }).join('\n'); };
     let histPersOut = "";
@@ -1605,13 +1605,13 @@ function updateUI() {
     if (AMI > 0) {
         attrOut += `↠ *𝙰𝚔𝚞𝚖𝚊 𝚗𝚘 𝙼𝚒:* ${strCalc(AMI, bonus.ami, flatBonus.ami)}\n`;
         if (i.hasAmiAlc && aAlc > 0) {
-            let calcAAlc = Math.round(aAlc * (1 + bonus.amiAlc)) + flatBonus.amiAlc;
+            let calcAAlc = Math.round((aAlc + flatBonus.amiAlc) * (1 + bonus.amiAlc));
             let mult = parseFloat((i.amiAlcMult || "1").toString().replace(',', '.')) || 1;
             let metros = (calcAAlc / 20) * mult;
             attrOut += `> _𝙰𝚕𝚌𝚊𝚗𝚌𝚎:_ ${strCalc(aAlc, bonus.amiAlc, flatBonus.amiAlc)} (${metros.toLocaleString("pt-BR", {maximumFractionDigits: 1})}m)\n`;
         }
         if (i.hasAmiDur && aDur > 0) {
-            let calcADur = Math.round(aDur * (1 + bonus.amiDur)) + flatBonus.amiDur;
+            let calcADur = Math.round((aDur + flatBonus.amiDur) * (1 + bonus.amiDur));
             let cenas = Math.floor(calcADur / 500);
             attrOut += `> _𝙳𝚞𝚛𝚊𝚋𝚒𝚕𝚒𝚍𝚊𝚍𝚎:_ ${strCalc(aDur, bonus.amiDur, flatBonus.amiDur)} (${cenas} cena${cenas !== 1 ? 's' : ''})\n`;
         }
