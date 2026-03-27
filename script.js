@@ -1631,6 +1631,27 @@ function updateUI() {
     let racaOutput = formatRaceStr(i.raca, i.animal, i.sexo === "Feminino") || '🔒';
     if (i.linhagem === "Charlotte") { let raca2Output = formatRaceStr(i.raca2, i.animal2, i.sexo === "Feminino"); racaOutput += ` / ${raca2Output}`; }
 
+    let alcunhaOut = i.alcunhaAtiva || 'Nenhuma';
+    if (i.alcunhaAtiva && i.alcunhasList) {
+        let ativa = i.alcunhasList.find(a => a.nome === i.alcunhaAtiva);
+        if (ativa && ativa.buffs && ativa.buffs.length > 0) {
+            let buffGroups = {};
+            let names = {tudo:"Todos os Atributos",d:"Destreza",f:"Força",r:"Resistência",v:"Velocidade",refl:"Reflexo",vcorp:"Vel. Corporal",ha:"Haki do Armamento",ho:"Haki da Observação",hr:"Haki do Rei",amiAlc:"Alcance",amiDur:"Durabilidade",amiPot:"Potência",amiVel:"Velocidade"};
+            ativa.buffs.forEach(b => {
+                let key = (b.val >= 0 ? '+' : '') + b.val + (b.type === 'pct' ? '%' : '');
+                if(!buffGroups[key]) buffGroups[key] = [];
+                buffGroups[key].push(names[b.stat] || b.stat);
+            });
+            let buffStrings = [];
+            for (let k in buffGroups) {
+                let items = buffGroups[k];
+                let joined = items.length > 1 ? items.slice(0, -1).join(", ") + " e " + items[items.length - 1] : items[0];
+                buffStrings.push(`${k} em ${joined}`);
+            }
+            alcunhaOut = `${i.alcunhaAtiva} [${buffStrings.join("; ")}]`;
+        }
+    }
+
     let displayLinhagem = i.linhagem ? i.linhagem.replace("Tenryūbito: Família ", "") : 'Nenhuma';
     let recompensaOutText = `\n  : ᓩ _𝐑ᴇᴄᴏᴍᴘᴇɴsᴀ:_\n> ${outRecompensa}\n`;
     let berriesOutText = !isNPC ? `\n : ᓩ _𝐁ᴇʀʀɪᴇs:_\n> ${outBerries}\n` : "";
@@ -1648,7 +1669,7 @@ Iີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ�
 > ${currentChar.name || '🔒'}
 
   : ᓩ _𝐀ʟᴄᴜɴʜᴀ:_
-> ${i.alcunhaAtiva || 'Nenhuma'}
+> ${alcunhaOut}
 ${recompensaOutText}
   : ᓩ _𝐀ʟᴛᴜʀᴀ:_
 > ${i.altura || '🔒'}
