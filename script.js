@@ -1413,7 +1413,7 @@ function updateUI() {
         }
         if (danoAmi > 0) {
             somaAtual += danoAmi;
-            calcFormTexto += ` <span style="color:#dc3545;">+ Bônus Paramecia: ${aPot.toLocaleString("pt-BR")} × ${controlePct}% (${danoAmi.toLocaleString("pt-BR")}) = ${somaAtual.toLocaleString("pt-BR")}</span>`;
+            calcFormTexto += ` <span style="color:#dc3545;">+ ${danoAmi.toLocaleString("pt-BR")} (Bônus Paramecia: ${controlePct}% de ${aPot.toLocaleString("pt-BR")}) = ${somaAtual.toLocaleString("pt-BR")}</span>`;
         }
         calcFormTexto += `<br>`;
     }
