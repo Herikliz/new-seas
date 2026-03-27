@@ -892,7 +892,7 @@ function strCalc(base, bonus, flat = 0) {
     let parts = [base.toLocaleString("pt-BR")];
     if (bonus !== 0) parts.push(`${bonus >= 0 ? "+" : ""}${(bonus * 100).toFixed(0)}%`);
     if (flat !== 0) parts.push(`${flat >= 0 ? "+" : ""}${flat.toLocaleString("pt-BR")}`);
-    return `${parts.join(" ")} = ${total.toLocaleString("pt-BR")}`;
+    return `${parts.join("")} = ${total.toLocaleString("pt-BR")}`;
 }
 
 function formatRaceStr(rName, aName, isFem) {
