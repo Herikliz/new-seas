@@ -1397,7 +1397,7 @@ function updateUI() {
     
     let calcFormTexto = "";
     if (buffFlat > 0 || buffPct !== 0 || danoAmi > 0) {
-        calcFormTexto += `Atributo: ${baseCalcAttr.toLocaleString("pt-BR")}`;
+        calcFormTexto += `${baseCalcAttr.toLocaleString("pt-BR")} (Atributo)`;
         if (buffFlat > 0) calcFormTexto += ` + ${buffFlat.toLocaleString("pt-BR")} (Bônus de Estilo) = ${step1Attr.toLocaleString("pt-BR")}`;
         if (buffPct !== 0) calcFormTexto += ` + ${buffPct}% (Buff Ativo) = ${calcAttrSemAmi.toLocaleString("pt-BR")}`;
         if (danoAmi > 0) calcFormTexto += ` <span style="color:var(--info);">+ Bônus Paramecia: ${aPot.toLocaleString("pt-BR")} × ${controlePct}% (${danoAmi.toLocaleString("pt-BR")}) = ${calcAttrVal.toLocaleString("pt-BR")}</span>`;
