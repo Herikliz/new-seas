@@ -759,14 +759,50 @@ function renderLogs() {
     });
 }
 
+let editingAlcunhaOldName = "";
+
 function openAlcunhaModal() {
     if(isReadOnly) return;
+    editingAlcunhaOldName = "";
+    document.getElementById('modal-alcunha-title').innerText = 'Criar Nova Alcunha';
     document.getElementById('alcunha-nome').value = '';
     document.getElementById('alcunha-has-buff').checked = false;
     document.getElementById('alcunha-buffs-container').style.display = 'none';
     document.getElementById('alcunha-buffs-list').innerHTML = '';
+    document.getElementById('btn-delete-alcunha').style.display = 'none';
     document.getElementById('modal-alcunha').style.display = 'flex';
 }
+
+function editAlcunhaModal() {
+    if(isReadOnly || !currentChar.info.alcunhasList || currentChar.info.alcunhasList.length === 0 || !currentChar.info.alcunhaAtiva) return;
+    let ativa = currentChar.info.alcunhasList.find(a => a.nome === currentChar.info.alcunhaAtiva);
+    if(!ativa) return;
+    
+    editingAlcunhaOldName = ativa.nome;
+    document.getElementById('modal-alcunha-title').innerText = 'Editar Alcunha';
+    document.getElementById('alcunha-nome').value = ativa.nome;
+    document.getElementById('alcunha-buffs-list').innerHTML = '';
+    
+    if (ativa.buffs && ativa.buffs.length > 0) {
+        document.getElementById('alcunha-has-buff').checked = true;
+        document.getElementById('alcunha-buffs-container').style.display = 'block';
+        ativa.buffs.forEach(b => {
+            addAlcunhaBuffRow();
+            let rows = document.getElementById('alcunha-buffs-list').children;
+            let lastRow = rows[rows.length - 1];
+            lastRow.querySelector('.buff-stat').value = b.stat;
+            lastRow.querySelector('.buff-type').value = b.type;
+            lastRow.querySelector('.buff-val').value = b.val;
+        });
+    } else {
+        document.getElementById('alcunha-has-buff').checked = false;
+        document.getElementById('alcunha-buffs-container').style.display = 'none';
+    }
+    
+    document.getElementById('btn-delete-alcunha').style.display = 'inline-block';
+    document.getElementById('modal-alcunha').style.display = 'flex';
+}
+
 function addAlcunhaBuffRow() {
     const list = document.getElementById('alcunha-buffs-list');
     const row = document.createElement('div');
@@ -787,6 +823,7 @@ function addAlcunhaBuffRow() {
     `;
     list.appendChild(row);
 }
+
 function saveAlcunha() {
     let nome = document.getElementById('alcunha-nome').value.trim();
     if(!nome) return;
@@ -801,16 +838,27 @@ function saveAlcunha() {
         });
     }
     if(!currentChar.info.alcunhasList) currentChar.info.alcunhasList = [];
-    currentChar.info.alcunhasList.push({nome, buffs});
+    
+    if (editingAlcunhaOldName !== "") {
+        let idx = currentChar.info.alcunhasList.findIndex(a => a.nome === editingAlcunhaOldName);
+        if (idx !== -1) {
+            currentChar.info.alcunhasList[idx] = {nome, buffs};
+        }
+    } else {
+        currentChar.info.alcunhasList.push({nome, buffs});
+    }
+    
     currentChar.info.alcunhaAtiva = nome;
     document.getElementById('modal-alcunha').style.display = 'none';
     saveData(); updateUI();
 }
+
 function deleteAlcunha() {
     if(isReadOnly || !currentChar.info.alcunhasList || currentChar.info.alcunhasList.length === 0 || !currentChar.info.alcunhaAtiva) return;
-    let ativa = currentChar.info.alcunhaAtiva;
-    currentChar.info.alcunhasList = currentChar.info.alcunhasList.filter(a => a.nome !== ativa);
+    let targetName = editingAlcunhaOldName || currentChar.info.alcunhaAtiva;
+    currentChar.info.alcunhasList = currentChar.info.alcunhasList.filter(a => a.nome !== targetName);
     currentChar.info.alcunhaAtiva = currentChar.info.alcunhasList.length > 0 ? currentChar.info.alcunhasList[0].nome : "";
+    document.getElementById('modal-alcunha').style.display = 'none';
     saveData(); updateUI();
 }
 

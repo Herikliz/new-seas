@@ -45,7 +45,7 @@
                       <div style="display:flex; gap:5px;">
                           <select id="info-alcunha" onchange="updateField('info', 'alcunhaAtiva', this.value)" style="flex:1; padding:6px; background-color:#2a2a2a; border:1px solid #444; color:var(--text); border-radius:4px;"></select>
                           <button class="btn btn-outline btn-success" style="padding: 4px 8px;" onclick="openAlcunhaModal()">+</button>
-                          <button class="btn btn-outline btn-danger" style="padding: 4px 8px;" onclick="deleteAlcunha()">🗑️</button>
+                          <button class="btn btn-outline btn-warning" style="padding: 4px 8px;" onclick="editAlcunhaModal()">✏️</button>
                       </div>
                   </div>
                   <div class="input-group"><label>Idade</label><input type="text" id="info-idade" placeholder="Mín: 15" oninput="updateField('info', 'idade', this.value)"></div>
@@ -527,7 +527,7 @@
 
 <div id="modal-alcunha" class="modal-overlay">
   <div class="modal-box" style="width: 400px; max-height: 80vh; overflow-y: auto;">
-    <div class="modal-msg" style="font-weight:bold; color:var(--info);">Criar Nova Alcunha</div>
+    <div id="modal-alcunha-title" class="modal-msg" style="font-weight:bold; color:var(--info);">Criar Nova Alcunha</div>
     <input type="text" id="alcunha-nome" placeholder="Nome da Alcunha" style="margin-bottom: 10px; text-align:center;">
     <label style="display:flex; align-items:center; gap:5px; justify-content:center; margin-bottom:10px; font-size:12px; cursor:pointer;">
       <input type="checkbox" id="alcunha-has-buff" onchange="document.getElementById('alcunha-buffs-container').style.display = this.checked ? 'block' : 'none'"> Dá algum buff?
@@ -538,7 +538,8 @@
     </div>
     <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
       <button class="btn btn-outline btn-success" onclick="saveAlcunha()">Salvar</button>
-      <button class="btn btn-outline btn-danger" onclick="document.getElementById('modal-alcunha').style.display='none'">Cancelar</button>
+      <button id="btn-delete-alcunha" class="btn btn-outline btn-danger" onclick="deleteAlcunha()" style="display:none;">Apagar</button>
+      <button class="btn btn-outline" style="border-color: #666; color: #ccc;" onclick="document.getElementById('modal-alcunha').style.display='none'">Cancelar</button>
     </div>
   </div>
 </div>
