@@ -1376,8 +1376,6 @@ function updateUI() {
 
     let calcRes = parseInt(i.calcInimigoRes) || 0;
     let K = 25000;
-    let calcFator = K / (K + calcRes);
-    let danoFisico = Math.floor(calcAttrVal * calcFator);
     
     let isParamecia = false;
     if (typeof akumasFixas !== 'undefined' && i.akumaNome) {
@@ -1387,19 +1385,25 @@ function updateUI() {
     if (i.calcUseAmi !== 'nao' && isParamecia) {
         danoAmi = Math.floor(aPot * (controlePct / 100));
     }
-    let calcDanoFinal = danoFisico + danoAmi;
+
+    let calcAttrSemAmi = calcAttrVal;
+    calcAttrVal += danoAmi;
+
+    let calcFator = K / (K + calcRes);
+    let danoFisico = Math.floor(calcAttrVal * calcFator);
+    let calcDanoFinal = danoFisico;
     
     document.getElementById('calc-dano-final').textContent = calcDanoFinal.toLocaleString("pt-BR");
     
     let calcFormTexto = "";
-    if (buffFlat > 0 || buffPct !== 0) {
+    if (buffFlat > 0 || buffPct !== 0 || danoAmi > 0) {
         calcFormTexto += `Atributo: ${baseCalcAttr.toLocaleString("pt-BR")}`;
         if (buffFlat > 0) calcFormTexto += ` + ${buffFlat.toLocaleString("pt-BR")} (Bônus de Estilo) = ${step1Attr.toLocaleString("pt-BR")}`;
-        if (buffPct !== 0) calcFormTexto += ` + ${buffPct}% (Buff Ativo) = ${calcAttrVal.toLocaleString("pt-BR")}`;
+        if (buffPct !== 0) calcFormTexto += ` + ${buffPct}% (Buff Ativo) = ${calcAttrSemAmi.toLocaleString("pt-BR")}`;
+        if (danoAmi > 0) calcFormTexto += ` <span style="color:var(--info);">+ Bônus Paramecia: ${aPot.toLocaleString("pt-BR")} × ${controlePct}% (${danoAmi.toLocaleString("pt-BR")}) = ${calcAttrVal.toLocaleString("pt-BR")}</span>`;
         calcFormTexto += `<br>`;
     }
     calcFormTexto += `Dano Básico: ${calcAttrVal.toLocaleString("pt-BR")} × (${K.toLocaleString("pt-BR")} / (${K.toLocaleString("pt-BR")} + ${calcRes.toLocaleString("pt-BR")})) = ${danoFisico.toLocaleString("pt-BR")}`;
-    if (danoAmi > 0) calcFormTexto += `<br><span style="color:var(--info);">+ Bônus Paramecia: ${aPot.toLocaleString("pt-BR")} × ${controlePct}% = ${danoAmi.toLocaleString("pt-BR")}</span><br><b style="color:var(--danger);">Dano Total (Físico + Akuma): ${calcDanoFinal.toLocaleString("pt-BR")}</b>`;
     document.getElementById('calc-formula').innerHTML = calcFormTexto;
 
     let typeMin = { "Treino Padrão": 250, "Treino de Técnicas": 60, "Interação": 50, "Missão": 250, "Recrutar NPCs": 200, "Trabalho Tipo 1": 200, "Trabalho Tipo 2": 300, "Trabalho Tipo 3": 500, "Extra-Narrada": 2000 };
