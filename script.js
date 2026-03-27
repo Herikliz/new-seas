@@ -821,6 +821,16 @@ function formatCurrency(category, field, el) {
     saveData(); updateUI();
 }
 
+function formatPhone(el) {
+    let v = el.value.replace(/\D/g, "").substring(0, 11);
+    let res = v;
+    if (v.length > 2) res = "(" + v.substring(0, 2) + ") " + v.substring(2);
+    if (v.length > 7) res = res.substring(0, 10) + "-" + res.substring(10);
+    el.value = res;
+    currentChar.info.telefone = res;
+    saveData();
+}
+
 function strCalc(base, bonus) {
     if(bonus === 0) return base.toLocaleString("pt-BR");
     let total = Math.round(base * (1 + bonus)); let sinal = bonus >= 0 ? "+" : ""; let pct = (bonus * 100).toFixed(0) + "%";
