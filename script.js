@@ -1679,8 +1679,11 @@ function updateUI() {
     let racaOutput = formatRaceStr(i.raca, i.animal, i.sexo === "Feminino") || '🔒';
     if (i.linhagem === "Charlotte") { let raca2Output = formatRaceStr(i.raca2, i.animal2, i.sexo === "Feminino"); racaOutput += ` / ${raca2Output}`; }
 
-    let alcunhaOut = i.alcunhaAtiva || 'Nenhuma';
-    if (i.alcunhaAtiva && i.alcunhasList) {
+    let alcunhaOut = "";
+    if (!i.alcunhasList || i.alcunhasList.length === 0) {
+        alcunhaOut = "🔒";
+    } else if (i.alcunhaAtiva) {
+        alcunhaOut = i.alcunhaAtiva;
         let ativa = i.alcunhasList.find(a => a.nome === i.alcunhaAtiva);
         if (ativa && ativa.buffs && ativa.buffs.length > 0) {
             let buffGroups = {};
