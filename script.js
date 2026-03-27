@@ -597,7 +597,7 @@ function runFallbackChecks() {
           const defInfo = { 
               classe: "", classe2: "", classe3: "", classe4: "", classe5: "", raca: "", raca2: "", animal: "", animal2: "", 
               linhagem: "", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp", 
-              alcunha: "", recompensa: "", altura: "", idade: "", sexo: "", sangue: "", nacionalidade: "", localizacao: "", 
+              alcunha: "", alcunhasList: [], alcunhaAtiva: "", recompensa: "", altura: "", idade: "", sexo: "", sangue: "", nacionalidade: "", localizacao: "", 
               telefone: "", orgTipo: "", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", 
               estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", 
               personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, hasAmiDesp: false,
@@ -759,6 +759,61 @@ function renderLogs() {
     });
 }
 
+function openAlcunhaModal() {
+    if(isReadOnly) return;
+    document.getElementById('alcunha-nome').value = '';
+    document.getElementById('alcunha-has-buff').checked = false;
+    document.getElementById('alcunha-buffs-container').style.display = 'none';
+    document.getElementById('alcunha-buffs-list').innerHTML = '';
+    document.getElementById('modal-alcunha').style.display = 'flex';
+}
+function addAlcunhaBuffRow() {
+    const list = document.getElementById('alcunha-buffs-list');
+    const row = document.createElement('div');
+    row.style.display = 'flex'; row.style.gap = '5px'; row.style.marginBottom = '5px';
+    row.innerHTML = `
+        <select class="buff-stat" style="flex:2; font-size:11px; padding:4px; background:#2a2a2a; border:1px solid #444; color:#fff; border-radius:4px;">
+            <optgroup label="Tudo"><option value="tudo">Todos os Atributos</option></optgroup>
+            <optgroup label="Atributos"><option value="d">Destreza</option><option value="f">Força</option><option value="r">Resistência</option><option value="v">Velocidade</option><option value="refl">Reflexo</option><option value="vcorp">Vel. Corporal</option></optgroup>
+            <optgroup label="Espírito"><option value="ha">Armamento</option><option value="ho">Observação</option><option value="hr">Rei</option></optgroup>
+            <optgroup label="Akuma no Mi"><option value="amiAlc">Alcance</option><option value="amiDur">Durabilidade</option><option value="amiPot">Potência</option><option value="amiVel">Velocidade</option></optgroup>
+        </select>
+        <select class="buff-type" style="flex:1; font-size:11px; padding:4px; background:#2a2a2a; border:1px solid #444; color:#fff; border-radius:4px;">
+            <option value="flat">Pts (+X)</option>
+            <option value="pct">% (+X%)</option>
+        </select>
+        <input type="number" class="buff-val" placeholder="Qtd" style="flex:1; font-size:11px; padding:4px; background:#2a2a2a; border:1px solid #444; color:#fff; border-radius:4px;">
+        <button class="btn btn-outline btn-danger" style="padding:2px 6px; font-size:10px; margin:0;" onclick="this.parentElement.remove()">X</button>
+    `;
+    list.appendChild(row);
+}
+function saveAlcunha() {
+    let nome = document.getElementById('alcunha-nome').value.trim();
+    if(!nome) return;
+    let hasBuff = document.getElementById('alcunha-has-buff').checked;
+    let buffs = [];
+    if(hasBuff) {
+        document.querySelectorAll('#alcunha-buffs-list > div').forEach(row => {
+            let stat = row.querySelector('.buff-stat').value;
+            let type = row.querySelector('.buff-type').value;
+            let val = parseInt(row.querySelector('.buff-val').value) || 0;
+            if(val !== 0) buffs.push({stat, type, val});
+        });
+    }
+    if(!currentChar.info.alcunhasList) currentChar.info.alcunhasList = [];
+    currentChar.info.alcunhasList.push({nome, buffs});
+    currentChar.info.alcunhaAtiva = nome;
+    document.getElementById('modal-alcunha').style.display = 'none';
+    saveData(); updateUI();
+}
+function deleteAlcunha() {
+    if(isReadOnly || !currentChar.info.alcunhasList || currentChar.info.alcunhasList.length === 0 || !currentChar.info.alcunhaAtiva) return;
+    let ativa = currentChar.info.alcunhaAtiva;
+    currentChar.info.alcunhasList = currentChar.info.alcunhasList.filter(a => a.nome !== ativa);
+    currentChar.info.alcunhaAtiva = currentChar.info.alcunhasList.length > 0 ? currentChar.info.alcunhasList[0].nome : "";
+    saveData(); updateUI();
+}
+
 function populateSelects() {}
 
 function updateField(category, field, value) { 
@@ -831,10 +886,13 @@ function formatPhone(el) {
     saveData();
 }
 
-function strCalc(base, bonus) {
-    if(bonus === 0) return base.toLocaleString("pt-BR");
-    let total = Math.round(base * (1 + bonus)); let sinal = bonus >= 0 ? "+" : ""; let pct = (bonus * 100).toFixed(0) + "%";
-    return `${base.toLocaleString("pt-BR")}${sinal}${pct} = ${total.toLocaleString("pt-BR")}`;
+function strCalc(base, bonus, flat = 0) {
+    if(bonus === 0 && flat === 0) return base.toLocaleString("pt-BR");
+    let total = Math.round(base * (1 + bonus)) + flat; 
+    let parts = [base.toLocaleString("pt-BR")];
+    if (bonus !== 0) parts.push(`${bonus >= 0 ? "+" : ""}${(bonus * 100).toFixed(0)}%`);
+    if (flat !== 0) parts.push(`${flat >= 0 ? "+" : ""}${flat.toLocaleString("pt-BR")}`);
+    return `${parts.join(" ")} = ${total.toLocaleString("pt-BR")}`;
 }
 
 function formatRaceStr(rName, aName, isFem) {
@@ -970,8 +1028,16 @@ function updateUI() {
     } else { anim2.style.display = "none"; }
 
     document.getElementById('pc-name').value = currentChar.name;
-    const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'alcunha', 'altura', 'idade', 'sexo', 'sangue', 'telefone', 'nacionalidade', 'localizacao', 'tripulacao', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2', 'sceneType', 'sceneText', 'calcUseAttr', 'calcUseAmi', 'calcUseHaki', 'amiAlcMult', 'ordemTecnicas'];
+    const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'altura', 'idade', 'sexo', 'sangue', 'telefone', 'nacionalidade', 'localizacao', 'tripulacao', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2', 'sceneType', 'sceneText', 'calcUseAttr', 'calcUseAmi', 'calcUseHaki', 'amiAlcMult', 'ordemTecnicas'];
     textFields.forEach(f => { let el = document.getElementById('info-'+f); if(el) el.value = i[f] || ""; });
+
+    let selAlcunha = document.getElementById('info-alcunha');
+    if(selAlcunha) {
+        let htmlAlc = '<option value="">-- Nenhuma --</option>';
+        if(i.alcunhasList) { i.alcunhasList.forEach(a => { htmlAlc += `<option value="${a.nome}">${a.nome}</option>`; }); }
+        if(selAlcunha.innerHTML !== htmlAlc) selAlcunha.innerHTML = htmlAlc;
+        selAlcunha.value = i.alcunhaAtiva || "";
+    }
 
     let calcResEl = document.getElementById('info-calcInimigoRes');
     if(calcResEl) calcResEl.value = i.calcInimigoRes ? i.calcInimigoRes.toLocaleString("pt-BR") : "";
@@ -1180,7 +1246,21 @@ function updateUI() {
         amiEl.placeholder = "0"; 
     }
 
-    let bonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0, refl:0, vcorp:0};
+    let bonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0, refl:0, vcorp:0, amiAlc:0, amiDur:0, amiPot:0, amiVel:0};
+    let flatBonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0, refl:0, vcorp:0, amiAlc:0, amiDur:0, amiPot:0, amiVel:0};
+
+    if (i.alcunhasList && i.alcunhaAtiva) {
+        let ativa = i.alcunhasList.find(a => a.nome === i.alcunhaAtiva);
+        if (ativa && ativa.buffs) {
+            ativa.buffs.forEach(b => {
+                let targets = b.stat === "tudo" ? ["d","f","r","v"] : [b.stat];
+                targets.forEach(t => {
+                    if (b.type === "pct") { if(typeof bonus[t] !== 'undefined') bonus[t] += (b.val / 100); }
+                    else { if(typeof flatBonus[t] !== 'undefined') flatBonus[t] += b.val; }
+                });
+            });
+        }
+    }
 
     if(combatenteLevel > 0) { bonus[i.selClasseDF] += combatenteLevel * 0.05; }
 
@@ -1215,11 +1295,11 @@ function updateUI() {
     const statFields = ['f', 'd', 'r', 'v', 'esp', 'ami'];
     statFields.forEach(f => { let el = document.getElementById('stat-'+f); if(el) el.value = currentChar.stats[f] ? currentChar.stats[f].toLocaleString("pt-BR") : ""; });
 
-    let totalD = Math.round(D * (1 + bonus.d)); document.getElementById('total-d').innerText = "Total: " + totalD.toLocaleString("pt-BR");
-    let totalF = Math.round(F * (1 + bonus.f)); document.getElementById('total-f').innerText = "Total: " + totalF.toLocaleString("pt-BR");
-    let totalR = Math.round(R * (1 + bonus.r)); document.getElementById('total-r').innerText = "Total: " + totalR.toLocaleString("pt-BR");
+    let totalD = Math.round(D * (1 + bonus.d)) + flatBonus.d; document.getElementById('total-d').innerText = "Total: " + totalD.toLocaleString("pt-BR");
+    let totalF = Math.round(F * (1 + bonus.f)) + flatBonus.f; document.getElementById('total-f').innerText = "Total: " + totalF.toLocaleString("pt-BR");
+    let totalR = Math.round(R * (1 + bonus.r)) + flatBonus.r; document.getElementById('total-r').innerText = "Total: " + totalR.toLocaleString("pt-BR");
     
-    let totalV = Math.round(V * (1 + bonus.v)); document.getElementById('total-v').innerText = "Total: " + totalV.toLocaleString("pt-BR");
+    let totalV = Math.round(V * (1 + bonus.v)) + flatBonus.v; document.getElementById('total-v').innerText = "Total: " + totalV.toLocaleString("pt-BR");
     document.getElementById('container-boxVel').style.display = totalV > 0 ? "block" : "none";
     
     if(totalV === 0) { currentChar.substats.refl = 0; currentChar.substats.vcorp = 0; }
@@ -1245,7 +1325,7 @@ function updateUI() {
     document.getElementById('sub-refl').value = currentChar.substats.refl ? currentChar.substats.refl.toLocaleString("pt-BR") : "";
     document.getElementById('sub-vcorp').value = currentChar.substats.vcorp ? currentChar.substats.vcorp.toLocaleString("pt-BR") : "";
 
-    let ESP = currentChar.stats.esp; let totalEsp = Math.round(ESP * (1 + bonus.esp)); document.getElementById('total-esp').innerText = "Total: " + totalEsp.toLocaleString("pt-BR");
+    let ESP = currentChar.stats.esp; let totalEsp = Math.round(ESP * (1 + bonus.esp)) + flatBonus.esp; document.getElementById('total-esp').innerText = "Total: " + totalEsp.toLocaleString("pt-BR");
     
     let HA = currentChar.substats.hArm || 0, HO = currentChar.substats.hObs || 0, HR = currentChar.substats.hRei || 0;
     let totalHaki = HA + HO + HR;
@@ -1283,7 +1363,7 @@ function updateUI() {
         if (amiElUpdate) amiElUpdate.value = AMI.toLocaleString("pt-BR");
     }
 
-    let totalAmi = Math.round(AMI * (1 + bonus.ami)); document.getElementById('total-ami').innerText = "Total: " + totalAmi.toLocaleString("pt-BR");
+    let totalAmi = Math.round(AMI * (1 + bonus.ami)) + flatBonus.ami; document.getElementById('total-ami').innerText = "Total: " + totalAmi.toLocaleString("pt-BR");
     document.getElementById('box-amiSub').style.display = AMI > 0 ? "block" : "none";
     if(AMI === 0) { currentChar.substats.amiAlc = 0; currentChar.substats.amiDur = 0; currentChar.substats.amiPot = 0; currentChar.substats.amiVel = 0; currentChar.substats.amiDesp = 0; }
     
@@ -1391,14 +1471,17 @@ function updateUI() {
     if (typeof akumasFixas !== 'undefined' && i.akumaNome) {
         if (akumasFixas['Paramecia'].includes(i.akumaNome) || akumasFixas['Paramecia Especial'].includes(i.akumaNome)) isParamecia = true;
     }
+    
+    let calcAPot = Math.round(aPot * (1 + bonus.amiPot)) + flatBonus.amiPot;
     let danoAmi = 0;
     if (i.calcUseAmi !== 'nao' && isParamecia) {
-        danoAmi = Math.floor(aPot * (controlePct / 100));
+        danoAmi = Math.floor(calcAPot * (controlePct / 100));
     }
 
+    let calcHA = Math.round(HA * (1 + bonus.ha)) + flatBonus.ha;
     let danoHaki = 0;
-    if (i.calcUseHaki === 'sim' && HA > 0) {
-        danoHaki = HA;
+    if (i.calcUseHaki === 'sim' && calcHA > 0) {
+        danoHaki = calcHA;
     }
 
     let calcAttrSemAmi = calcAttrVal;
@@ -1453,37 +1536,39 @@ function updateUI() {
     if(i.historia && i.historia.trim() !== "") { histPersOut += `\n  : ᓩ _𝐇ɪsᴛᴏ́ʀɪᴀ:_\n${formatHistPers(i.historia)}\n`; }
 
     let attrOut = "";
-    if (D > 0) attrOut += `↠ *𝙳𝚎𝚜𝚝𝚛𝚎𝚣𝚊:* ${strCalc(D, bonus.d)}\n\n`;
-    if (F > 0) attrOut += `↠ *𝙵𝚘𝚛𝚌̧𝚊:* ${strCalc(F, bonus.f)}\n\n`;
-    if (R > 0) { attrOut += `↠ *𝚁𝚎𝚜𝚒𝚜𝚝𝚎̂𝚗𝚌𝚒𝚊:* ${strCalc(R, bonus.r)}\n> 𝙴𝚜𝚝𝚊𝚖𝚒𝚗𝚊: ${(Math.round(R * (1 + bonus.r)) * 2).toLocaleString("pt-BR")}\n\n`; }
+    if (D > 0) attrOut += `↠ *𝙳𝚎𝚜𝚝𝚛𝚎𝚣𝚊:* ${strCalc(D, bonus.d, flatBonus.d)}\n\n`;
+    if (F > 0) attrOut += `↠ *𝙵𝚘𝚛𝚌̧𝚊:* ${strCalc(F, bonus.f, flatBonus.f)}\n\n`;
+    if (R > 0) { attrOut += `↠ *𝚁𝚎𝚜𝚒𝚜𝚝𝚎̂𝚗𝚌𝚒𝚊:* ${strCalc(R, bonus.r, flatBonus.r)}\n> 𝙴𝚜𝚝𝚊𝚖𝚒𝚗𝚊: ${(totalR * 2).toLocaleString("pt-BR")}\n\n`; }
     if (V > 0) {
-        attrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${strCalc(V, bonus.v) + (inWater ? " (dentro da água)" : "")}\n`;
-        if (REF > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${strCalc(REF, bonus.refl)}\n`;
-        if (VCORP > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${strCalc(VCORP, bonus.vcorp)}\n`;
+        attrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${strCalc(V, bonus.v, flatBonus.v) + (inWater ? " (dentro da água)" : "")}\n`;
+        if (REF > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${strCalc(REF, bonus.refl, flatBonus.refl)}\n`;
+        if (VCORP > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${strCalc(VCORP, bonus.vcorp, flatBonus.vcorp)}\n`;
         attrOut += `\n`;
     }
     
     if (totalBase >= reqEsp && ESP > 0) {
-        attrOut += `↠ *𝙴𝚜𝚙𝚒́𝚛𝚒𝚝𝚘:* ${strCalc(ESP, bonus.esp)}\n`;
-        if (HA > 0) attrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚘 𝙰𝚛𝚖𝚊𝚖𝚎𝚗𝚝𝚘:_ ${strCalc(HA, bonus.ha)}\n`;
-        if (HO > 0) attrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚊 𝙾𝚋𝚜𝚎𝚛𝚟𝚊𝚌̧𝚊̃𝚘:_ ${strCalc(HO, bonus.ho)}\n`;
-        if (HR > 0) attrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚘 𝚁𝚎𝚒:_ ${strCalc(HR, bonus.hr)}\n`;
+        attrOut += `↠ *𝙴𝚜𝚙𝚒́𝚛𝚒𝚝𝚘:* ${strCalc(ESP, bonus.esp, flatBonus.esp)}\n`;
+        if (HA > 0) attrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚘 𝙰𝚛𝚖𝚊𝚖𝚎𝚗𝚝𝚘:_ ${strCalc(HA, bonus.ha, flatBonus.ha)}\n`;
+        if (HO > 0) attrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚊 𝙾𝚋𝚜𝚎𝚛𝚟𝚊𝚌̧𝚊̃𝚘:_ ${strCalc(HO, bonus.ho, flatBonus.ho)}\n`;
+        if (HR > 0) attrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚘 𝚁𝚎𝚒:_ ${strCalc(HR, bonus.hr, flatBonus.hr)}\n`;
         attrOut += `\n`;
     }
     
     if (AMI > 0) {
-        attrOut += `↠ *𝙰𝚔𝚞𝚖𝚊 𝚗𝚘 𝙼𝚒:* ${strCalc(AMI, bonus.ami)}\n`;
+        attrOut += `↠ *𝙰𝚔𝚞𝚖𝚊 𝚗𝚘 𝙼𝚒:* ${strCalc(AMI, bonus.ami, flatBonus.ami)}\n`;
         if (i.hasAmiAlc && aAlc > 0) {
+            let calcAAlc = Math.round(aAlc * (1 + bonus.amiAlc)) + flatBonus.amiAlc;
             let mult = parseFloat((i.amiAlcMult || "1").toString().replace(',', '.')) || 1;
-            let metros = (aAlc / 20) * mult;
-            attrOut += `> _𝙰𝚕𝚌𝚊𝚗𝚌𝚎:_ ${aAlc.toLocaleString("pt-BR")} (${metros.toLocaleString("pt-BR", {maximumFractionDigits: 1})}m)\n`;
+            let metros = (calcAAlc / 20) * mult;
+            attrOut += `> _𝙰𝚕𝚌𝚊𝚗𝚌𝚎:_ ${strCalc(aAlc, bonus.amiAlc, flatBonus.amiAlc)} (${metros.toLocaleString("pt-BR", {maximumFractionDigits: 1})}m)\n`;
         }
         if (i.hasAmiDur && aDur > 0) {
-            let cenas = Math.floor(aDur / 500);
-            attrOut += `> _𝙳𝚞𝚛𝚊𝚋𝚒𝚕𝚒𝚍𝚊𝚍𝚎:_ ${aDur.toLocaleString("pt-BR")} (${cenas} cena${cenas !== 1 ? 's' : ''})\n`;
+            let calcADur = Math.round(aDur * (1 + bonus.amiDur)) + flatBonus.amiDur;
+            let cenas = Math.floor(calcADur / 500);
+            attrOut += `> _𝙳𝚞𝚛𝚊𝚋𝚒𝚕𝚒𝚍𝚊𝚍𝚎:_ ${strCalc(aDur, bonus.amiDur, flatBonus.amiDur)} (${cenas} cena${cenas !== 1 ? 's' : ''})\n`;
         }
-        if (i.hasAmiPot && aPot > 0) attrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${aPot.toLocaleString("pt-BR")}\n`;
-        if (i.hasAmiVel && aVel > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${aVel.toLocaleString("pt-BR")}\n`;
+        if (i.hasAmiPot && aPot > 0) attrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${strCalc(aPot, bonus.amiPot, flatBonus.amiPot)}\n`;
+        if (i.hasAmiVel && aVel > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${strCalc(aVel, bonus.amiVel, flatBonus.amiVel)}\n`;
         if (i.hasAmiDesp && aDesp > 0) attrOut += `> _𝙳𝚎𝚜𝚙𝚎𝚛𝚝𝚊𝚛:_ ${aDesp.toLocaleString("pt-BR")}\n`;
         if (activeAmiStats > 0) attrOut += `> _𝙲𝚘𝚗𝚝𝚛ᴏ𝚕𝚎:_ ${controlePct}%\n`;
         attrOut += `\n`;
@@ -1563,7 +1648,7 @@ Iີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ�
 > ${currentChar.name || '🔒'}
 
   : ᓩ _𝐀ʟᴄᴜɴʜᴀ:_
-> ${i.alcunha || '🔒'}
+> ${i.alcunhaAtiva || 'Nenhuma'}
 ${recompensaOutText}
   : ᓩ _𝐀ʟᴛᴜʀᴀ:_
 > ${i.altura || '🔒'}

@@ -40,7 +40,14 @@
           <div id="wrapper-boxIden" class="box-content">
               <div class="input-group"><label>Nome do Personagem</label><input type="text" id="pc-name" oninput="updateField('name', null, this.value)"></div>
               <div class="input-row">
-                  <div class="input-group"><label>Alcunha</label><input type="text" id="info-alcunha" oninput="updateField('info', 'alcunha', this.value)"></div>
+                  <div class="input-group">
+                      <label>Alcunha</label>
+                      <div style="display:flex; gap:5px;">
+                          <select id="info-alcunha" onchange="updateField('info', 'alcunhaAtiva', this.value)" style="flex:1; padding:6px; background-color:#2a2a2a; border:1px solid #444; color:var(--text); border-radius:4px;"></select>
+                          <button class="btn btn-outline btn-success" style="padding: 4px 8px;" onclick="openAlcunhaModal()">+</button>
+                          <button class="btn btn-outline btn-danger" style="padding: 4px 8px;" onclick="deleteAlcunha()">🗑️</button>
+                      </div>
+                  </div>
                   <div class="input-group"><label>Idade</label><input type="text" id="info-idade" placeholder="Mín: 15" oninput="updateField('info', 'idade', this.value)"></div>
               </div>
               <div class="input-row">
@@ -515,6 +522,24 @@
   <div class="modal-box" style="border-color: var(--info);">
     <div id="custom-alert-msg" class="modal-msg"></div>
     <button class="btn btn-outline btn-info" id="custom-alert-ok">OK</button>
+  </div>
+</div>
+
+<div id="modal-alcunha" class="modal-overlay">
+  <div class="modal-box" style="width: 400px; max-height: 80vh; overflow-y: auto;">
+    <div class="modal-msg" style="font-weight:bold; color:var(--info);">Criar Nova Alcunha</div>
+    <input type="text" id="alcunha-nome" placeholder="Nome da Alcunha" style="margin-bottom: 10px; text-align:center;">
+    <label style="display:flex; align-items:center; gap:5px; justify-content:center; margin-bottom:10px; font-size:12px; cursor:pointer;">
+      <input type="checkbox" id="alcunha-has-buff" onchange="document.getElementById('alcunha-buffs-container').style.display = this.checked ? 'block' : 'none'"> Dá algum buff?
+    </label>
+    <div id="alcunha-buffs-container" style="display:none; text-align:left; border-top:1px dashed #555; padding-top:10px;">
+      <div id="alcunha-buffs-list"></div>
+      <button class="btn btn-outline btn-success" style="width:100%; font-size:11px; margin-top:5px; padding:6px;" onclick="addAlcunhaBuffRow()">+ Adicionar Buff</button>
+    </div>
+    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+      <button class="btn btn-outline btn-success" onclick="saveAlcunha()">Salvar</button>
+      <button class="btn btn-outline btn-danger" onclick="document.getElementById('modal-alcunha').style.display='none'">Cancelar</button>
+    </div>
   </div>
 </div>
 
