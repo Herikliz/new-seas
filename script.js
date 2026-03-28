@@ -1435,9 +1435,15 @@ function updateUI() {
             if(typeof currentChar.substats.vcorpAgua === 'undefined') currentChar.substats.vcorpAgua = 0;
             
             let REFAgua = currentChar.substats.reflAgua || 0, VCORPAgua = currentChar.substats.vcorpAgua || 0;
-            
-            if (REFAgua < REF) { REFAgua = REF; currentChar.substats.reflAgua = REFAgua; }
-            if (VCORPAgua < VCORP) { VCORPAgua = VCORP; currentChar.substats.vcorpAgua = VCORPAgua; }
+            let isBuffAgua = totalVAgua >= totalV;
+
+            if (isBuffAgua) {
+                if (REFAgua < REF) { REFAgua = REF; currentChar.substats.reflAgua = REFAgua; }
+                if (VCORPAgua < VCORP) { VCORPAgua = VCORP; currentChar.substats.vcorpAgua = VCORPAgua; }
+            } else {
+                if (REFAgua > REF) { REFAgua = REF; currentChar.substats.reflAgua = REFAgua; }
+                if (VCORPAgua > VCORP) { VCORPAgua = VCORP; currentChar.substats.vcorpAgua = VCORPAgua; }
+            }
             
             let totalVelSubAgua = REFAgua + VCORPAgua;
             
@@ -1446,20 +1452,23 @@ function updateUI() {
                 let active = document.activeElement;
                 if(active && active.id === 'sub-reflAgua') { 
                     REFAgua -= diff; 
-                    if(REFAgua < REF) { VCORPAgua -= (REF - REFAgua); REFAgua = REF; currentChar.substats.vcorpAgua = VCORPAgua; }
+                    if(isBuffAgua && REFAgua < REF) { VCORPAgua -= (REF - REFAgua); REFAgua = REF; currentChar.substats.vcorpAgua = VCORPAgua; }
                     currentChar.substats.reflAgua = REFAgua; 
                 }
                 else if(active && active.id === 'sub-vcorpAgua') { 
                     VCORPAgua -= diff; 
-                    if(VCORPAgua < VCORP) { REFAgua -= (VCORP - VCORPAgua); VCORPAgua = VCORP; currentChar.substats.reflAgua = REFAgua; }
+                    if(isBuffAgua && VCORPAgua < VCORP) { REFAgua -= (VCORP - VCORPAgua); VCORPAgua = VCORP; currentChar.substats.reflAgua = REFAgua; }
                     currentChar.substats.vcorpAgua = VCORPAgua; 
                 }
                 else {
-                    if(VCORPAgua - diff >= VCORP) { VCORPAgua -= diff; currentChar.substats.vcorpAgua = VCORPAgua; }
-                    else if(REFAgua - diff >= REF) { REFAgua -= diff; currentChar.substats.reflAgua = REFAgua; }
-                    else {
-                        REFAgua = REF; VCORPAgua = VCORP; 
-                        currentChar.substats.reflAgua = REFAgua; currentChar.substats.vcorpAgua = VCORPAgua;
+                    if(isBuffAgua) {
+                        if(VCORPAgua - diff >= VCORP) { VCORPAgua -= diff; currentChar.substats.vcorpAgua = VCORPAgua; }
+                        else if(REFAgua - diff >= REF) { REFAgua -= diff; currentChar.substats.reflAgua = REFAgua; }
+                        else { REFAgua = REF; VCORPAgua = VCORP; currentChar.substats.reflAgua = REFAgua; currentChar.substats.vcorpAgua = VCORPAgua; }
+                    } else {
+                        if(VCORPAgua >= diff) { VCORPAgua -= diff; currentChar.substats.vcorpAgua = VCORPAgua; }
+                        else if(REFAgua >= diff) { REFAgua -= diff; currentChar.substats.reflAgua = REFAgua; }
+                        else { REFAgua = 0; VCORPAgua = 0; currentChar.substats.reflAgua = 0; currentChar.substats.vcorpAgua = 0; }
                     }
                 }
                 document.getElementById('avisoVelAgua').style.display = "block"; document.getElementById('avisoVelAgua').textContent = `Limite atingido!\n Máx: ${totalVAgua.toLocaleString("pt-BR")}`;
