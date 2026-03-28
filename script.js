@@ -1660,19 +1660,28 @@ function updateUI() {
     if (F > 0) attrOut += `↠ *𝙵𝚘𝚛𝚌̧𝚊:* ${strCalc(F, bonus.f, flatBonus.f)}\n\n`;
     if (R > 0) { attrOut += `↠ *𝚁𝚎𝚜𝚒𝚜𝚝𝚎̂𝚗𝚌𝚒𝚊:* ${strCalc(R, bonus.r, flatBonus.r)}\n> 𝙴𝚜𝚝𝚊𝚖𝚒𝚗𝚊: ${(totalR * 2).toLocaleString("pt-BR")}\n\n`; }
     if (V > 0) {
-        attrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${strCalc(V, bonus.v, flatBonus.v)}\n`;
-        if (REF > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${strCalc(REF, bonus.refl, flatBonus.refl)}\n`;
-        if (VCORP > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${strCalc(VCORP, bonus.vcorp, flatBonus.vcorp)}\n`;
+        let velNormalStr = strCalc(V, bonus.v, flatBonus.v);
         
         if (inWater) {
             let buffPctAgua = parseInt(i.buffAguaPct) || 0;
             let totalBonusVAgua = bonus.v + (buffPctAgua / 100);
             let strTotalAgua = strCalc(V, totalBonusVAgua, flatBonus.v);
-            attrOut += `\n↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 (𝙳𝚎𝚗𝚝𝚛𝚘 𝚍'𝚊́𝚐𝚞𝚊):* ${strTotalAgua}\n`;
+            attrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${velNormalStr} | ${strTotalAgua} (dentro d'água)\n`;
+        } else {
+            attrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${velNormalStr}\n`;
+        }
+
+        if (REF > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${strCalc(REF, bonus.refl, flatBonus.refl)}\n`;
+        if (VCORP > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${strCalc(VCORP, bonus.vcorp, flatBonus.vcorp)}\n`;
+        
+        if (inWater) {
             let REFAgua = currentChar.substats.reflAgua || 0;
             let VCORPAgua = currentChar.substats.vcorpAgua || 0;
-            if (REFAgua > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${strCalc(REFAgua, bonus.refl, flatBonus.refl)}\n`;
-            if (VCORPAgua > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${strCalc(VCORPAgua, bonus.vcorp, flatBonus.vcorp)}\n`;
+            if (REFAgua > 0 || VCORPAgua > 0) {
+                attrOut += `> _𝙳𝚎𝚗𝚝𝚛𝚘 𝚍'𝚊́𝚐𝚞𝚊:_\n`;
+                if (REFAgua > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${strCalc(REFAgua, bonus.refl, flatBonus.refl)}\n`;
+                if (VCORPAgua > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${strCalc(VCORPAgua, bonus.vcorp, flatBonus.vcorp)}\n`;
+            }
         }
         attrOut += `\n`;
     }
