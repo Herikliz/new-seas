@@ -1435,16 +1435,32 @@ function updateUI() {
             if(typeof currentChar.substats.vcorpAgua === 'undefined') currentChar.substats.vcorpAgua = 0;
             
             let REFAgua = currentChar.substats.reflAgua || 0, VCORPAgua = currentChar.substats.vcorpAgua || 0;
+            
+            if (REFAgua < REF) { REFAgua = REF; currentChar.substats.reflAgua = REFAgua; }
+            if (VCORPAgua < VCORP) { VCORPAgua = VCORP; currentChar.substats.vcorpAgua = VCORPAgua; }
+            
             let totalVelSubAgua = REFAgua + VCORPAgua;
             
             if(totalVelSubAgua > totalVAgua) {
                 let diff = totalVelSubAgua - totalVAgua;
                 let active = document.activeElement;
-                if(active && active.id === 'sub-reflAgua') { REFAgua -= diff; currentChar.substats.reflAgua = REFAgua; }
-                else if(active && active.id === 'sub-vcorpAgua') { VCORPAgua -= diff; currentChar.substats.vcorpAgua = VCORPAgua; }
+                if(active && active.id === 'sub-reflAgua') { 
+                    REFAgua -= diff; 
+                    if(REFAgua < REF) { VCORPAgua -= (REF - REFAgua); REFAgua = REF; currentChar.substats.vcorpAgua = VCORPAgua; }
+                    currentChar.substats.reflAgua = REFAgua; 
+                }
+                else if(active && active.id === 'sub-vcorpAgua') { 
+                    VCORPAgua -= diff; 
+                    if(VCORPAgua < VCORP) { REFAgua -= (VCORP - VCORPAgua); VCORPAgua = VCORP; currentChar.substats.reflAgua = REFAgua; }
+                    currentChar.substats.vcorpAgua = VCORPAgua; 
+                }
                 else {
-                    if(VCORPAgua >= diff) { VCORPAgua -= diff; currentChar.substats.vcorpAgua = VCORPAgua; }
-                    else if(REFAgua >= diff) { REFAgua -= diff; currentChar.substats.reflAgua = REFAgua; }
+                    if(VCORPAgua - diff >= VCORP) { VCORPAgua -= diff; currentChar.substats.vcorpAgua = VCORPAgua; }
+                    else if(REFAgua - diff >= REF) { REFAgua -= diff; currentChar.substats.reflAgua = REFAgua; }
+                    else {
+                        REFAgua = REF; VCORPAgua = VCORP; 
+                        currentChar.substats.reflAgua = REFAgua; currentChar.substats.vcorpAgua = VCORPAgua;
+                    }
                 }
                 document.getElementById('avisoVelAgua').style.display = "block"; document.getElementById('avisoVelAgua').textContent = `Limite atingido!\n Máx: ${totalVAgua.toLocaleString("pt-BR")}`;
             } else if (totalVelSubAgua < totalVAgua && totalVAgua > 0) {
@@ -1683,25 +1699,32 @@ function updateUI() {
             let totalFlatBonusVAgua = flatBonus.v + flatBonus.vAgua;
             let strTotalAgua = strCalc(V, totalBonusVAgua, totalFlatBonusVAgua);
             attrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${velNormalStr} | ${strTotalAgua} (dentro d'água)\n`;
-        } else {
-            attrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${velNormalStr}\n`;
-        }
-
-        if (REF > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${strCalc(REF, bonus.refl, flatBonus.refl)}\n`;
-        if (VCORP > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${strCalc(VCORP, bonus.vcorp, flatBonus.vcorp)}\n`;
-        
-        if (hasWaterDiff) {
+            
             let REFAgua = currentChar.substats.reflAgua || 0;
             let VCORPAgua = currentChar.substats.vcorpAgua || 0;
-            if (REFAgua > 0 || VCORPAgua > 0) {
-                attrOut += `> _𝙳𝚎𝚗𝚝𝚛𝚘 𝚍'𝚊́𝚐𝚞𝚊:_\n`;
-                let totalBonusReflAgua = bonus.refl + bonus.reflAgua;
-                let totalFlatBonusReflAgua = flatBonus.refl + flatBonus.reflAgua;
-                let totalBonusVcorpAgua = bonus.vcorp + bonus.vcorpAgua;
-                let totalFlatBonusVcorpAgua = flatBonus.vcorp + flatBonus.vcorpAgua;
-                if (REFAgua > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${strCalc(REFAgua, totalBonusReflAgua, totalFlatBonusReflAgua)}\n`;
-                if (VCORPAgua > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${strCalc(VCORPAgua, totalBonusVcorpAgua, totalFlatBonusVcorpAgua)}\n`;
+            let totalBonusReflAgua = bonus.refl + bonus.reflAgua;
+            let totalFlatBonusReflAgua = flatBonus.refl + flatBonus.reflAgua;
+            let totalBonusVcorpAgua = bonus.vcorp + bonus.vcorpAgua;
+            let totalFlatBonusVcorpAgua = flatBonus.vcorp + flatBonus.vcorpAgua;
+
+            if (REF > 0 || REFAgua > 0) {
+                let refNormStr = REF > 0 ? strCalc(REF, bonus.refl, flatBonus.refl) : "";
+                let refWaterStr = REFAgua > 0 ? strCalc(REFAgua, totalBonusReflAgua, totalFlatBonusReflAgua) : "";
+                if (REF > 0 && REFAgua > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${refNormStr} | ${refWaterStr} (dentro d'água)\n`;
+                else if (REF > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${refNormStr}\n`;
+                else if (REFAgua > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘 (𝙳𝚎𝚗𝚝𝚛𝚘 𝚍'𝚊́𝚐𝚞𝚊):_ ${refWaterStr}\n`;
             }
+            if (VCORP > 0 || VCORPAgua > 0) {
+                let vcorpNormStr = VCORP > 0 ? strCalc(VCORP, bonus.vcorp, flatBonus.vcorp) : "";
+                let vcorpWaterStr = VCORPAgua > 0 ? strCalc(VCORPAgua, totalBonusVcorpAgua, totalFlatBonusVcorpAgua) : "";
+                if (VCORP > 0 && VCORPAgua > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${vcorpNormStr} | ${vcorpWaterStr} (dentro d'água)\n`;
+                else if (VCORP > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${vcorpNormStr}\n`;
+                else if (VCORPAgua > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕 (𝙳𝚎𝚗𝚝𝚛𝚘 𝚍'𝚊́𝚐𝚞𝚊):_ ${vcorpWaterStr}\n`;
+            }
+        } else {
+            attrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${velNormalStr}\n`;
+            if (REF > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${strCalc(REF, bonus.refl, flatBonus.refl)}\n`;
+            if (VCORP > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${strCalc(VCORP, bonus.vcorp, flatBonus.vcorp)}\n`;
         }
         attrOut += `\n`;
     }
