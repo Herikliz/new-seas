@@ -1771,10 +1771,10 @@ function updateUI() {
 
     let tecnicasOut = "";
     let hasValidTecnica = currentChar.tecnicasList && currentChar.tecnicasList.some(t => t.nome || t.desc || t.efeito);
+    let trAcum = i.treinosAcumulados ? i.treinosAcumulados : 0;
 
-    if (hasValidTecnica) {
+    if (hasValidTecnica || trAcum > 0) {
         tecnicasOut += "▬▬▬▬  [ 𝐓ᴇ́ᴄɴɪᴄᴀs ]  ▬▬▬▬\n\n";
-        let trAcum = i.treinosAcumulados ? i.treinosAcumulados : 0;
         tecnicasOut += `Treinos Acumulados: ${trAcum.toLocaleString("pt-BR")}\n\n`;
 
         let tecnicasOrdenadas = [...currentChar.tecnicasList].filter(t => t.nome || t.desc || t.efeito);
