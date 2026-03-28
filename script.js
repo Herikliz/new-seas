@@ -1377,6 +1377,23 @@ function updateUI() {
     let totalF = Math.round((F + flatBonus.f) * (1 + bonus.f)); document.getElementById('total-f').innerText = "Total: " + totalF.toLocaleString("pt-BR");
     let totalR = Math.round((R + flatBonus.r) * (1 + bonus.r)); document.getElementById('total-r').innerText = "Total: " + totalR.toLocaleString("pt-BR");
     
+    let waterBuffV = 0;
+    if(ln !== "Charlotte") {
+        if(rc === "Sereiano") waterBuffV += 0.40;
+        if(rc === "Tritão") waterBuffV += 0.30;
+    } else {
+        if(rc === "Sereiano" && i.selCharR1 === "v") waterBuffV += 0.40;
+        if(rc === "Tritão" && i.selCharR1 === "v") waterBuffV += 0.30;
+        if(rc2 === "Sereiano" && i.selCharR2 === "v") waterBuffV += 0.40;
+        if(rc2 === "Tritão" && i.selCharR2 === "v") waterBuffV += 0.30;
+    }
+    if(document.getElementById('container-linhagem').style.display === "block" && ln === "Neptune") {
+        waterBuffV += 0.25;
+        if(totalBase >= 10000) waterBuffV += 0.20;
+        else if(totalBase >= 5000) waterBuffV += 0.10;
+    }
+    bonus.v -= waterBuffV;
+
     let totalV = Math.round((V + flatBonus.v) * (1 + bonus.v)); document.getElementById('total-v').innerText = "Total: " + totalV.toLocaleString("pt-BR");
     document.getElementById('container-boxVel').style.display = totalV > 0 ? "block" : "none";
     
@@ -1412,7 +1429,7 @@ function updateUI() {
             if(elBuffPct) elBuffPct.value = i.buffAguaPct ? i.buffAguaPct.toLocaleString("pt-BR") : "";
             
             let buffPctAgua = parseInt(i.buffAguaPct) || 0;
-            let totalBonusVAgua = bonus.v + (buffPctAgua / 100);
+            let totalBonusVAgua = bonus.v + waterBuffV + (buffPctAgua / 100);
             let totalVAgua = Math.round((V + flatBonus.v) * (1 + totalBonusVAgua));
             document.getElementById('total-vAgua').innerText = "Total na Água: " + totalVAgua.toLocaleString("pt-BR");
             
@@ -1664,7 +1681,7 @@ function updateUI() {
         
         if (inWater) {
             let buffPctAgua = parseInt(i.buffAguaPct) || 0;
-            let totalBonusVAgua = bonus.v + (buffPctAgua / 100);
+            let totalBonusVAgua = bonus.v + waterBuffV + (buffPctAgua / 100);
             let strTotalAgua = strCalc(V, totalBonusVAgua, flatBonus.v);
             attrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${velNormalStr} | ${strTotalAgua} (dentro d'água)\n`;
         } else {
