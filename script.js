@@ -610,6 +610,7 @@ function runFallbackChecks() {
           if (!c.stats) c.stats = { f: 0, d: 0, r: 0, v: 0, esp: 0, ami: 0 };
           if (!c.substats) c.substats = { refl: 0, vcorp: 0, hArm: 0, hObs: 0, hRei: 0, amiAlc: 0, amiDur: 0, amiPot: 0, amiVel: 0, amiDesp: 0 };
           if (!c.tecnicasList) c.tecnicasList = [];
+          c.tecnicasList.forEach(t => { if (typeof t.estilo === 'undefined') t.estilo = ""; });
           if (!c.logList) c.logList = [];
       });
   });
@@ -636,7 +637,7 @@ window.toggleAllBoxes = function(state) {
 };
 
 function addTecnica() {
-    currentChar.tecnicasList.push({nome: "", desc: "", efeito: ""});
+    currentChar.tecnicasList.push({nome: "", desc: "", efeito: "", estilo: ""});
     saveData();
     renderTecnicas();
     updateUI();
@@ -694,7 +695,25 @@ function moveTecnica(idx, dir) {
 function renderTecnicas() {
     const container = document.getElementById('tecnicas-container');
     container.innerHTML = '';
+    let i = currentChar.info;
+    let availableStyles = [];
+    let isMink = (i.raca === "Mink" || (i.linhagem === "Charlotte" && i.raca2 === "Mink"));
+    if (isMink) availableStyles.push({ id: "Electro", name: "Electro" });
+    [1, 2, 3, 4].forEach(n => {
+        let st = i['estilo'+n];
+        if (st && st !== "Nenhum") {
+            let dName = st;
+            if (st === "Freestyle") dName = (i['freestyle'+n] && i['freestyle'+n].trim() !== "") ? i['freestyle'+n] : "Freestyle";
+            availableStyles.push({ id: 'estilo'+n, name: dName });
+        }
+    });
+
     currentChar.tecnicasList.forEach((t, idx) => {
+        let styleOptions = '<option value="">-- Sem Estilo --</option>';
+        availableStyles.forEach(st => {
+            styleOptions += `<option value="${st.id}" ${t.estilo === st.id ? 'selected' : ''}>${st.name}</option>`;
+        });
+
         container.innerHTML += `
             <div style="background: rgba(0,0,0,0.3); padding: 10px; border: 1px dashed #555; border-radius: 6px; margin-bottom: 10px;">
                 <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
@@ -705,6 +724,9 @@ function renderTecnicas() {
                         <button type="button" class="btn btn-outline" style="color:var(--danger); border-color:var(--danger); font-size:10px; padding:2px 6px;" onclick="removeTecnica(${idx})">Remover</button>
                     </div>
                 </div>
+                <select onchange="updateTecnica(${idx}, 'estilo', this.value)" style="margin-bottom:5px; background-color:#222; border:1px solid #555; color:var(--text); padding:4px; font-size:11px; border-radius:4px;">
+                    ${styleOptions}
+                </select>
                 <textarea placeholder="Nome da Técnica (Ex: Golpe Rápido)" oninput="updateTecnica(${idx}, 'nome', this.value)" style="min-height:38px; margin-bottom:5px; text-align:justify; padding-top:8px;">${t.nome}</textarea>
                 <textarea placeholder="Descrição da Técnica" oninput="updateTecnica(${idx}, 'desc', this.value)" style="min-height:50px; margin-bottom:5px; text-align:justify;">${t.desc}</textarea>
                 <textarea placeholder="Efeito / Buff (Ex: Perde 10% de Res)" oninput="updateTecnica(${idx}, 'efeito', this.value)" style="min-height:38px; text-align:justify; padding-top:8px;">${t.efeito}</textarea>
@@ -878,6 +900,7 @@ function updateField(category, field, value) {
     }
     
     saveData(); updateUI(); 
+    if (field.startsWith('estilo') || field.startsWith('freestyle') || field === 'raca' || field === 'raca2' || field === 'linhagem') renderTecnicas();
 }
 
 async function handlePatenteChange(val) {
@@ -1236,7 +1259,10 @@ function updateUI() {
     let elEst1 = document.getElementById('info-estilo1');
     if (elEst1) {
         let htmlE1 = '<option value="">-- Selecione --</option>';
-        allowedEstilo1.forEach(e => htmlE1 += `<option value="${e}">${e}</option>`);
+        allowedEstilo1.forEach(e => {
+            let disabled = (e !== "Freestyle" && e !== "Nenhum" && e !== i.estilo1 && [i.estilo2, i.estilo3, i.estilo4].includes(e)) ? "disabled" : "";
+            htmlE1 += `<option value="${e}" ${disabled}>${e}</option>`;
+        });
         if (elEst1.innerHTML !== htmlE1) elEst1.innerHTML = htmlE1;
         elEst1.value = i.estilo1;
     }
@@ -1245,7 +1271,11 @@ function updateUI() {
         let elEst = document.getElementById('info-estilo'+n);
         if (elEst) {
             let htmlE = '<option value="">-- Selecione --</option>';
-            allStyles.forEach(e => htmlE += `<option value="${e}">${e}</option>`);
+            let otherStyles = [1, 2, 3, 4].filter(x => x !== n).map(x => i['estilo'+x]);
+            allStyles.forEach(e => {
+                let disabled = (e !== "Freestyle" && e !== "Nenhum" && e !== i['estilo'+n] && otherStyles.includes(e)) ? "disabled" : "";
+                htmlE += `<option value="${e}" ${disabled}>${e}</option>`;
+            });
             if (elEst.innerHTML !== htmlE) elEst.innerHTML = htmlE;
             elEst.value = i['estilo'+n];
         }
@@ -1633,18 +1663,57 @@ function updateUI() {
         let trAcum = i.treinosAcumulados ? i.treinosAcumulados : 0;
         tecnicasOut += `Treinos Acumulados: ${trAcum.toLocaleString("pt-BR")}\n\n`;
 
-        let tecnicasOrdenadas = [...currentChar.tecnicasList];
+        let tecnicasOrdenadas = [...currentChar.tecnicasList].filter(t => t.nome || t.desc || t.efeito);
         if (i.ordemTecnicas !== "manual") {
             tecnicasOrdenadas.sort((a, b) => { let nA = (a.nome || "").trim().toLowerCase(); let nB = (b.nome || "").trim().toLowerCase(); return nA.localeCompare(nB); });
         }
+
+        let availableStylesMap = {};
+        let isMinkEstilo = (i.raca === "Mink" || (i.linhagem === "Charlotte" && i.raca2 === "Mink"));
+        if (isMinkEstilo) availableStylesMap["Electro"] = "Electro";
+        [1, 2, 3, 4].forEach(n => {
+            let st = i['estilo'+n];
+            if (st && st !== "Nenhum") {
+                let dName = st;
+                if (st === "Freestyle") dName = (i['freestyle'+n] && i['freestyle'+n].trim() !== "") ? i['freestyle'+n] : "Freestyle";
+                availableStylesMap['estilo'+n] = dName;
+            }
+        });
+
+        let agrupado = {};
         tecnicasOrdenadas.forEach(t => {
-            if(t.nome || t.desc || t.efeito) {
+            let stNome = "Sem Estilo";
+            if (t.estilo) {
+                if (availableStylesMap[t.estilo]) {
+                    stNome = availableStylesMap[t.estilo];
+                } else {
+                    let foundId = Object.keys(availableStylesMap).find(k => availableStylesMap[k] === t.estilo);
+                    if (foundId) {
+                        stNome = availableStylesMap[foundId];
+                        t.estilo = foundId;
+                    }
+                }
+            }
+            if (!agrupado[stNome]) agrupado[stNome] = [];
+            agrupado[stNome].push(t);
+        });
+
+        let estilosKeys = Object.keys(agrupado).sort((a, b) => {
+            if (a === "Sem Estilo") return 1;
+            if (b === "Sem Estilo") return -1;
+            return a.localeCompare(b);
+        });
+
+        estilosKeys.forEach(stKey => {
+            tecnicasOut += `> ${stKey}\n\n`;
+            agrupado[stKey].forEach(t => {
                 if (t.nome) tecnicasOut += `* ${t.nome}\n`;
                 if (t.desc) { t.desc.split('\n').forEach(line => { let trimLine = line.trim(); if(trimLine !== "") tecnicasOut += `> ${trimLine.replace(/^>\s*/, '')}\n`; }); }
                 if (t.efeito) { t.efeito.split('\n').forEach((line, idx) => { let trimLine = line.trim(); if(trimLine !== "") { if (idx === 0) tecnicasOut += `> Efeito: ${trimLine.replace(/^>\s*/, '')}\n`; else tecnicasOut += `> ${trimLine.replace(/^>\s*/, '')}\n`; } }); }
                 tecnicasOut += `\n`;
-            }
+            });
         });
+
         tecnicasOut += `«▬▬▬▬▬▬  [ 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 𝙾𝙿 𝚁𝙿𝙶 ]  ▬▬▬▬▬▬»`;
     } else { 
         tecnicasOut += `«▬▬▬▬▬▬  [ 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 𝙾𝙿 𝚁𝙿𝙶 ]  ▬▬▬▬▬▬»`; 
