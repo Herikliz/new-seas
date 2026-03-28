@@ -832,7 +832,7 @@ function addAlcunhaBuffRow() {
     row.innerHTML = `
         <select class="buff-stat" style="flex:2; font-size:11px; padding:4px; background:#2a2a2a; border:1px solid #444; color:#fff; border-radius:4px;">
             <optgroup label="Tudo"><option value="tudo">Todos os Atributos</option></optgroup>
-            <optgroup label="Atributos"><option value="d">Destreza</option><option value="f">Força</option><option value="r">Resistência</option><option value="v">Velocidade</option><option value="refl">Reflexo</option><option value="vcorp">Vel. Corporal</option></optgroup>
+            <optgroup label="Atributos"><option value="d">Destreza</option><option value="f">Força</option><option value="r">Resistência</option><option value="v">Velocidade</option><option value="refl">Reflexo</option><option value="vcorp">Vel. Corporal</option><option value="vAgua">Velocidade (Água)</option><option value="reflAgua">Reflexo (Água)</option><option value="vcorpAgua">Vel. Corporal (Água)</option></optgroup>
             <optgroup label="Espírito"><option value="ha">Armamento</option><option value="ho">Observação</option><option value="hr">Rei</option></optgroup>
             <optgroup label="Akuma no Mi"><option value="amiAlc">Alcance</option><option value="amiDur">Durabilidade</option><option value="amiPot">Potência</option><option value="amiVel">Velocidade</option></optgroup>
         </select>
@@ -1324,8 +1324,8 @@ function updateUI() {
         amiEl.placeholder = "0"; 
     }
 
-    let bonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0, refl:0, vcorp:0, amiAlc:0, amiDur:0, amiPot:0, amiVel:0};
-    let flatBonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0, refl:0, vcorp:0, amiAlc:0, amiDur:0, amiPot:0, amiVel:0};
+    let bonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0, refl:0, vcorp:0, amiAlc:0, amiDur:0, amiPot:0, amiVel:0, vAgua:0, reflAgua:0, vcorpAgua:0};
+    let flatBonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0, refl:0, vcorp:0, amiAlc:0, amiDur:0, amiPot:0, amiVel:0, vAgua:0, reflAgua:0, vcorpAgua:0};
 
     if (i.alcunhasList && i.alcunhaAtiva) {
         let ativa = i.alcunhasList.find(a => a.nome === i.alcunhaAtiva);
@@ -1420,17 +1420,15 @@ function updateUI() {
     document.getElementById('sub-refl').value = currentChar.substats.refl ? currentChar.substats.refl.toLocaleString("pt-BR") : "";
     document.getElementById('sub-vcorp').value = currentChar.substats.vcorp ? currentChar.substats.vcorp.toLocaleString("pt-BR") : "";
 
-    let inWater = (rc === "Sereiano" || rc === "Tritão" || ln === "Neptune" || (ln === "Charlotte" && (rc2 === "Sereiano" || rc2 === "Tritão")));
+    let hasWaterDiff = (waterBuffV !== 0 || bonus.vAgua !== 0 || flatBonus.vAgua !== 0 || bonus.reflAgua !== 0 || flatBonus.reflAgua !== 0 || bonus.vcorpAgua !== 0 || flatBonus.vcorpAgua !== 0);
     let elBoxVelAgua = document.getElementById('container-boxVelAgua');
     if (elBoxVelAgua) {
-        if (inWater && V > 0) {
+        if (hasWaterDiff && V > 0) {
             elBoxVelAgua.style.display = "block";
-            let elBuffPct = document.getElementById('info-buffAguaPct');
-            if(elBuffPct) elBuffPct.value = i.buffAguaPct ? i.buffAguaPct.toLocaleString("pt-BR") : "";
             
-            let buffPctAgua = parseInt(i.buffAguaPct) || 0;
-            let totalBonusVAgua = bonus.v + waterBuffV + (buffPctAgua / 100);
-            let totalVAgua = Math.round((V + flatBonus.v) * (1 + totalBonusVAgua));
+            let totalBonusVAgua = bonus.v + waterBuffV + bonus.vAgua;
+            let totalFlatBonusVAgua = flatBonus.v + flatBonus.vAgua;
+            let totalVAgua = Math.round((V + totalFlatBonusVAgua) * (1 + totalBonusVAgua));
             document.getElementById('total-vAgua').innerText = "Total na Água: " + totalVAgua.toLocaleString("pt-BR");
             
             if(typeof currentChar.substats.reflAgua === 'undefined') currentChar.substats.reflAgua = 0;
@@ -1678,11 +1676,12 @@ function updateUI() {
     if (R > 0) { attrOut += `↠ *𝚁𝚎𝚜𝚒𝚜𝚝𝚎̂𝚗𝚌𝚒𝚊:* ${strCalc(R, bonus.r, flatBonus.r)}\n> 𝙴𝚜𝚝𝚊𝚖𝚒𝚗𝚊: ${(totalR * 2).toLocaleString("pt-BR")}\n\n`; }
     if (V > 0) {
         let velNormalStr = strCalc(V, bonus.v, flatBonus.v);
+        let hasWaterDiff = (waterBuffV !== 0 || bonus.vAgua !== 0 || flatBonus.vAgua !== 0 || bonus.reflAgua !== 0 || flatBonus.reflAgua !== 0 || bonus.vcorpAgua !== 0 || flatBonus.vcorpAgua !== 0);
         
-        if (inWater) {
-            let buffPctAgua = parseInt(i.buffAguaPct) || 0;
-            let totalBonusVAgua = bonus.v + waterBuffV + (buffPctAgua / 100);
-            let strTotalAgua = strCalc(V, totalBonusVAgua, flatBonus.v);
+        if (hasWaterDiff) {
+            let totalBonusVAgua = bonus.v + waterBuffV + bonus.vAgua;
+            let totalFlatBonusVAgua = flatBonus.v + flatBonus.vAgua;
+            let strTotalAgua = strCalc(V, totalBonusVAgua, totalFlatBonusVAgua);
             attrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${velNormalStr} | ${strTotalAgua} (dentro d'água)\n`;
         } else {
             attrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${velNormalStr}\n`;
@@ -1691,13 +1690,17 @@ function updateUI() {
         if (REF > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${strCalc(REF, bonus.refl, flatBonus.refl)}\n`;
         if (VCORP > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${strCalc(VCORP, bonus.vcorp, flatBonus.vcorp)}\n`;
         
-        if (inWater) {
+        if (hasWaterDiff) {
             let REFAgua = currentChar.substats.reflAgua || 0;
             let VCORPAgua = currentChar.substats.vcorpAgua || 0;
             if (REFAgua > 0 || VCORPAgua > 0) {
                 attrOut += `> _𝙳𝚎𝚗𝚝𝚛𝚘 𝚍'𝚊́𝚐𝚞𝚊:_\n`;
-                if (REFAgua > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${strCalc(REFAgua, bonus.refl, flatBonus.refl)}\n`;
-                if (VCORPAgua > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${strCalc(VCORPAgua, bonus.vcorp, flatBonus.vcorp)}\n`;
+                let totalBonusReflAgua = bonus.refl + bonus.reflAgua;
+                let totalFlatBonusReflAgua = flatBonus.refl + flatBonus.reflAgua;
+                let totalBonusVcorpAgua = bonus.vcorp + bonus.vcorpAgua;
+                let totalFlatBonusVcorpAgua = flatBonus.vcorp + flatBonus.vcorpAgua;
+                if (REFAgua > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${strCalc(REFAgua, totalBonusReflAgua, totalFlatBonusReflAgua)}\n`;
+                if (VCORPAgua > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${strCalc(VCORPAgua, totalBonusVcorpAgua, totalFlatBonusVcorpAgua)}\n`;
             }
         }
         attrOut += `\n`;
@@ -1835,7 +1838,7 @@ function updateUI() {
         let ativa = i.alcunhasList.find(a => a.nome === i.alcunhaAtiva);
         if (ativa && ativa.buffs && ativa.buffs.length > 0) {
             let buffGroups = {};
-            let names = {tudo:"Todos os Atributos",d:"Destreza",f:"Força",r:"Resistência",v:"Velocidade",refl:"Reflexo",vcorp:"Vel. Corporal",ha:"Haki do Armamento",ho:"Haki da Observação",hr:"Haki do Rei",amiAlc:"Alcance",amiDur:"Durabilidade",amiPot:"Potência",amiVel:"Velocidade"};
+            let names = {tudo:"Todos os Atributos",d:"Destreza",f:"Força",r:"Resistência",v:"Velocidade",refl:"Reflexo",vcorp:"Vel. Corporal",vAgua:"Velocidade (Água)",reflAgua:"Reflexo (Água)",vcorpAgua:"Vel. Corporal (Água)",ha:"Haki do Armamento",ho:"Haki da Observação",hr:"Haki do Rei",amiAlc:"Alcance",amiDur:"Durabilidade",amiPot:"Potência",amiVel:"Velocidade"};
             ativa.buffs.forEach(b => {
                 let key = (b.val >= 0 ? '+' : '') + b.val + (b.type === 'pct' ? '%' : '');
                 if(!buffGroups[key]) buffGroups[key] = [];
