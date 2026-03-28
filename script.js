@@ -1403,6 +1403,49 @@ function updateUI() {
     document.getElementById('sub-refl').value = currentChar.substats.refl ? currentChar.substats.refl.toLocaleString("pt-BR") : "";
     document.getElementById('sub-vcorp').value = currentChar.substats.vcorp ? currentChar.substats.vcorp.toLocaleString("pt-BR") : "";
 
+    let inWater = (rc === "Sereiano" || rc === "Tritão" || ln === "Neptune" || (ln === "Charlotte" && (rc2 === "Sereiano" || rc2 === "Tritão")));
+    let elBoxVelAgua = document.getElementById('container-boxVelAgua');
+    if (elBoxVelAgua) {
+        if (inWater && V > 0) {
+            elBoxVelAgua.style.display = "block";
+            let elBuffPct = document.getElementById('info-buffAguaPct');
+            if(elBuffPct) elBuffPct.value = i.buffAguaPct ? i.buffAguaPct.toLocaleString("pt-BR") : "";
+            
+            let buffPctAgua = parseInt(i.buffAguaPct) || 0;
+            let totalBonusVAgua = bonus.v + (buffPctAgua / 100);
+            let totalVAgua = Math.round((V + flatBonus.v) * (1 + totalBonusVAgua));
+            document.getElementById('total-vAgua').innerText = "Total na Água: " + totalVAgua.toLocaleString("pt-BR");
+            
+            if(typeof currentChar.substats.reflAgua === 'undefined') currentChar.substats.reflAgua = 0;
+            if(typeof currentChar.substats.vcorpAgua === 'undefined') currentChar.substats.vcorpAgua = 0;
+            
+            let REFAgua = currentChar.substats.reflAgua || 0, VCORPAgua = currentChar.substats.vcorpAgua || 0;
+            let totalVelSubAgua = REFAgua + VCORPAgua;
+            
+            if(totalVelSubAgua > totalVAgua) {
+                let diff = totalVelSubAgua - totalVAgua;
+                let active = document.activeElement;
+                if(active && active.id === 'sub-reflAgua') { REFAgua -= diff; currentChar.substats.reflAgua = REFAgua; }
+                else if(active && active.id === 'sub-vcorpAgua') { VCORPAgua -= diff; currentChar.substats.vcorpAgua = VCORPAgua; }
+                else {
+                    if(VCORPAgua >= diff) { VCORPAgua -= diff; currentChar.substats.vcorpAgua = VCORPAgua; }
+                    else if(REFAgua >= diff) { REFAgua -= diff; currentChar.substats.reflAgua = REFAgua; }
+                }
+                document.getElementById('avisoVelAgua').style.display = "block"; document.getElementById('avisoVelAgua').textContent = `Limite atingido!\n Máx: ${totalVAgua.toLocaleString("pt-BR")}`;
+            } else if (totalVelSubAgua < totalVAgua && totalVAgua > 0) {
+                let diff = totalVAgua - totalVelSubAgua;
+                document.getElementById('avisoVelAgua').style.display = "block"; document.getElementById('avisoVelAgua').textContent = `Pontos não distribuídos na Água: ${diff.toLocaleString("pt-BR")}`;
+            } else { document.getElementById('avisoVelAgua').style.display = "none"; }
+            
+            document.getElementById('sub-reflAgua').value = currentChar.substats.reflAgua ? currentChar.substats.reflAgua.toLocaleString("pt-BR") : "";
+            document.getElementById('sub-vcorpAgua').value = currentChar.substats.vcorpAgua ? currentChar.substats.vcorpAgua.toLocaleString("pt-BR") : "";
+        } else {
+            elBoxVelAgua.style.display = "none";
+            if(currentChar.substats.reflAgua) currentChar.substats.reflAgua = 0; 
+            if(currentChar.substats.vcorpAgua) currentChar.substats.vcorpAgua = 0;
+        }
+    }
+
     let ESP = currentChar.stats.esp; let totalEsp = Math.round((ESP + flatBonus.esp) * (1 + bonus.esp)); document.getElementById('total-esp').innerText = "Total: " + totalEsp.toLocaleString("pt-BR");
     
     let HA = currentChar.substats.hArm || 0, HO = currentChar.substats.hObs || 0, HR = currentChar.substats.hRei || 0;
@@ -1605,7 +1648,6 @@ function updateUI() {
     if (sWords >= minW) { statusEl.textContent = `(✔️ Alcançou o mínimo de ${minW})`; statusEl.style.color = "var(--success)"; } 
     else { statusEl.textContent = `(❌ Faltam ${minW - sWords})`; statusEl.style.color = "var(--danger)"; }
 
-    let inWater = (rc === "Sereiano" || rc === "Tritão" || ln === "Neptune" || (ln === "Charlotte" && (rc2 === "Sereiano" || rc2 === "Tritão")));
     let totalHP = 10000 + Math.round((R + flatBonus.r) * (1 + bonus.r));
 
     let formatHistPers = (text) => { return text.split('\n').map(l => { let trimL = l.trim(); if (trimL === "") return ""; return '> ' + trimL.replace(/^>\s*/, ''); }).join('\n'); };
@@ -1618,9 +1660,20 @@ function updateUI() {
     if (F > 0) attrOut += `↠ *𝙵𝚘𝚛𝚌̧𝚊:* ${strCalc(F, bonus.f, flatBonus.f)}\n\n`;
     if (R > 0) { attrOut += `↠ *𝚁𝚎𝚜𝚒𝚜𝚝𝚎̂𝚗𝚌𝚒𝚊:* ${strCalc(R, bonus.r, flatBonus.r)}\n> 𝙴𝚜𝚝𝚊𝚖𝚒𝚗𝚊: ${(totalR * 2).toLocaleString("pt-BR")}\n\n`; }
     if (V > 0) {
-        attrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${strCalc(V, bonus.v, flatBonus.v) + (inWater ? " (dentro da água)" : "")}\n`;
+        attrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${strCalc(V, bonus.v, flatBonus.v)}\n`;
         if (REF > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${strCalc(REF, bonus.refl, flatBonus.refl)}\n`;
         if (VCORP > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${strCalc(VCORP, bonus.vcorp, flatBonus.vcorp)}\n`;
+        
+        if (inWater) {
+            let buffPctAgua = parseInt(i.buffAguaPct) || 0;
+            let totalBonusVAgua = bonus.v + (buffPctAgua / 100);
+            let strTotalAgua = strCalc(V, totalBonusVAgua, flatBonus.v);
+            attrOut += `\n↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 (𝙳𝚎𝚗𝚝𝚛𝚘 𝚍'𝚊́𝚐𝚞𝚊):* ${strTotalAgua}\n`;
+            let REFAgua = currentChar.substats.reflAgua || 0;
+            let VCORPAgua = currentChar.substats.vcorpAgua || 0;
+            if (REFAgua > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${strCalc(REFAgua, bonus.refl, flatBonus.refl)}\n`;
+            if (VCORPAgua > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${strCalc(VCORPAgua, bonus.vcorp, flatBonus.vcorp)}\n`;
+        }
         attrOut += `\n`;
     }
     
