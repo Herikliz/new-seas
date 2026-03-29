@@ -1175,6 +1175,9 @@ function updateUI() {
     let D = currentChar.stats.d, F = currentChar.stats.f, R = currentChar.stats.r, V = currentChar.stats.v;
     let totalBase = D + F + R + V;
 
+    let elSomaBase = document.getElementById('soma-atributos-base');
+    if (elSomaBase) elSomaBase.textContent = totalBase.toLocaleString("pt-BR");
+
     let avisoBase = document.getElementById('avisoBase');
     if(totalBase > 1000) { avisoBase.style.display = "block"; avisoBase.textContent = `Atenção: Limite inicial de 1.000 pontos ultrapassado! Total: ${totalBase.toLocaleString("pt-BR")}`; } else { avisoBase.style.display = "none"; }
 
