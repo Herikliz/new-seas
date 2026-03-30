@@ -1640,6 +1640,25 @@ function updateUI() {
     }
 
     let calcHA = Math.round((HA + flatBonus.ha) * (1 + bonus.ha));
+    let elCalcUseHaki = document.getElementById('info-calcUseHaki');
+    if (elCalcUseHaki) {
+        let htmlHaki = '<option value="nao">Não</option>';
+        if (calcHA > 0) {
+            htmlHaki += '<option value="invisivel">Haki do Armamento Invisível</option>';
+            htmlHaki += '<option value="visivel">Haki do Armamento Visível</option>';
+            if (calcHA >= 3000) htmlHaki += '<option value="imbuicao">Haki do Armamento: Imbuição</option>';
+            if (calcHA >= 5000) htmlHaki += '<option value="fullbody">Haki do Armamento: Full Body</option>';
+            if (calcHA >= 7000) htmlHaki += '<option value="emissao">Haki do Armamento: Emissão</option>';
+            if (calcHA >= 8000) htmlHaki += '<option value="avancado">Haki do Armamento: Avançado</option>';
+        }
+        if (elCalcUseHaki.innerHTML !== htmlHaki) elCalcUseHaki.innerHTML = htmlHaki;
+        if (Array.from(elCalcUseHaki.options).some(o => o.value === i.calcUseHaki)) {
+            elCalcUseHaki.value = i.calcUseHaki;
+        } else {
+            elCalcUseHaki.value = "nao";
+            i.calcUseHaki = "nao";
+        }
+    }
     let danoHaki = 0;
     if (calcHA > 0) {
         if (i.calcUseHaki === 'invisivel') danoHaki = Math.floor(calcHA * 0.25);
