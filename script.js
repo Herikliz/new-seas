@@ -1641,8 +1641,16 @@ function updateUI() {
 
     let calcHA = Math.round((HA + flatBonus.ha) * (1 + bonus.ha));
     let danoHaki = 0;
-    if (i.calcUseHaki === 'sim' && calcHA > 0) {
-        danoHaki = calcHA;
+    if (calcHA > 0) {
+        if (i.calcUseHaki === 'invisivel') danoHaki = Math.floor(calcHA * 0.25);
+        else if (i.calcUseHaki === 'visivel') danoHaki = Math.floor(calcHA * 0.50);
+        else if (i.calcUseHaki === 'imbuicao') danoHaki = Math.floor(calcHA * 0.80);
+        else if (i.calcUseHaki === 'fullbody') danoHaki = calcHA;
+        else if (i.calcUseHaki === 'emissao') danoHaki = calcHA;
+        else if (i.calcUseHaki === 'avancado') {
+            danoHaki = calcHA;
+            calcRes = Math.floor(calcRes * 0.75);
+        }
     }
 
     let calcAttrSemAmi = calcAttrVal;
