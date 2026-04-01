@@ -698,7 +698,7 @@ function addNpcEspecial() {
     let origem = "Evento";
     if (domCount < 3) origem = "Dominação";
     else if (extCount < 3) origem = "Extra-Narrada";
-    currentChar.info.npcsEspeciaisList.push({nome: "", origem: origem, pontos: "", classe: "", classe2: "", classe3: "", classe4: "", classe5: ""});
+    currentChar.info.npcsEspeciaisList.push({nome: "", origem: origem, sexo: "Masculino", pontos: "", classe: "", classe2: "", classe3: "", classe4: "", classe5: ""});
     saveData(); renderNpcsEspeciais(); updateUI(); toggleEditability();
 }
 function removeNpcEspecial(idx) {
@@ -762,6 +762,10 @@ function renderNpcsEspeciais() {
             <div style="background: rgba(0,0,0,0.3); padding: 5px; border: 1px dashed #555; border-radius: 6px; margin-bottom: 5px; display: flex; flex-direction: column; gap: 5px;">
                 <div style="display: flex; gap: 5px; align-items: center;">
                     <input type="text" placeholder="Nome" value="${n.nome || ''}" oninput="updateNpcEspecial(${idx}, 'nome', this.value)" style="flex: 2;">
+                    <select onchange="updateNpcEspecial(${idx}, 'sexo', this.value)" style="width: 60px;">
+                        <option value="Masculino" ${n.sexo !== 'Feminino' ? 'selected' : ''}>Masc</option>
+                        <option value="Feminino" ${n.sexo === 'Feminino' ? 'selected' : ''}>Fem</option>
+                    </select>
                     <select onchange="updateNpcEspecial(${idx}, 'origem', this.value)" style="flex: 1;">
                         <option value="Dominação" ${n.origem === 'Dominação' ? 'selected' : ''}>Dominação</option>
                         <option value="Evento" ${n.origem === 'Evento' ? 'selected' : ''}>Evento</option>
@@ -1964,10 +1968,15 @@ function updateUI() {
                 else if (rFormatada === "tontatta") rFormatada = "tontattas";
             }
             let cleanPtsStr = String(n.pontos || "").replace(/\D/g, "");
-            let ptsStr = (parseInt(cleanPtsStr) || 0).toLocaleString("pt-BR");
+            let ptsNum = parseInt(cleanPtsStr) || 0;
+            let ptsStr = ptsNum.toLocaleString("pt-BR");
             let cleanQtdStr = String(n.quantidade || "").replace(/\D/g, "");
             let qtdStr = cleanQtdStr ? (parseInt(cleanQtdStr) || 0).toLocaleString("pt-BR") : "0";
-            outNpcsC += `> ${qtdStr} ${rFormatada} [${ptsStr} pontos]\n`;
+            if (ptsNum === 0) {
+                outNpcsC += `> ${qtdStr} ${rFormatada}\n`;
+            } else {
+                outNpcsC += `> ${qtdStr} ${rFormatada} [${ptsStr} pontos]\n`;
+            }
         });
         outNpcsC = outNpcsC.trim();
     } else {
@@ -1990,7 +1999,11 @@ function updateUI() {
             });
             let cStrs = [];
             Object.keys(maxLvl).sort().forEach(b => {
-                cStrs.push(getClassDisplayName(`${b} ${maxLvl[b]}`, "Masculino")); 
+                let cName = getClassDisplayName(`${b} ${maxLvl[b]}`, n.sexo || "Masculino");
+                if (cName.includes(":")) {
+                    cName = cName.split(":").pop().trim();
+                }
+                cStrs.push(cName); 
             });
             return cStrs.length > 0 ? cStrs.join(" / ") : "Sem Classe";
         };
@@ -2007,9 +2020,22 @@ function updateUI() {
                 outNpcsE += `➾ ${origem === 'Dominação' ? '𝐃𝐨𝐦𝐢𝐧𝐚𝐜̧𝐚̃𝐨' : origem === 'Evento' ? '𝐄𝐯𝐞𝐧𝐭𝐨' : '𝐄𝐱𝐭𝐫𝐚-𝐍𝐚𝐫𝐫𝐚𝐝𝐚'}\n`;
                 filtrados.forEach((n, idx) => {
                     let cleanPtsStr = String(n.pontos || "").replace(/\D/g, "");
-                    let ptsStr = (parseInt(cleanPtsStr) || 0).toLocaleString("pt-BR");
+                    let ptsNum = parseInt(cleanPtsStr) || 0;
+                    let ptsStr = ptsNum.toLocaleString("pt-BR");
                     let classStr = getDisplayClasses(n);
-                    outNpcsE += `${idx + 1}. ${n.nome || "Desconhecido"} [${classStr} - ${ptsStr} pontos]\n`;
+                    
+                    let displayStr = "";
+                    if (classStr === "Sem Classe") {
+                        displayStr = ptsNum > 0 ? `${ptsStr} pontos` : "";
+                    } else {
+                        displayStr = ptsNum > 0 ? `${classStr} - ${ptsStr} pontos` : classStr;
+                    }
+                    
+                    if (displayStr === "") {
+                        outNpcsE += `${idx + 1}. ${n.nome || "Desconhecido"}\n`;
+                    } else {
+                        outNpcsE += `${idx + 1}. ${n.nome || "Desconhecido"} [${displayStr}]\n`;
+                    }
                 });
             }
         });
