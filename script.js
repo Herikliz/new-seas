@@ -657,25 +657,38 @@ function updateNpcComum(idx, field, val) {
     currentChar.info.npcsComunsList[idx][field] = val;
     saveData(); updateUI();
 }
+function formatNpcNumber(el) {
+    let cleanVal = el.value.replace(/\D/g, "");
+    let num = cleanVal ? parseInt(cleanVal, 10) : "";
+    let cursor = el.selectionStart;
+    let oldLength = el.value.length;
+    el.value = cleanVal ? num.toLocaleString("pt-BR") : "";
+    let newLength = el.value.length;
+    try { el.setSelectionRange(cursor + (newLength - oldLength), cursor + (newLength - oldLength)); } catch(e){}
+    return num;
+}
 function renderNpcsComuns() {
     const container = document.getElementById('npcs-comuns-container');
     if(!container) return;
-    container.innerHTML = '';
-    let rHtml = '';
-    Object.keys(racas).forEach(r => rHtml += `<option value="${r}">${r}</option>`);
+    let finalHtml = '';
     (currentChar.info.npcsComunsList || []).forEach((n, idx) => {
-        let html = `
+        let rHtml = '';
+        Object.keys(racas).forEach(r => {
+            let isSelected = (n.raca || "Humano") === r ? 'selected' : '';
+            rHtml += `<option value="${r}" ${isSelected}>${r}</option>`;
+        });
+        let cQtd = String(n.quantidade || "").replace(/\D/g, ""); let numQtd = parseInt(cQtd) || "";
+        let cPts = String(n.pontos || "").replace(/\D/g, ""); let numPts = parseInt(cPts) || "";
+        finalHtml += `
             <div style="background: rgba(0,0,0,0.3); padding: 5px; border: 1px dashed #555; border-radius: 6px; margin-bottom: 5px; display: flex; gap: 5px; align-items: center;">
-                <input type="number" placeholder="Qtd" value="${n.quantidade}" oninput="updateNpcComum(${idx}, 'quantidade', this.value)" style="width: 60px;">
+                <input type="text" placeholder="Qtd" value="${cQtd ? numQtd.toLocaleString('pt-BR') : ''}" oninput="updateNpcComum(${idx}, 'quantidade', formatNpcNumber(this))" style="width: 60px;">
                 <select onchange="updateNpcComum(${idx}, 'raca', this.value)" style="flex: 1;">${rHtml}</select>
-                <input type="number" placeholder="Pontos" value="${n.pontos}" oninput="updateNpcComum(${idx}, 'pontos', this.value)" style="width: 80px;">
+                <input type="text" placeholder="Pontos" value="${cPts ? numPts.toLocaleString('pt-BR') : ''}" oninput="updateNpcComum(${idx}, 'pontos', formatNpcNumber(this))" style="width: 80px;">
                 <button type="button" class="btn btn-outline btn-danger" style="padding: 2px 6px; font-size: 10px; margin: 0;" onclick="removeNpcComum(${idx})">X</button>
             </div>
         `;
-        container.innerHTML += html;
-        let selects = container.querySelectorAll('select');
-        selects[selects.length - 1].value = n.raca || "Humano";
     });
+    container.innerHTML = finalHtml;
 }
 
 function addNpcEspecial() {
@@ -717,15 +730,16 @@ function updateNpcEspecial(idx, field, val) {
 function renderNpcsEspeciais() {
     const container = document.getElementById('npcs-especiais-container');
     if(!container) return;
-    container.innerHTML = '';
     let list = currentChar.info.npcsEspeciaisList || [];
     let domCount = list.filter(n => n.origem === 'Dominação').length;
     let extCount = list.filter(n => n.origem === 'Extra-Narrada').length;
     let elDom = document.getElementById('count-npc-dom'); if(elDom) elDom.textContent = domCount;
     let elExt = document.getElementById('count-npc-ext'); if(elExt) elExt.textContent = extCount;
 
+    let finalHtml = '';
     list.forEach((n, idx) => {
-        let pts = parseInt(n.pontos) || 0;
+        let cleanPtsStr = String(n.pontos || "").replace(/\D/g, "");
+        let pts = parseInt(cleanPtsStr) || 0;
         let cHTML = (slotId, reqPts, prevSlots) => {
             if (pts < reqPts) return `<select disabled style="flex:1; font-size:10px;"><option>🔒 Req ${reqPts.toLocaleString('pt-BR')}</option></select>`;
             let counts = {};
@@ -744,16 +758,16 @@ function renderNpcsEspeciais() {
             return html;
         };
 
-        let html = `
+        finalHtml += `
             <div style="background: rgba(0,0,0,0.3); padding: 5px; border: 1px dashed #555; border-radius: 6px; margin-bottom: 5px; display: flex; flex-direction: column; gap: 5px;">
                 <div style="display: flex; gap: 5px; align-items: center;">
-                    <input type="text" placeholder="Nome" value="${n.nome}" oninput="updateNpcEspecial(${idx}, 'nome', this.value)" style="flex: 2;">
+                    <input type="text" placeholder="Nome" value="${n.nome || ''}" oninput="updateNpcEspecial(${idx}, 'nome', this.value)" style="flex: 2;">
                     <select onchange="updateNpcEspecial(${idx}, 'origem', this.value)" style="flex: 1;">
                         <option value="Dominação" ${n.origem === 'Dominação' ? 'selected' : ''}>Dominação</option>
                         <option value="Evento" ${n.origem === 'Evento' ? 'selected' : ''}>Evento</option>
                         <option value="Extra-Narrada" ${n.origem === 'Extra-Narrada' ? 'selected' : ''}>Extra-Narrada</option>
                     </select>
-                    <input type="number" placeholder="Pontos" value="${n.pontos}" oninput="updateNpcEspecial(${idx}, 'pontos', this.value)" style="width: 80px;">
+                    <input type="text" placeholder="Pontos" value="${cleanPtsStr ? pts.toLocaleString('pt-BR') : ''}" oninput="formatNpcNumber(this)" onchange="updateNpcEspecial(${idx}, 'pontos', this.value.replace(/\D/g, ''))" style="width: 80px;">
                     <button type="button" class="btn btn-outline btn-danger" style="padding: 2px 6px; font-size: 10px; margin: 0;" onclick="removeNpcEspecial(${idx})">X</button>
                 </div>
                 <div style="display: flex; gap: 5px;">
@@ -765,8 +779,8 @@ function renderNpcsEspeciais() {
                 </div>
             </div>
         `;
-        container.innerHTML += html;
     });
+    container.innerHTML = finalHtml;
 }
 
 function addTecnica() {
@@ -1929,16 +1943,16 @@ function updateUI() {
     let listC = [...(i.npcsComunsList || [])];
     if (listC.length > 0) {
         listC.sort((a, b) => {
-            let qA = parseInt(a.quantidade) || 0; let qB = parseInt(b.quantidade) || 0;
+            let qA = parseInt(String(a.quantidade || "").replace(/\D/g, "")) || 0; let qB = parseInt(String(b.quantidade || "").replace(/\D/g, "")) || 0;
             if (qA !== qB) return qB - qA;
-            let pA = parseInt(a.pontos) || 0; let pB = parseInt(b.pontos) || 0;
+            let pA = parseInt(String(a.pontos || "").replace(/\D/g, "")) || 0; let pB = parseInt(String(b.pontos || "").replace(/\D/g, "")) || 0;
             if (pA !== pB) return pB - pA;
             let rA = (a.raca || "").toLowerCase(); let rB = (b.raca || "").toLowerCase();
             return rA.localeCompare(rB);
         });
         listC.forEach(n => {
             let rFormatada = (n.raca || "Humano").toLowerCase();
-            if ((parseInt(n.quantidade) || 0) > 1) {
+            if ((parseInt(String(n.quantidade || "").replace(/\D/g, "")) || 0) > 1) {
                 if (rFormatada === "humano") rFormatada = "humanos";
                 else if (rFormatada === "tritão") rFormatada = "tritões";
                 else if (rFormatada === "sereiano") rFormatada = "sereianos";
@@ -1949,8 +1963,11 @@ function updateUI() {
                 else if (rFormatada === "oni") rFormatada = "onis";
                 else if (rFormatada === "tontatta") rFormatada = "tontattas";
             }
-            let ptsStr = (parseInt(n.pontos) || 0).toLocaleString("pt-BR");
-            outNpcsC += `> ${n.quantidade || 0} ${rFormatada} [${ptsStr} pontos]\n`;
+            let cleanPtsStr = String(n.pontos || "").replace(/\D/g, "");
+            let ptsStr = (parseInt(cleanPtsStr) || 0).toLocaleString("pt-BR");
+            let cleanQtdStr = String(n.quantidade || "").replace(/\D/g, "");
+            let qtdStr = cleanQtdStr ? (parseInt(cleanQtdStr) || 0).toLocaleString("pt-BR") : "0";
+            outNpcsC += `> ${qtdStr} ${rFormatada} [${ptsStr} pontos]\n`;
         });
         outNpcsC = outNpcsC.trim();
     } else {
@@ -1982,14 +1999,15 @@ function updateUI() {
             let filtrados = listE.filter(n => n.origem === origem);
             if (filtrados.length > 0) {
                 filtrados.sort((a, b) => {
-                    let pA = parseInt(a.pontos) || 0; let pB = parseInt(b.pontos) || 0;
+                    let pA = parseInt(String(a.pontos || "").replace(/\D/g, "")) || 0; let pB = parseInt(String(b.pontos || "").replace(/\D/g, "")) || 0;
                     if (pA !== pB) return pB - pA;
                     let nA = (a.nome || "").toLowerCase(); let nB = (b.nome || "").toLowerCase();
                     return nA.localeCompare(nB);
                 });
                 outNpcsE += `➾ ${origem === 'Dominação' ? '𝐃𝐨𝐦𝐢𝐧𝐚𝐜̧𝐚̃𝐨' : origem === 'Evento' ? '𝐄𝐯𝐞𝐧𝐭𝐨' : '𝐄𝐱𝐭𝐫𝐚-𝐍𝐚𝐫𝐫𝐚𝐝𝐚'}\n`;
                 filtrados.forEach((n, idx) => {
-                    let ptsStr = (parseInt(n.pontos) || 0).toLocaleString("pt-BR");
+                    let cleanPtsStr = String(n.pontos || "").replace(/\D/g, "");
+                    let ptsStr = (parseInt(cleanPtsStr) || 0).toLocaleString("pt-BR");
                     let classStr = getDisplayClasses(n);
                     outNpcsE += `${idx + 1}. ${n.nome || "Desconhecido"} [${classStr} - ${ptsStr} pontos]\n`;
                 });
