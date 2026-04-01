@@ -611,7 +611,7 @@ function runFallbackChecks() {
               personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, hasAmiDesp: false,
               amiResPct: "", amiAlcMult: "1", calcUseAttr: "d", calcInimigoRes: "", calcBuffFlat: "", calcBuffPct: "", calcUseAmi: "sim", calcUseHaki: "nao", sceneType: "Treino Padrão", sceneText: "",
               boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxEsp: false, boxAmi: false, boxHist: false, 
-              boxInv: false, boxCalc: false, boxScene: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0, ordemTecnicas: "alfabetica" 
+              boxInv: false, boxCalc: false, boxScene: false, boxEstamina: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0, ordemTecnicas: "alfabetica", estaminaAtual: "", isExausto: false 
           };
           for(let k in defInfo) if (typeof c.info[k] === 'undefined') c.info[k] = defInfo[k];
           
@@ -638,7 +638,7 @@ window.toggleBox = function(id) {
 
 window.toggleAllBoxes = function(state) {
     if (!currentChar) return;
-    const boxKeys = ['boxIden', 'boxMec', 'boxSoc', 'boxBase', 'boxEsp', 'boxAmi', 'boxHist', 'boxLog', 'boxInv', 'boxTec', 'boxRes', 'boxCalc', 'boxScene'];
+    const boxKeys = ['boxIden', 'boxMec', 'boxSoc', 'boxBase', 'boxEsp', 'boxAmi', 'boxEstamina', 'boxHist', 'boxLog', 'boxInv', 'boxTec', 'boxRes', 'boxCalc', 'boxScene'];
     boxKeys.forEach(k => currentChar.info[k] = state);
     saveData();
     updateUI();
@@ -1149,7 +1149,7 @@ function updateUI() {
     let i = currentChar.info;
     let isNPC = currentChar.isNPC;
 
-    ['boxIden', 'boxMec', 'boxSoc', 'boxBase', 'boxEsp', 'boxAmi', 'boxHist', 'boxLog', 'boxInv', 'boxTec', 'boxRes', 'boxCalc', 'boxScene'].forEach(id => {
+    ['boxIden', 'boxMec', 'boxSoc', 'boxBase', 'boxEsp', 'boxAmi', 'boxEstamina', 'boxHist', 'boxLog', 'boxInv', 'boxTec', 'boxRes', 'boxCalc', 'boxScene'].forEach(id => {
         let wrapper = document.getElementById('wrapper-' + id);
         let icon = document.getElementById('icon-' + id);
         let titleBlock = document.getElementById('title-' + id);
@@ -1523,6 +1523,36 @@ function updateUI() {
     const statFields = ['f', 'd', 'r', 'v', 'esp', 'ami'];
     statFields.forEach(f => { let el = document.getElementById('stat-'+f); if(el) el.value = currentChar.stats[f] ? currentChar.stats[f].toLocaleString("pt-BR") : ""; });
 
+    let maxEstamina = Math.round((R + flatBonus.r) * (1 + bonus.r)) * 2;
+    if (i.estaminaAtual === "" || typeof i.estaminaAtual === 'undefined' || i.estaminaAtual === null) {
+        i.estaminaAtual = maxEstamina;
+    }
+    if (parseInt(i.estaminaAtual) > 0 && i.isExausto) {
+        i.isExausto = false;
+    }
+    if (i.isExausto) {
+        bonus.d -= 0.20; bonus.f -= 0.20; bonus.r -= 0.20; bonus.v -= 0.20; bonus.esp -= 0.20; bonus.ami -= 0.20;
+    }
+
+    let elEstaminaMax = document.getElementById('estamina-max');
+    if (elEstaminaMax) elEstaminaMax.innerText = maxEstamina.toLocaleString("pt-BR");
+    let elEstaminaAtual = document.getElementById('info-estaminaAtual');
+    if (elEstaminaAtual) elEstaminaAtual.value = parseInt(i.estaminaAtual).toLocaleString("pt-BR");
+
+    let elAlertaExaustao = document.getElementById('alerta-exaustao');
+    let btnRecMov = document.getElementById('btn-rec-mov');
+    let chkExausto = document.getElementById('info-isExausto');
+    if (elAlertaExaustao) {
+        if (parseInt(i.estaminaAtual) <= 0) {
+            elAlertaExaustao.style.display = 'block';
+            if (btnRecMov) btnRecMov.disabled = true;
+        } else {
+            elAlertaExaustao.style.display = 'none';
+            if (btnRecMov) btnRecMov.disabled = false;
+        }
+        if (chkExausto) chkExausto.checked = i.isExausto;
+    }
+
     let totalD = Math.round((D + flatBonus.d) * (1 + bonus.d)); document.getElementById('total-d').innerText = "Total: " + totalD.toLocaleString("pt-BR");
     let totalF = Math.round((F + flatBonus.f) * (1 + bonus.f)); document.getElementById('total-f').innerText = "Total: " + totalF.toLocaleString("pt-BR");
     let totalR = Math.round((R + flatBonus.r) * (1 + bonus.r)); document.getElementById('total-r').innerText = "Total: " + totalR.toLocaleString("pt-BR");
@@ -1875,7 +1905,10 @@ function updateUI() {
     let attrOut = "";
     if (D > 0) attrOut += `↠ *𝙳𝚎𝚜𝚝𝚛𝚎𝚣𝚊:* ${strCalc(D, bonus.d, flatBonus.d)}\n\n`;
     if (F > 0) attrOut += `↠ *𝙵𝚘𝚛𝚌̧𝚊:* ${strCalc(F, bonus.f, flatBonus.f)}\n\n`;
-    if (R > 0) { attrOut += `↠ *𝚁𝚎𝚜𝚒𝚜𝚝𝚎̂𝚗𝚌𝚒𝚊:* ${strCalc(R, bonus.r, flatBonus.r)}\n> 𝙴𝚜𝚝𝚊𝚖𝚒𝚗𝚊: ${(totalR * 2).toLocaleString("pt-BR")}\n\n`; }
+    if (R > 0) {
+        let estAtualStr = (i.estaminaAtual !== undefined && i.estaminaAtual !== "") ? parseInt(i.estaminaAtual).toLocaleString("pt-BR") : maxEstamina.toLocaleString("pt-BR");
+        attrOut += `↠ *𝚁𝚎𝚜𝚒𝚜𝚝𝚎̂𝚗𝚌𝚒𝚊:* ${strCalc(R, bonus.r, flatBonus.r)}\n> 𝙴𝚜𝚝𝚊𝚖𝚒𝚗𝚊: ${estAtualStr} / ${maxEstamina.toLocaleString("pt-BR")}\n\n`;
+    }
     if (V > 0) {
         let velNormalStr = strCalc(V, bonus.v, flatBonus.v);
         let hasWaterDiff = (waterBuffV !== 0 || bonus.vAgua !== 0 || flatBonus.vAgua !== 0 || bonus.reflAgua !== 0 || flatBonus.reflAgua !== 0 || bonus.vcorpAgua !== 0 || flatBonus.vcorpAgua !== 0);
@@ -2224,14 +2257,14 @@ ${inventarioFormatado}
 > ${i.akumaNome || '🔒'}
 
 ▬▬▬▬  [ 𝐒ᴛᴀᴛᴜs ]  ▬▬▬▬
-HP: ${totalHP.toLocaleString("pt-BR")}
+HP: ${totalHP.toLocaleString("pt-BR")}${i.isExausto ? '\nStatus: Exausto (Atributos -20%)' : ''}
 
 ↠  *𝐀ᴛʀɪʙᴜᴛᴏs*
 * ${totalBase.toLocaleString("pt-BR")}
 
 ${attrOut}${tecnicasOut}`;
 
-    window.copyDataAtributos = `▬▬▬▬  [ 𝐒ᴛᴀᴛᴜs ]  ▬▬▬▬\nHP: ${totalHP.toLocaleString("pt-BR")}\n\n↠  *𝐀ᴛʀɪʙᴜᴛᴏs*\n* ${totalBase.toLocaleString("pt-BR")}\n\n${attrOut}`.trim();
+    window.copyDataAtributos = `▬▬▬▬  [ 𝐒ᴛᴀᴛᴜs ]  ▬▬▬▬\nHP: ${totalHP.toLocaleString("pt-BR")}${i.isExausto ? '\nStatus: Exausto (Atributos -20%)' : ''}\n\n↠  *𝐀ᴛʀɪʙᴜᴛᴏs*\n* ${totalBase.toLocaleString("pt-BR")}\n\n${attrOut}`.trim();
     window.copyDataTecnicas = tecnicasOut.trim();
     document.getElementById('resBox').textContent = out.trim();
 
@@ -2347,6 +2380,63 @@ async function deleteFichaID() {
         await customAlert(`Sucesso! O ID foi completamente apagado.`);
     } catch (e) { document.getElementById('db-status').classList.remove('syncing'); await customAlert("Erro de conexão ao tentar apagar o ID."); }
 }
+
+window.updateEstamina = function(val) {
+    if (!currentChar) return;
+    let num = parseInt(val.replace(/\D/g, '')) || 0;
+    currentChar.info.estaminaAtual = num;
+    saveData();
+    updateUI();
+};
+
+window.calcularGastoEstamina = function() {
+    if (!currentChar || isReadOnly) return;
+    let valBuff = parseInt(document.getElementById('estamina-buff').value.replace(/\D/g, '')) || 0;
+    let valVel = parseInt(document.getElementById('estamina-vel').value.replace(/\D/g, '')) || 0;
+    let valDano = parseInt(document.getElementById('estamina-dano').value.replace(/\D/g, '')) || 0;
+    let hakiArm = document.getElementById('estamina-hakiArm').checked;
+    let hakiObs = document.getElementById('estamina-hakiObs').checked;
+    
+    let gastoBuff = (valBuff / 10) * 150;
+    let gastoVel = valVel * 0.10;
+    let gastoDano = valDano * 0.10;
+    let gastoHaki = (hakiArm ? 300 : 0) + (hakiObs ? 200 : 0);
+    
+    let totalGasto = Math.round(gastoBuff + gastoVel + gastoDano + gastoHaki);
+    
+    if (totalGasto === 0) {
+        customAlert("Nenhum gasto preenchido.");
+        return;
+    }
+    
+    let atual = parseInt(currentChar.info.estaminaAtual) || 0;
+    atual -= totalGasto;
+    if (atual < 0) atual = 0;
+    
+    currentChar.info.estaminaAtual = atual;
+    
+    document.getElementById('estamina-buff').value = "";
+    document.getElementById('estamina-vel').value = "";
+    document.getElementById('estamina-dano').value = "";
+    document.getElementById('estamina-hakiArm').checked = false;
+    document.getElementById('estamina-hakiObs').checked = false;
+    
+    saveData();
+    updateUI();
+    customAlert("Gasto de " + totalGasto.toLocaleString("pt-BR") + " de Estamina aplicado!");
+};
+
+window.recuperarEstamina = function(pct) {
+    if (!currentChar || isReadOnly) return;
+    let max = parseInt(document.getElementById('estamina-max').innerText.replace(/\D/g, '')) || 0;
+    let atual = parseInt(currentChar.info.estaminaAtual) || 0;
+    let ganho = Math.round(max * (pct / 100));
+    atual += ganho;
+    if (atual > max) atual = max;
+    currentChar.info.estaminaAtual = atual;
+    saveData();
+    updateUI();
+};
 
 window.onload = init;
 
