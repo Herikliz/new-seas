@@ -404,7 +404,15 @@
             </div>
             <div id="wrapper-boxHist" class="box-content">
                 <div class="input-group"><label>Personalidade</label><textarea id="info-personalidade" oninput="updateField('info', 'personalidade', this.value)"></textarea></div>
-                <div class="input-group"><label>História</label><textarea id="info-historia" style="min-height: 120px;" oninput="updateField('info', 'historia', this.value)"></textarea></div>
+                <div class="input-group">
+                    <label style="display:flex; justify-content:space-between; align-items:center;">
+                        História
+                        <label style="font-size: 10px; font-weight: normal; color: #aaa; text-transform: none; display: flex; align-items: center; gap: 4px; margin: 0; cursor: pointer;">
+                            <input type="checkbox" id="info-ocultarHistoria" onchange="updateField('info', 'ocultarHistoria', this.checked)"> Ocultar na Ficha
+                        </label>
+                    </label>
+                    <textarea id="info-historia" style="min-height: 120px;" oninput="updateField('info', 'historia', this.value)"></textarea>
+                </div>
                 <div class="input-group"><label>Aparência</label><textarea id="info-aparencia" oninput="updateField('info', 'aparencia', this.value)"></textarea></div>
             </div>
         </div>
@@ -470,9 +478,20 @@
                 <span>Inventário e NPCs</span><span id="icon-boxInv" class="toggle-icon">▼</span>
             </div>
             <div id="wrapper-boxInv" class="box-content">
-                <div class="input-row">
-                    <div class="input-group"><label>NPCs Comuns</label><textarea id="info-npcsC" oninput="updateField('info', 'npcsC', this.value)"></textarea></div>
-                    <div class="input-group"><label>NPCs Especiais</label><textarea id="info-npcsE" placeholder="🔒" oninput="updateField('info', 'npcsE', this.value)"></textarea></div>
+                <div class="input-group">
+                    <label style="display:flex; justify-content:space-between; align-items:center;">
+                        NPCs Comuns
+                        <button type="button" id="btn-add-npc-c" class="btn btn-outline btn-success" style="font-size: 10px; padding: 2px 6px;" onclick="addNpcComum()">+</button>
+                    </label>
+                    <div id="npcs-comuns-container"></div>
+                </div>
+                <div class="input-group" style="margin-top: 15px; border-top: 1px dashed #444; padding-top: 15px; margin-bottom: 15px;">
+                    <label style="display:flex; justify-content:space-between; align-items:center;">
+                        NPCs Especiais
+                        <div style="font-size: 10px; color: #aaa; text-transform: none;">Dominação: <span id="count-npc-dom">0</span>/3 | Extra-Narrada: <span id="count-npc-ext">0</span>/3</div>
+                        <button type="button" id="btn-add-npc-e" class="btn btn-outline btn-success" style="font-size: 10px; padding: 2px 6px;" onclick="addNpcEspecial()">+</button>
+                    </label>
+                    <div id="npcs-especiais-container"></div>
                 </div>
                 <div class="input-group">
                     <label>Inventário</label>

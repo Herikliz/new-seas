@@ -130,6 +130,8 @@ function switchChar(pIdx, nIdx) {
     renderTabs();
     updateUI();
     renderTecnicas();
+    renderNpcsComuns();
+    renderNpcsEspeciais();
     renderLogs();
     toggleEditability();
 }
@@ -205,6 +207,8 @@ async function deleteCurrentChar() {
     saveData();
     renderTabs();
     renderTecnicas();
+    renderNpcsComuns();
+    renderNpcsEspeciais();
     renderLogs();
     updateUI();
     toggleEditability();
@@ -385,6 +389,8 @@ function init() {
   setupSumButtons();
   renderTabs();
   renderTecnicas();
+  renderNpcsComuns();
+  renderNpcsEspeciais();
   renderLogs();
   updateUI();
   initFirebase();
@@ -441,6 +447,8 @@ async function loadFromCloud() {
           currentChar = activeNpcIndex === -1 ? charData.pcs[activePcIndex].pc : charData.pcs[activePcIndex].npcs[activeNpcIndex];
           renderTabs();
           renderTecnicas(); 
+          renderNpcsComuns();
+          renderNpcsEspeciais();
           renderLogs();
           updateUI(); 
           toggleEditability();
@@ -526,7 +534,7 @@ function toggleEditability() {
             el.disabled = true;
             return;
         }
-        if(isNPC && (el.id === 'info-berries' || el.id === 'info-npcsC' || el.id === 'info-npcsE')) {
+        if(isNPC && (el.id === 'info-berries' || el.id === 'btn-add-npc-c' || el.id === 'btn-add-npc-e' || (el.closest && (el.closest('#npcs-comuns-container') || el.closest('#npcs-especiais-container'))))) {
             el.disabled = true;
         } else if(el.type === 'checkbox') {
             el.disabled = isReadOnly;
@@ -599,7 +607,7 @@ function runFallbackChecks() {
               linhagem: "", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp", 
               alcunha: "", alcunhasList: [], alcunhaAtiva: "", recompensa: "", altura: "", idade: "", sexo: "", sangue: "", nacionalidade: "", localizacao: "", 
               telefone: "", orgTipo: "", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", 
-              estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsC: "", npcsE: "", akumaNome: "", 
+              estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsComunsList: [], npcsEspeciaisList: [], akumaNome: "", 
               personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, hasAmiDesp: false,
               amiResPct: "", amiAlcMult: "1", calcUseAttr: "d", calcInimigoRes: "", calcBuffFlat: "", calcBuffPct: "", calcUseAmi: "sim", calcUseHaki: "nao", sceneType: "Treino Padrão", sceneText: "",
               boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxEsp: false, boxAmi: false, boxHist: false, 
@@ -635,6 +643,131 @@ window.toggleAllBoxes = function(state) {
     saveData();
     updateUI();
 };
+
+function addNpcComum() {
+    if (!currentChar.info.npcsComunsList) currentChar.info.npcsComunsList = [];
+    currentChar.info.npcsComunsList.push({quantidade: "", raca: "Humano", pontos: ""});
+    saveData(); renderNpcsComuns(); updateUI(); toggleEditability();
+}
+function removeNpcComum(idx) {
+    currentChar.info.npcsComunsList.splice(idx, 1);
+    saveData(); renderNpcsComuns(); updateUI(); toggleEditability();
+}
+function updateNpcComum(idx, field, val) {
+    currentChar.info.npcsComunsList[idx][field] = val;
+    saveData(); updateUI();
+}
+function renderNpcsComuns() {
+    const container = document.getElementById('npcs-comuns-container');
+    if(!container) return;
+    container.innerHTML = '';
+    let rHtml = '';
+    Object.keys(racas).forEach(r => rHtml += `<option value="${r}">${r}</option>`);
+    (currentChar.info.npcsComunsList || []).forEach((n, idx) => {
+        let html = `
+            <div style="background: rgba(0,0,0,0.3); padding: 5px; border: 1px dashed #555; border-radius: 6px; margin-bottom: 5px; display: flex; gap: 5px; align-items: center;">
+                <input type="number" placeholder="Qtd" value="${n.quantidade}" oninput="updateNpcComum(${idx}, 'quantidade', this.value)" style="width: 60px;">
+                <select onchange="updateNpcComum(${idx}, 'raca', this.value)" style="flex: 1;">${rHtml}</select>
+                <input type="number" placeholder="Pontos" value="${n.pontos}" oninput="updateNpcComum(${idx}, 'pontos', this.value)" style="width: 80px;">
+                <button type="button" class="btn btn-outline btn-danger" style="padding: 2px 6px; font-size: 10px; margin: 0;" onclick="removeNpcComum(${idx})">X</button>
+            </div>
+        `;
+        container.innerHTML += html;
+        let selects = container.querySelectorAll('select');
+        selects[selects.length - 1].value = n.raca || "Humano";
+    });
+}
+
+function addNpcEspecial() {
+    if (!currentChar.info.npcsEspeciaisList) currentChar.info.npcsEspeciaisList = [];
+    let domCount = currentChar.info.npcsEspeciaisList.filter(n => n.origem === 'Dominação').length;
+    let extCount = currentChar.info.npcsEspeciaisList.filter(n => n.origem === 'Extra-Narrada').length;
+    let origem = "Evento";
+    if (domCount < 3) origem = "Dominação";
+    else if (extCount < 3) origem = "Extra-Narrada";
+    currentChar.info.npcsEspeciaisList.push({nome: "", origem: origem, pontos: "", classe: "", classe2: "", classe3: "", classe4: "", classe5: ""});
+    saveData(); renderNpcsEspeciais(); updateUI(); toggleEditability();
+}
+function removeNpcEspecial(idx) {
+    currentChar.info.npcsEspeciaisList.splice(idx, 1);
+    saveData(); renderNpcsEspeciais(); updateUI(); toggleEditability();
+}
+function updateNpcEspecial(idx, field, val) {
+    let n = currentChar.info.npcsEspeciaisList[idx];
+    let oldOrigem = n.origem;
+    n[field] = val;
+    
+    if (field === 'origem') {
+        let domCount = currentChar.info.npcsEspeciaisList.filter(x => x.origem === 'Dominação').length;
+        let extCount = currentChar.info.npcsEspeciaisList.filter(x => x.origem === 'Extra-Narrada').length;
+        if (val === 'Dominação' && domCount > 3) {
+            n.origem = oldOrigem;
+            customAlert("Limite de 3 NPCs de Dominação atingido!");
+        } else if (val === 'Extra-Narrada' && extCount > 3) {
+            n.origem = oldOrigem;
+            customAlert("Limite de 3 NPCs de Extra-Narrada atingido!");
+        }
+    }
+    
+    if (field === 'origem' || field === 'pontos' || field.startsWith('classe')) {
+        renderNpcsEspeciais();
+    }
+    saveData(); updateUI();
+}
+function renderNpcsEspeciais() {
+    const container = document.getElementById('npcs-especiais-container');
+    if(!container) return;
+    container.innerHTML = '';
+    let list = currentChar.info.npcsEspeciaisList || [];
+    let domCount = list.filter(n => n.origem === 'Dominação').length;
+    let extCount = list.filter(n => n.origem === 'Extra-Narrada').length;
+    let elDom = document.getElementById('count-npc-dom'); if(elDom) elDom.textContent = domCount;
+    let elExt = document.getElementById('count-npc-ext'); if(elExt) elExt.textContent = extCount;
+
+    list.forEach((n, idx) => {
+        let pts = parseInt(n.pontos) || 0;
+        let cHTML = (slotId, reqPts, prevSlots) => {
+            if (pts < reqPts) return `<select disabled style="flex:1; font-size:10px;"><option>🔒 Req ${reqPts.toLocaleString('pt-BR')}</option></select>`;
+            let counts = {};
+            baseClassesList.forEach(c => counts[c] = 1);
+            prevSlots.forEach(p => {
+                if(n[p]) { let match = n[p].match(/(.+) (\d+)/); if(match) counts[match[1]] = Math.max(counts[match[1]], parseInt(match[2]) + 1); }
+            });
+            let html = `<select onchange="updateNpcEspecial(${idx}, '${slotId}', this.value)" style="flex:1; font-size:10px;"><option value="">-- Classe --</option>`;
+            baseClassesList.forEach(c => {
+                if(counts[c] <= 5) {
+                    html += `<option value="${c} ${counts[c]}" ${n[slotId] === c+' '+counts[c] ? 'selected' : ''}>${c} ${counts[c]}</option>`;
+                }
+            });
+            if (n[slotId] && !html.includes(`value="${n[slotId]}"`)) { html += `<option value="${n[slotId]}" selected>${n[slotId]}</option>`; }
+            html += `</select>`;
+            return html;
+        };
+
+        let html = `
+            <div style="background: rgba(0,0,0,0.3); padding: 5px; border: 1px dashed #555; border-radius: 6px; margin-bottom: 5px; display: flex; flex-direction: column; gap: 5px;">
+                <div style="display: flex; gap: 5px; align-items: center;">
+                    <input type="text" placeholder="Nome" value="${n.nome}" oninput="updateNpcEspecial(${idx}, 'nome', this.value)" style="flex: 2;">
+                    <select onchange="updateNpcEspecial(${idx}, 'origem', this.value)" style="flex: 1;">
+                        <option value="Dominação" ${n.origem === 'Dominação' ? 'selected' : ''}>Dominação</option>
+                        <option value="Evento" ${n.origem === 'Evento' ? 'selected' : ''}>Evento</option>
+                        <option value="Extra-Narrada" ${n.origem === 'Extra-Narrada' ? 'selected' : ''}>Extra-Narrada</option>
+                    </select>
+                    <input type="number" placeholder="Pontos" value="${n.pontos}" oninput="updateNpcEspecial(${idx}, 'pontos', this.value)" style="width: 80px;">
+                    <button type="button" class="btn btn-outline btn-danger" style="padding: 2px 6px; font-size: 10px; margin: 0;" onclick="removeNpcEspecial(${idx})">X</button>
+                </div>
+                <div style="display: flex; gap: 5px;">
+                    ${cHTML('classe', 0, [])}
+                    ${cHTML('classe2', 5000, ['classe'])}
+                    ${cHTML('classe3', 10000, ['classe', 'classe2'])}
+                    ${cHTML('classe4', 20000, ['classe', 'classe2', 'classe3'])}
+                    ${cHTML('classe5', 35000, ['classe', 'classe2', 'classe3', 'classe4'])}
+                </div>
+            </div>
+        `;
+        container.innerHTML += html;
+    });
+}
 
 function addTecnica() {
     currentChar.tecnicasList.push({nome: "", desc: "", efeito: "", estilo: ""});
@@ -1101,6 +1234,9 @@ function updateUI() {
     document.getElementById('pc-name').value = currentChar.name;
     const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'altura', 'idade', 'sexo', 'sangue', 'telefone', 'nacionalidade', 'localizacao', 'tripulacao', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2', 'sceneType', 'sceneText', 'calcUseAttr', 'calcUseAmi', 'calcUseHaki', 'amiAlcMult', 'ordemTecnicas'];
     textFields.forEach(f => { let el = document.getElementById('info-'+f); if(el) el.value = i[f] || ""; });
+    
+    let chkHist = document.getElementById('info-ocultarHistoria');
+    if (chkHist) chkHist.checked = i.ocultarHistoria || false;
 
     let selAlcunha = document.getElementById('info-alcunha');
     if(selAlcunha) {
@@ -1130,10 +1266,6 @@ function updateUI() {
     } else {
         let berEl = document.getElementById('info-berries');
         if(berEl) berEl.value = i.berries ? i.berries.toLocaleString("pt-BR") : "";
-        let npcCEl = document.getElementById('info-npcsC');
-        if(npcCEl) npcCEl.value = i.npcsC || "";
-        let npcEEl = document.getElementById('info-npcsE');
-        if(npcEEl) npcEEl.value = i.npcsE || "";
     }
 
     let orgTipo = i.orgTipo || "";
@@ -1720,7 +1852,7 @@ function updateUI() {
     let formatHistPers = (text) => { return text.split('\n').map(l => { let trimL = l.trim(); if (trimL === "") return ""; return '> ' + trimL.replace(/^>\s*/, ''); }).join('\n'); };
     let histPersOut = "";
     if(i.personalidade && i.personalidade.trim() !== "") { histPersOut += `\n  : ᓩ _𝐏ᴇʀsᴏɴᴀʟɪᴅᴀᴅᴇ:_\n${formatHistPers(i.personalidade)}\n`; }
-    if(i.historia && i.historia.trim() !== "") { histPersOut += `\n  : ᓩ _𝐇ɪsᴛᴏ́ʀɪᴀ:_\n${formatHistPers(i.historia)}\n`; }
+    if(!i.ocultarHistoria && i.historia && i.historia.trim() !== "") { histPersOut += `\n  : ᓩ _𝐇ɪsᴛᴏ́ʀɪᴀ:_\n${formatHistPers(i.historia)}\n`; }
 
     let attrOut = "";
     if (D > 0) attrOut += `↠ *𝙳𝚎𝚜𝚝𝚛𝚎𝚣𝚊:* ${strCalc(D, bonus.d, flatBonus.d)}\n\n`;
@@ -1793,8 +1925,80 @@ function updateUI() {
         attrOut += `\n`;
     }
 
-    let formatNpc = (text, defaultText) => { if (!text || text.trim() === "") return `> ${defaultText}`; return text.split('\n').map(l => { let trimL = l.trim(); if (trimL === "") return ""; return '> ' + trimL.replace(/^>\s*/, ''); }).join('\n'); };
-    let outNpcsC = formatNpc(i.npcsC, ""); let outNpcsE = formatNpc(i.npcsE, "🔒");
+    let outNpcsC = "";
+    let listC = [...(i.npcsComunsList || [])];
+    if (listC.length > 0) {
+        listC.sort((a, b) => {
+            let qA = parseInt(a.quantidade) || 0; let qB = parseInt(b.quantidade) || 0;
+            if (qA !== qB) return qB - qA;
+            let pA = parseInt(a.pontos) || 0; let pB = parseInt(b.pontos) || 0;
+            if (pA !== pB) return pB - pA;
+            let rA = (a.raca || "").toLowerCase(); let rB = (b.raca || "").toLowerCase();
+            return rA.localeCompare(rB);
+        });
+        listC.forEach(n => {
+            let rFormatada = (n.raca || "Humano").toLowerCase();
+            if ((parseInt(n.quantidade) || 0) > 1) {
+                if (rFormatada === "humano") rFormatada = "humanos";
+                else if (rFormatada === "tritão") rFormatada = "tritões";
+                else if (rFormatada === "sereiano") rFormatada = "sereianos";
+                else if (rFormatada === "gigante") rFormatada = "gigantes";
+                else if (rFormatada === "mink") rFormatada = "minks";
+                else if (rFormatada === "bucaneiro") rFormatada = "bucaneiros";
+                else if (rFormatada === "lunariano") rFormatada = "lunarianos";
+                else if (rFormatada === "oni") rFormatada = "onis";
+                else if (rFormatada === "tontatta") rFormatada = "tontattas";
+            }
+            let ptsStr = (parseInt(n.pontos) || 0).toLocaleString("pt-BR");
+            outNpcsC += `> ${n.quantidade || 0} ${rFormatada} [${ptsStr} pontos]\n`;
+        });
+        outNpcsC = outNpcsC.trim();
+    } else {
+        outNpcsC = "> ";
+    }
+
+    let outNpcsE = "";
+    let listE = [...(i.npcsEspeciaisList || [])];
+    if (listE.length > 0) {
+        let getDisplayClasses = (n) => {
+            let maxLvl = {};
+            [n.classe, n.classe2, n.classe3, n.classe4, n.classe5].forEach(c => {
+                if (c) {
+                    let match = c.match(/(.+) (\d+)/);
+                    if (match) {
+                        let base = match[1]; let lvl = parseInt(match[2]);
+                        if (!maxLvl[base] || lvl > maxLvl[base]) maxLvl[base] = lvl;
+                    }
+                }
+            });
+            let cStrs = [];
+            Object.keys(maxLvl).sort().forEach(b => {
+                cStrs.push(getClassDisplayName(`${b} ${maxLvl[b]}`, "Masculino")); 
+            });
+            return cStrs.length > 0 ? cStrs.join(" / ") : "Sem Classe";
+        };
+
+        ['Dominação', 'Evento', 'Extra-Narrada'].forEach(origem => {
+            let filtrados = listE.filter(n => n.origem === origem);
+            if (filtrados.length > 0) {
+                filtrados.sort((a, b) => {
+                    let pA = parseInt(a.pontos) || 0; let pB = parseInt(b.pontos) || 0;
+                    if (pA !== pB) return pB - pA;
+                    let nA = (a.nome || "").toLowerCase(); let nB = (b.nome || "").toLowerCase();
+                    return nA.localeCompare(nB);
+                });
+                outNpcsE += `➾ ${origem === 'Dominação' ? '𝐃𝐨𝐦𝐢𝐧𝐚𝐜̧𝐚̃𝐨' : origem === 'Evento' ? '𝐄𝐯𝐞𝐧𝐭𝐨' : '𝐄𝐱𝐭𝐫𝐚-𝐍𝐚𝐫𝐫𝐚𝐝𝐚'}\n`;
+                filtrados.forEach((n, idx) => {
+                    let ptsStr = (parseInt(n.pontos) || 0).toLocaleString("pt-BR");
+                    let classStr = getDisplayClasses(n);
+                    outNpcsE += `${idx + 1}. ${n.nome || "Desconhecido"} [${classStr} - ${ptsStr} pontos]\n`;
+                });
+            }
+        });
+        outNpcsE = outNpcsE.trim();
+    } else {
+        outNpcsE = "> 🔒";
+    }
 
     let tecnicasOut = "";
     let hasValidTecnica = currentChar.tecnicasList && currentChar.tecnicasList.some(t => t.nome || t.desc || t.efeito);
