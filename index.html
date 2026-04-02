@@ -404,7 +404,7 @@
             </div>
             <div id="wrapper-boxEstamina" class="box-content">
                 <div style="text-align: center; margin-bottom: 15px;">
-                    <span style="font-family: 'Cinzel', serif; font-weight: bold; color: var(--success); font-size: 16px;">Estamina: <span id="estamina-atual">0</span> / <span id="estamina-total">0</span></span>
+                    <span style="font-family: 'Cinzel', serif; font-weight: bold; color: var(--success); font-size: 16px;">Estamina: <input type="text" id="estamina-atual" value="0" class="no-sum" oninput="formatAndSave('info', 'estaminaAtual', this)" style="width: 70px; text-align: center; font-size: 16px; font-weight: bold; font-family: 'Cinzel', serif; background: transparent; border: none; border-bottom: 1px dashed var(--success); color: var(--success); padding: 0; outline: none;"> / <span id="estamina-total">0</span></span>
                     <div style="margin-top: 10px; display: flex; justify-content: center; gap: 10px;">
                         <button class="btn btn-outline" style="color:var(--info); border-color:var(--info); font-size: 11px; padding: 4px 8px;" onclick="recuperarEstamina(0.10)">Em Movimento (+10%)</button>
                         <button class="btn btn-outline" style="color:var(--success); border-color:var(--success); font-size: 11px; padding: 4px 8px;" onclick="recuperarEstamina(0.30)">Repouso Total (+30%)</button>

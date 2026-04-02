@@ -1863,7 +1863,7 @@ function updateUI() {
 
     document.getElementById('estamina-total').textContent = estTotalVal.toLocaleString("pt-BR");
     let elEstAtual = document.getElementById('estamina-atual');
-    if (elEstAtual) elEstAtual.textContent = i.estaminaAtual.toLocaleString("pt-BR");
+    if (elEstAtual) elEstAtual.value = i.estaminaAtual.toLocaleString("pt-BR");
 
     let eVel = parseInt(i.estaminaVelocidade) || 0;
     let eDano = parseInt(i.estaminaDano) || 0;
