@@ -409,6 +409,11 @@
                         <button class="btn btn-outline" style="color:var(--info); border-color:var(--info); font-size: 11px; padding: 4px 8px;" onclick="recuperarEstamina(0.10)">Em Movimento (+10%)</button>
                         <button class="btn btn-outline" style="color:var(--success); border-color:var(--success); font-size: 11px; padding: 4px 8px;" onclick="recuperarEstamina(0.30)">Repouso Total (+30%)</button>
                     </div>
+                    <div style="margin-top: 10px; display: flex; justify-content: center;">
+                        <label style="font-size:11px; color:var(--danger); font-weight:bold; cursor:pointer; display:flex; gap:5px; align-items:center;">
+                            <input type="checkbox" id="info-exaustaoCompleta" onchange="updateField('info', 'exaustaoCompleta', this.checked)" style="width:auto; margin:0;"> Exaustão Completa (-20% Todos os Atributos)
+                        </label>
+                    </div>
                 </div>
                 <div class="input-row">
                     <div class="input-group">
@@ -460,7 +465,15 @@
             </div>
             <div id="wrapper-boxHist" class="box-content">
                 <div class="input-group"><label>Personalidade</label><textarea id="info-personalidade" oninput="updateField('info', 'personalidade', this.value)"></textarea></div>
-                <div class="input-group"><label>História</label><textarea id="info-historia" style="min-height: 120px;" oninput="updateField('info', 'historia', this.value)"></textarea></div>
+                <div class="input-group">
+                    <label style="display:flex; justify-content:space-between; align-items:center;">
+                        História
+                        <label style="margin:0; font-size:10px; color:var(--warning); text-transform:none; cursor:pointer; display:flex; gap:5px; align-items:center;">
+                            <input type="checkbox" id="info-hideHistoria" onchange="updateField('info', 'hideHistoria', this.checked)" style="width:auto; margin:0;"> Ocultar na Ficha
+                        </label>
+                    </label>
+                    <textarea id="info-historia" style="min-height: 120px;" oninput="updateField('info', 'historia', this.value)"></textarea>
+                </div>
                 <div class="input-group"><label>Aparência</label><textarea id="info-aparencia" oninput="updateField('info', 'aparencia', this.value)"></textarea></div>
             </div>
         </div>
