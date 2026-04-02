@@ -316,7 +316,7 @@ function customAlert(msg) {
 function setupSumButtons() {
     const inputs = document.querySelectorAll("input[oninput*='formatAndSave'], input[oninput*='formatCurrency']");
     inputs.forEach(inp => {
-        if (inp.parentNode.classList.contains('sum-wrapper')) return;
+        if (inp.parentNode.classList.contains('sum-wrapper') || inp.classList.contains('no-sum')) return;
 
         let wrapper = document.createElement('div');
         wrapper.className = 'sum-wrapper';
@@ -611,7 +611,7 @@ function runFallbackChecks() {
               personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, hasAmiDesp: false,
               amiResPct: "", amiAlcMult: "1", calcUseAttr: "d", calcInimigoRes: "", calcBuffFlat: "", calcBuffPct: "", calcUseAmi: "sim", calcUseHaki: "nao", sceneType: "Treino Padrão", sceneText: "",
               boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxEsp: false, boxAmi: false, boxHist: false, 
-              boxInv: false, boxCalc: false, boxScene: false, boxEstamina: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0, ordemTecnicas: "alfabetica", estaminaAtual: "", isExausto: false 
+              boxInv: false, boxCalc: false, boxEstamina: false, estaminaAtual: -1, estaminaVelocidade: "", estaminaDano: "", estaminaBuffPct: "", estaminaHakiArm: "nao", estaminaHakiObs: "nao", boxScene: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0, ordemTecnicas: "alfabetica" 
           };
           for(let k in defInfo) if (typeof c.info[k] === 'undefined') c.info[k] = defInfo[k];
           
@@ -638,7 +638,7 @@ window.toggleBox = function(id) {
 
 window.toggleAllBoxes = function(state) {
     if (!currentChar) return;
-    const boxKeys = ['boxIden', 'boxMec', 'boxSoc', 'boxBase', 'boxEsp', 'boxAmi', 'boxEstamina', 'boxHist', 'boxLog', 'boxInv', 'boxTec', 'boxRes', 'boxCalc', 'boxScene'];
+    const boxKeys = ['boxIden', 'boxMec', 'boxSoc', 'boxBase', 'boxEsp', 'boxAmi', 'boxHist', 'boxLog', 'boxInv', 'boxTec', 'boxRes', 'boxCalc', 'boxEstamina', 'boxScene'];
     boxKeys.forEach(k => currentChar.info[k] = state);
     saveData();
     updateUI();
@@ -771,7 +771,7 @@ function renderNpcsEspeciais() {
                         <option value="Evento" ${n.origem === 'Evento' ? 'selected' : ''}>Evento</option>
                         <option value="Extra-Narrada" ${n.origem === 'Extra-Narrada' ? 'selected' : ''}>Extra-Narrada</option>
                     </select>
-                    <input type="text" placeholder="Pontos" value="${cleanPtsStr ? pts.toLocaleString('pt-BR') : ''}" oninput="formatNpcNumber(this)" onchange="updateNpcEspecial(${idx}, 'pontos', this.value.replace(/\D/g, ''))" style="width: 80px;">
+                    <input type="text" placeholder="Pontos" value="${cleanPtsStr ? pts.toLocaleString('pt-BR') : ''}" oninput="formatNpcNumber(this)" onchange="updateNpcEspecial(${idx}, 'pontos', this.value.replace(/\\D/g, ''))" style="width: 80px;">
                     <button type="button" class="btn btn-outline btn-danger" style="padding: 2px 6px; font-size: 10px; margin: 0;" onclick="removeNpcEspecial(${idx})">X</button>
                 </div>
                 <div style="display: flex; gap: 5px;">
@@ -1149,7 +1149,7 @@ function updateUI() {
     let i = currentChar.info;
     let isNPC = currentChar.isNPC;
 
-    ['boxIden', 'boxMec', 'boxSoc', 'boxBase', 'boxEsp', 'boxAmi', 'boxEstamina', 'boxHist', 'boxLog', 'boxInv', 'boxTec', 'boxRes', 'boxCalc', 'boxScene'].forEach(id => {
+    ['boxIden', 'boxMec', 'boxSoc', 'boxBase', 'boxEsp', 'boxAmi', 'boxHist', 'boxLog', 'boxInv', 'boxTec', 'boxRes', 'boxCalc', 'boxEstamina', 'boxScene'].forEach(id => {
         let wrapper = document.getElementById('wrapper-' + id);
         let icon = document.getElementById('icon-' + id);
         let titleBlock = document.getElementById('title-' + id);
@@ -1250,11 +1250,8 @@ function updateUI() {
     } else { anim2.style.display = "none"; }
 
     document.getElementById('pc-name').value = currentChar.name;
-    const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'altura', 'idade', 'sexo', 'sangue', 'telefone', 'nacionalidade', 'localizacao', 'tripulacao', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2', 'sceneType', 'sceneText', 'calcUseAttr', 'calcUseAmi', 'calcUseHaki', 'amiAlcMult', 'ordemTecnicas'];
+    const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'altura', 'idade', 'sexo', 'sangue', 'telefone', 'nacionalidade', 'localizacao', 'tripulacao', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2', 'sceneType', 'sceneText', 'calcUseAttr', 'calcUseAmi', 'calcUseHaki', 'amiAlcMult', 'ordemTecnicas', 'estaminaHakiArm', 'estaminaHakiObs'];
     textFields.forEach(f => { let el = document.getElementById('info-'+f); if(el) el.value = i[f] || ""; });
-    
-    let chkHist = document.getElementById('info-ocultarHistoria');
-    if (chkHist) chkHist.checked = i.ocultarHistoria || false;
 
     let selAlcunha = document.getElementById('info-alcunha');
     if(selAlcunha) {
@@ -1271,6 +1268,13 @@ function updateUI() {
     let calcBuffPctEl = document.getElementById('info-calcBuffPct');
     if(calcBuffPctEl) calcBuffPctEl.value = i.calcBuffPct ? i.calcBuffPct.toLocaleString("pt-BR") : "";
 
+    let estVelEl = document.getElementById('info-estaminaVelocidade');
+    if(estVelEl) estVelEl.value = i.estaminaVelocidade ? i.estaminaVelocidade.toLocaleString("pt-BR") : "";
+    let estDanoEl = document.getElementById('info-estaminaDano');
+    if(estDanoEl) estDanoEl.value = i.estaminaDano ? i.estaminaDano.toLocaleString("pt-BR") : "";
+    let estBuffPctEl = document.getElementById('info-estaminaBuffPct');
+    if(estBuffPctEl) estBuffPctEl.value = i.estaminaBuffPct ? i.estaminaBuffPct.toLocaleString("pt-BR") : "";
+
     let recEl = document.getElementById('info-recompensa');
     if(recEl) recEl.value = i.recompensa ? i.recompensa.toLocaleString("pt-BR") : "";
 
@@ -1279,8 +1283,6 @@ function updateUI() {
 
     if(isNPC) {
         document.getElementById('info-berries').value = "Bloqueado";
-        document.getElementById('info-npcsC').value = "Bloqueado";
-        document.getElementById('info-npcsE').value = "Bloqueado";
     } else {
         let berEl = document.getElementById('info-berries');
         if(berEl) berEl.value = i.berries ? i.berries.toLocaleString("pt-BR") : "";
@@ -1523,34 +1525,12 @@ function updateUI() {
     const statFields = ['f', 'd', 'r', 'v', 'esp', 'ami'];
     statFields.forEach(f => { let el = document.getElementById('stat-'+f); if(el) el.value = currentChar.stats[f] ? currentChar.stats[f].toLocaleString("pt-BR") : ""; });
 
-    let maxEstamina = Math.round((R + flatBonus.r) * (1 + bonus.r)) * 2;
-    if (i.estaminaAtual === "" || typeof i.estaminaAtual === 'undefined' || i.estaminaAtual === null) {
-        i.estaminaAtual = maxEstamina;
-    }
-    if (parseInt(i.estaminaAtual) > 0 && i.isExausto) {
-        i.isExausto = false;
-    }
-    if (i.isExausto) {
+    let estTotalVal = Math.round((R + flatBonus.r) * (1 + bonus.r)) * 2;
+    if (typeof i.estaminaAtual === 'undefined' || i.estaminaAtual === -1) i.estaminaAtual = estTotalVal;
+    if (i.estaminaAtual > estTotalVal) i.estaminaAtual = estTotalVal;
+
+    if (i.estaminaAtual === 0) {
         bonus.d -= 0.20; bonus.f -= 0.20; bonus.r -= 0.20; bonus.v -= 0.20; bonus.esp -= 0.20; bonus.ami -= 0.20;
-    }
-
-    let elEstaminaMax = document.getElementById('estamina-max');
-    if (elEstaminaMax) elEstaminaMax.innerText = maxEstamina.toLocaleString("pt-BR");
-    let elEstaminaAtual = document.getElementById('info-estaminaAtual');
-    if (elEstaminaAtual) elEstaminaAtual.value = parseInt(i.estaminaAtual).toLocaleString("pt-BR");
-
-    let elAlertaExaustao = document.getElementById('alerta-exaustao');
-    let btnRecMov = document.getElementById('btn-rec-mov');
-    let chkExausto = document.getElementById('info-isExausto');
-    if (elAlertaExaustao) {
-        if (parseInt(i.estaminaAtual) <= 0) {
-            elAlertaExaustao.style.display = 'block';
-            if (btnRecMov) btnRecMov.disabled = true;
-        } else {
-            elAlertaExaustao.style.display = 'none';
-            if (btnRecMov) btnRecMov.disabled = false;
-        }
-        if (chkExausto) chkExausto.checked = i.isExausto;
     }
 
     let totalD = Math.round((D + flatBonus.d) * (1 + bonus.d)); document.getElementById('total-d').innerText = "Total: " + totalD.toLocaleString("pt-BR");
@@ -1881,6 +1861,36 @@ function updateUI() {
     calcFormTexto += `Dano Básico: ${calcAttrVal.toLocaleString("pt-BR")} × (${K.toLocaleString("pt-BR")} / (${K.toLocaleString("pt-BR")} + ${calcRes.toLocaleString("pt-BR")})) = ${danoFisico.toLocaleString("pt-BR")}`;
     document.getElementById('calc-formula').innerHTML = calcFormTexto;
 
+    document.getElementById('estamina-total').textContent = estTotalVal.toLocaleString("pt-BR");
+    let elEstAtual = document.getElementById('estamina-atual');
+    if (elEstAtual) elEstAtual.textContent = i.estaminaAtual.toLocaleString("pt-BR");
+
+    let eVel = parseInt(i.estaminaVelocidade) || 0;
+    let eDano = parseInt(i.estaminaDano) || 0;
+    let eBuff = parseInt(i.estaminaBuffPct) || 0;
+    let eHArm = i.estaminaHakiArm === 'sim' ? 300 : 0;
+    let eHObs = i.estaminaHakiObs === 'sim' ? 200 : 0;
+
+    let custoVel = Math.floor(eVel * 0.10);
+    let custoDano = Math.floor(eDano * 0.10);
+    let custoBuff = Math.floor((eBuff / 10) * 150);
+    let custoHaki = eHArm + eHObs;
+
+    let custoEstTotal = custoVel + custoDano + custoBuff + custoHaki;
+    document.getElementById('estamina-custo-final').textContent = custoEstTotal.toLocaleString("pt-BR");
+
+    let estFormula = "";
+    if (custoEstTotal > 0) {
+        if (custoVel > 0) estFormula += `<span style="color:#0dcaf0;">+ ${custoVel.toLocaleString("pt-BR")} (10% de Vel.)</span><br>`;
+        if (custoDano > 0) estFormula += `<span style="color:#dc3545;">+ ${custoDano.toLocaleString("pt-BR")} (10% de Dano)</span><br>`;
+        if (custoBuff > 0) estFormula += `<span style="color:#198754;">+ ${custoBuff.toLocaleString("pt-BR")} (${eBuff}% de Buff)</span><br>`;
+        if (custoHaki > 0) estFormula += `<span style="color:#a461ff;">+ ${custoHaki.toLocaleString("pt-BR")} (Haki)</span><br>`;
+        estFormula += `Gasto Total: ${custoEstTotal.toLocaleString("pt-BR")} de Estamina`;
+    } else {
+        estFormula = "Nenhum gasto registrado.";
+    }
+    document.getElementById('estamina-formula').innerHTML = estFormula;
+
     let typeMin = { "Treino Padrão": 250, "Treino de Técnicas": 60, "Interação": 50, "Missão": 250, "Recrutar NPCs": 200, "Trabalho Tipo 1": 200, "Trabalho Tipo 2": 300, "Trabalho Tipo 3": 500, "Extra-Narrada": 2000 };
     let sceneTxt = i.sceneText || "";
     let sChars = sceneTxt.length;
@@ -1900,15 +1910,12 @@ function updateUI() {
     let formatHistPers = (text) => { return text.split('\n').map(l => { let trimL = l.trim(); if (trimL === "") return ""; return '> ' + trimL.replace(/^>\s*/, ''); }).join('\n'); };
     let histPersOut = "";
     if(i.personalidade && i.personalidade.trim() !== "") { histPersOut += `\n  : ᓩ _𝐏ᴇʀsᴏɴᴀʟɪᴅᴀᴅᴇ:_\n${formatHistPers(i.personalidade)}\n`; }
-    if(!i.ocultarHistoria && i.historia && i.historia.trim() !== "") { histPersOut += `\n  : ᓩ _𝐇ɪsᴛᴏ́ʀɪᴀ:_\n${formatHistPers(i.historia)}\n`; }
+    if(i.historia && i.historia.trim() !== "") { histPersOut += `\n  : ᓩ _𝐇ɪsᴛᴏ́ʀɪᴀ:_\n${formatHistPers(i.historia)}\n`; }
 
     let attrOut = "";
     if (D > 0) attrOut += `↠ *𝙳𝚎𝚜𝚝𝚛𝚎𝚣𝚊:* ${strCalc(D, bonus.d, flatBonus.d)}\n\n`;
     if (F > 0) attrOut += `↠ *𝙵𝚘𝚛𝚌̧𝚊:* ${strCalc(F, bonus.f, flatBonus.f)}\n\n`;
-    if (R > 0) {
-        let estAtualStr = (i.estaminaAtual !== undefined && i.estaminaAtual !== "") ? parseInt(i.estaminaAtual).toLocaleString("pt-BR") : maxEstamina.toLocaleString("pt-BR");
-        attrOut += `↠ *𝚁𝚎𝚜𝚒𝚜𝚝𝚎̂𝚗𝚌𝚒𝚊:* ${strCalc(R, bonus.r, flatBonus.r)}\n> 𝙴𝚜𝚝𝚊𝚖𝚒𝚗𝚊: ${estAtualStr} / ${maxEstamina.toLocaleString("pt-BR")}\n\n`;
-    }
+    if (R > 0) { attrOut += `↠ *𝚁𝚎𝚜𝚒𝚜𝚝𝚎̂𝚗𝚌𝚒𝚊:* ${strCalc(R, bonus.r, flatBonus.r)}\n> 𝙴𝚜𝚝𝚊𝚖𝚒𝚗𝚊: ${i.estaminaAtual.toLocaleString("pt-BR")} / ${estTotalVal.toLocaleString("pt-BR")}\n\n`; }
     if (V > 0) {
         let velNormalStr = strCalc(V, bonus.v, flatBonus.v);
         let hasWaterDiff = (waterBuffV !== 0 || bonus.vAgua !== 0 || flatBonus.vAgua !== 0 || bonus.reflAgua !== 0 || flatBonus.reflAgua !== 0 || bonus.vcorpAgua !== 0 || flatBonus.vcorpAgua !== 0);
@@ -2257,14 +2264,14 @@ ${inventarioFormatado}
 > ${i.akumaNome || '🔒'}
 
 ▬▬▬▬  [ 𝐒ᴛᴀᴛᴜs ]  ▬▬▬▬
-HP: ${totalHP.toLocaleString("pt-BR")}${i.isExausto ? '\nStatus: Exausto (Atributos -20%)' : ''}
+HP: ${totalHP.toLocaleString("pt-BR")}
 
 ↠  *𝐀ᴛʀɪʙᴜᴛᴏs*
 * ${totalBase.toLocaleString("pt-BR")}
 
 ${attrOut}${tecnicasOut}`;
 
-    window.copyDataAtributos = `▬▬▬▬  [ 𝐒ᴛᴀᴛᴜs ]  ▬▬▬▬\nHP: ${totalHP.toLocaleString("pt-BR")}${i.isExausto ? '\nStatus: Exausto (Atributos -20%)' : ''}\n\n↠  *𝐀ᴛʀɪʙᴜᴛᴏs*\n* ${totalBase.toLocaleString("pt-BR")}\n\n${attrOut}`.trim();
+    window.copyDataAtributos = `▬▬▬▬  [ 𝐒ᴛᴀᴛᴜs ]  ▬▬▬▬\nHP: ${totalHP.toLocaleString("pt-BR")}\n\n↠  *𝐀ᴛʀɪʙᴜᴛᴏs*\n* ${totalBase.toLocaleString("pt-BR")}\n\n${attrOut}`.trim();
     window.copyDataTecnicas = tecnicasOut.trim();
     document.getElementById('resBox').textContent = out.trim();
 
@@ -2381,64 +2388,65 @@ async function deleteFichaID() {
     } catch (e) { document.getElementById('db-status').classList.remove('syncing'); await customAlert("Erro de conexão ao tentar apagar o ID."); }
 }
 
-window.updateEstamina = function(val) {
-    if (!currentChar) return;
-    let num = parseInt(val.replace(/\D/g, '')) || 0;
-    currentChar.info.estaminaAtual = num;
-    saveData();
-    updateUI();
-};
-
-window.calcularGastoEstamina = function() {
-    if (!currentChar || isReadOnly) return;
-    let valBuff = parseInt(document.getElementById('estamina-buff').value.replace(/\D/g, '')) || 0;
-    let valVel = parseInt(document.getElementById('estamina-vel').value.replace(/\D/g, '')) || 0;
-    let valDano = parseInt(document.getElementById('estamina-dano').value.replace(/\D/g, '')) || 0;
-    let hakiArm = document.getElementById('estamina-hakiArm').checked;
-    let hakiObs = document.getElementById('estamina-hakiObs').checked;
-    
-    let gastoBuff = (valBuff / 10) * 150;
-    let gastoVel = valVel * 0.10;
-    let gastoDano = valDano * 0.10;
-    let gastoHaki = (hakiArm ? 300 : 0) + (hakiObs ? 200 : 0);
-    
-    let totalGasto = Math.round(gastoBuff + gastoVel + gastoDano + gastoHaki);
-    
-    if (totalGasto === 0) {
-        customAlert("Nenhum gasto preenchido.");
-        return;
-    }
-    
-    let atual = parseInt(currentChar.info.estaminaAtual) || 0;
-    atual -= totalGasto;
-    if (atual < 0) atual = 0;
-    
-    currentChar.info.estaminaAtual = atual;
-    
-    document.getElementById('estamina-buff').value = "";
-    document.getElementById('estamina-vel').value = "";
-    document.getElementById('estamina-dano').value = "";
-    document.getElementById('estamina-hakiArm').checked = false;
-    document.getElementById('estamina-hakiObs').checked = false;
-    
-    saveData();
-    updateUI();
-    customAlert("Gasto de " + totalGasto.toLocaleString("pt-BR") + " de Estamina aplicado!");
-};
-
-window.recuperarEstamina = function(pct) {
-    if (!currentChar || isReadOnly) return;
-    let max = parseInt(document.getElementById('estamina-max').innerText.replace(/\D/g, '')) || 0;
-    let atual = parseInt(currentChar.info.estaminaAtual) || 0;
-    let ganho = Math.round(max * (pct / 100));
-    atual += ganho;
-    if (atual > max) atual = max;
-    currentChar.info.estaminaAtual = atual;
-    saveData();
-    updateUI();
-};
-
 window.onload = init;
+
+window.puxarVelocidade = function() {
+    if(isReadOnly) return;
+    let val = currentChar.substats.vcorp || 0;
+    document.getElementById('info-estaminaVelocidade').value = val.toLocaleString("pt-BR");
+    currentChar.info.estaminaVelocidade = val;
+    saveData(); updateUI();
+};
+
+window.puxarDano = function() {
+    if(isReadOnly) return;
+    let valStr = document.getElementById('calc-dano-final').textContent;
+    let val = parseInt(valStr.replace(/\D/g, '')) || 0;
+    document.getElementById('info-estaminaDano').value = val.toLocaleString("pt-BR");
+    currentChar.info.estaminaDano = val;
+    saveData(); updateUI();
+};
+
+window.gastarEstamina = async function() {
+    if(isReadOnly) { await customAlert("A ficha está no modo leitura."); return; }
+    let custoStr = document.getElementById('estamina-custo-final').textContent;
+    let custo = parseInt(custoStr.replace(/\D/g, '')) || 0;
+    if (custo === 0) { await customAlert("O custo de Estamina é 0."); return; }
+
+    let estAtual = currentChar.info.estaminaAtual;
+    let novaEst = estAtual - custo;
+    if (novaEst < 0) novaEst = 0;
+    
+    currentChar.info.estaminaAtual = novaEst;
+    currentChar.info.estaminaVelocidade = "";
+    currentChar.info.estaminaDano = "";
+    currentChar.info.estaminaBuffPct = "";
+    currentChar.info.estaminaHakiArm = "nao";
+    currentChar.info.estaminaHakiObs = "nao";
+    
+    saveData(); updateUI();
+    await customAlert(`Gasto de ${custo.toLocaleString('pt-BR')} Estamina aplicado! Estamina atual: ${novaEst.toLocaleString('pt-BR')}`);
+};
+
+window.recuperarEstamina = async function(pct) {
+    if(isReadOnly) { await customAlert("A ficha está no modo leitura."); return; }
+    let totalStr = document.getElementById('estamina-total').textContent;
+    let total = parseInt(totalStr.replace(/\D/g, '')) || 0;
+    if(total === 0) return;
+    
+    let recup = Math.floor(total * pct);
+    let estAtual = currentChar.info.estaminaAtual;
+    if (estAtual >= total) { await customAlert("Estamina já está no máximo!"); return; }
+
+    let novaEst = estAtual + recup;
+    if (novaEst > total) novaEst = total;
+    
+    currentChar.info.estaminaAtual = novaEst;
+    saveData(); updateUI();
+    
+    let nomeRecovery = pct === 0.10 ? "Em Movimento" : "Repouso Total";
+    await customAlert(`Recuperação (${nomeRecovery}): +${recup.toLocaleString('pt-BR')} Estamina! Estamina atual: ${novaEst.toLocaleString('pt-BR')}`);
+};
 
 window.selecionarAkuma = function(novoAkumaNome) {
     if (!currentChar.info) currentChar.info = {};

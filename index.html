@@ -399,48 +399,57 @@
         </div>
 
         <div class="box">
-            <div class="box-title" id="title-boxEstamina" style="color: #20c997;" onclick="toggleBox('boxEstamina')">
-                <span>Estamina</span><span id="icon-boxEstamina" class="toggle-icon">▼</span>
+            <div class="box-title" id="title-boxEstamina" onclick="toggleBox('boxEstamina')">
+                <span>Calculadora de Estamina</span><span id="icon-boxEstamina" class="toggle-icon">▼</span>
             </div>
             <div id="wrapper-boxEstamina" class="box-content">
                 <div style="text-align: center; margin-bottom: 15px;">
-                    <div style="font-size: 11px; color: #b3b3b3; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Estamina Atual / Máxima</div>
-                    <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 5px;">
-                        <input type="text" id="info-estaminaAtual" style="width: 120px; font-size: 20px; font-weight: bold; text-align: center; color: #20c997; border-color: #20c997; font-family: 'Cinzel', serif;" oninput="formatNpcNumber(this)" onchange="updateEstamina(this.value)">
-                        <span style="font-size: 20px; font-weight: bold; color: #666;">/</span>
-                        <span id="estamina-max" style="font-size: 20px; font-weight: bold; color: #ddd; font-family: 'Cinzel', serif;">0</span>
+                    <span style="font-family: 'Cinzel', serif; font-weight: bold; color: var(--success); font-size: 16px;">Estamina: <span id="estamina-atual">0</span> / <span id="estamina-total">0</span></span>
+                    <div style="margin-top: 10px; display: flex; justify-content: center; gap: 10px;">
+                        <button class="btn btn-outline" style="color:var(--info); border-color:var(--info); font-size: 11px; padding: 4px 8px;" onclick="recuperarEstamina(0.10)">Em Movimento (+10%)</button>
+                        <button class="btn btn-outline" style="color:var(--success); border-color:var(--success); font-size: 11px; padding: 4px 8px;" onclick="recuperarEstamina(0.30)">Repouso Total (+30%)</button>
                     </div>
                 </div>
-                <div class="input-row" style="border-top: 1px dashed #444; padding-top: 15px;">
+                <div class="input-row">
                     <div class="input-group">
-                        <label>Buffs da Ação (%)</label>
-                        <input type="text" id="estamina-buff" placeholder="Ex: 30" oninput="formatNpcNumber(this)">
-                    </div>
-                    <div class="input-group">
-                        <label>Velocidade Usada</label>
-                        <input type="text" id="estamina-vel" placeholder="Ex: 5.000" oninput="formatNpcNumber(this)">
-                        <button type="button" class="btn btn-outline" style="font-size: 9px; padding: 2px 4px; width: 100%; margin: 2px 0 0 0;" onclick="let val = document.getElementById('total-v').innerText.replace(/\D/g, ''); document.getElementById('estamina-vel').value = val ? parseInt(val).toLocaleString('pt-BR') : '';">Puxar Total</button>
+                        <label>Velocidade da Ação</label>
+                        <div style="display: flex; gap: 5px;">
+                            <input type="text" id="info-estaminaVelocidade" placeholder="0" class="no-sum" oninput="formatAndSave('info', 'estaminaVelocidade', this)">
+                            <button class="btn btn-outline btn-warning" style="padding: 4px 8px;" onclick="puxarVelocidade()">Puxar</button>
+                        </div>
                     </div>
                     <div class="input-group">
                         <label>Dano Causado</label>
-                        <input type="text" id="estamina-dano" placeholder="Ex: 10.000" oninput="formatNpcNumber(this)">
-                        <button type="button" class="btn btn-outline" style="font-size: 9px; padding: 2px 4px; width: 100%; margin: 2px 0 0 0;" onclick="let val = document.getElementById('calc-dano-final').innerText.replace(/\D/g, ''); document.getElementById('estamina-dano').value = val ? parseInt(val).toLocaleString('pt-BR') : '';">Puxar Dano</button>
+                        <div style="display: flex; gap: 5px;">
+                            <input type="text" id="info-estaminaDano" placeholder="0" class="no-sum" oninput="formatAndSave('info', 'estaminaDano', this)">
+                            <button class="btn btn-outline btn-danger" style="padding: 4px 8px;" onclick="puxarDano()">Puxar</button>
+                        </div>
                     </div>
                 </div>
-                <div class="input-row" style="margin-bottom: 10px;">
-                    <label style="font-size: 11px; display:flex; align-items:center; gap:5px; color: #ddd;"><input type="checkbox" id="estamina-hakiArm"> Haki Armamento Ativo (-300)</label>
-                    <label style="font-size: 11px; display:flex; align-items:center; gap:5px; color: #ddd;"><input type="checkbox" id="estamina-hakiObs"> Haki Observação Ativo (-200)</label>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Buff Ativo (%)</label>
+                        <input type="text" id="info-estaminaBuffPct" placeholder="0" oninput="formatAndSave('info', 'estaminaBuffPct', this)">
+                    </div>
+                    <div class="input-group">
+                        <label>Haki Armamento?</label>
+                        <select id="info-estaminaHakiArm" onchange="updateField('info', 'estaminaHakiArm', this.value)">
+                            <option value="nao">Não</option>
+                            <option value="sim">Sim</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Haki Observação?</label>
+                        <select id="info-estaminaHakiObs" onchange="updateField('info', 'estaminaHakiObs', this.value)">
+                            <option value="nao">Não</option>
+                            <option value="sim">Sim</option>
+                        </select>
+                    </div>
                 </div>
-                <button type="button" class="btn btn-outline btn-danger" style="width: 100%; margin: 0 0 15px 0;" onclick="calcularGastoEstamina()">⚔️ Aplicar Gastos do Turno</button>
-                <div class="input-row" style="border-top: 1px dashed #444; padding-top: 15px;">
-                    <button type="button" id="btn-rec-mov" class="btn btn-outline btn-success" style="flex: 1; font-size: 11px; margin: 0;" onclick="recuperarEstamina(10)">🏃 Em Movimento (+10%)</button>
-                    <button type="button" id="btn-rec-rep" class="btn btn-outline btn-success" style="flex: 1; font-size: 11px; margin: 0;" onclick="recuperarEstamina(30)">🧘 Repouso Total (+30%)</button>
-                </div>
-                <div id="alerta-exaustao" style="display: none; margin-top: 15px; background: rgba(220, 53, 69, 0.1); border: 1px dashed var(--danger); padding: 10px; border-radius: 6px; text-align: center;">
-                    <div style="color: var(--danger); font-weight: bold; font-family: 'Cinzel', serif; margin-bottom: 5px;">⚠️ EXAUSTÃO COMPLETA</div>
-                    <label style="font-size: 11px; color: #ddd; display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer;">
-                        <input type="checkbox" id="info-isExausto" onchange="updateField('info', 'isExausto', this.checked)"> Aplicar Penalidade (-20% Atributos)
-                    </label>
+                <div style="background: rgba(0,0,0,0.3); padding: 15px; border: 1px dashed #555; border-radius: 6px; text-align: center; margin-top: 5px;">
+                    <div style="font-size: 18px; font-family: 'Cinzel', serif; font-weight: bold; color: var(--warning);">Custo Estimado: <span id="estamina-custo-final">0</span></div>
+                    <div style="font-size: 11px; color: #aaa; margin-top: 8px; line-height: 1.4;" id="estamina-formula"></div>
+                    <button class="btn btn-outline" style="color:var(--danger); border-color:var(--danger); margin-top: 10px; width: 100%; font-size: 14px;" onclick="gastarEstamina()">🔥 Gastar Estamina</button>
                 </div>
             </div>
         </div>
@@ -451,15 +460,7 @@
             </div>
             <div id="wrapper-boxHist" class="box-content">
                 <div class="input-group"><label>Personalidade</label><textarea id="info-personalidade" oninput="updateField('info', 'personalidade', this.value)"></textarea></div>
-                <div class="input-group">
-                    <label style="display:flex; justify-content:space-between; align-items:center;">
-                        História
-                        <label style="font-size: 10px; font-weight: normal; color: #aaa; text-transform: none; display: flex; align-items: center; gap: 4px; margin: 0; cursor: pointer;">
-                            <input type="checkbox" id="info-ocultarHistoria" onchange="updateField('info', 'ocultarHistoria', this.checked)"> Ocultar na Ficha
-                        </label>
-                    </label>
-                    <textarea id="info-historia" style="min-height: 120px;" oninput="updateField('info', 'historia', this.value)"></textarea>
-                </div>
+                <div class="input-group"><label>História</label><textarea id="info-historia" style="min-height: 120px;" oninput="updateField('info', 'historia', this.value)"></textarea></div>
                 <div class="input-group"><label>Aparência</label><textarea id="info-aparencia" oninput="updateField('info', 'aparencia', this.value)"></textarea></div>
             </div>
         </div>
