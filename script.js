@@ -603,7 +603,7 @@ function runFallbackChecks() {
           if (typeof c.info.boxRes === 'undefined') c.info.boxRes = c.info.resumoColapsado || false;
 
           const defInfo = { 
-              classe: "", classe2: "", classe3: "", classe4: "", classe5: "", raca: "", raca2: "", animal: "", animal2: "", racaNomeCustom: "", customBuffF: "", customBuffD: "", customBuffR: "", customBuffV: "", 
+              classe: "", classe2: "", classe3: "", classe4: "", classe5: "", raca: "", raca2: "", animal: "", animal2: "", racaNomeCustom: "", customBuffF: "", customBuffD: "", customBuffR: "", customBuffV: "", racaNomeCustom2: "", customBuffF2: "", customBuffD2: "", customBuffR2: "", customBuffV2: "", 
               linhagem: "", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp", 
               alcunha: "", alcunhasList: [], alcunhaAtiva: "", recompensa: "", altura: "", idade: "", sexo: "", sangue: "", nacionalidade: "", localizacao: "", 
               telefone: "", orgTipo: "", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", 
@@ -1205,11 +1205,25 @@ function updateUI() {
             boxCustom.style.display = 'none';
         }
     }
+    let boxCustom2 = document.getElementById('box-racaCustom2');
+    if (boxCustom2) {
+        if (isNPC && i.linhagem === 'Charlotte' && i.raca2 === 'Outra') {
+            boxCustom2.style.display = 'flex';
+            document.getElementById('info-racaNomeCustom2').value = i.racaNomeCustom2 || "";
+            document.getElementById('info-customBuffF2').value = i.customBuffF2 || "";
+            document.getElementById('info-customBuffD2').value = i.customBuffD2 || "";
+            document.getElementById('info-customBuffR2').value = i.customBuffR2 || "";
+            document.getElementById('info-customBuffV2').value = i.customBuffV2 || "";
+        } else {
+            boxCustom2.style.display = 'none';
+        }
+    }
 
     let sRaca2 = document.getElementById('info-raca2');
     if (i.linhagem === "Charlotte") {
         sRaca2.style.display = "block";
         let r2Html = '<option value="">-- Selecione --</option>';
+        if (isNPC) r2Html += `<option value="Outra" ${i.raca2 === 'Outra' ? 'selected' : ''}>Outra...</option>`;
         for(let r in racas) {
             if (r === "Kuja" && i.sexo !== "Feminino") continue;
             if (noCharlotteRaces.includes(r)) continue;
@@ -1526,9 +1540,14 @@ function updateUI() {
         }
         if(rc === "Humano") { bonus[i.selDF] += 0.20; bonus[i.selRV] += 0.20; } else if(rc === "Kuja") { bonus[i.selDF] += 0.30; bonus[i.selRV] += 0.20; } else if(rc === "Três-Olhos" || rc === "Mink") { bonus[i.selDF] += 0.15; }
     } else {
-        let applyCharlotteBuff = (rName, selVal) => {
+        let applyCharlotteBuff = (rName, selVal, suffix = "") => {
             if (racas[rName]) {
                 for (let s in racas[rName]) { if (racas[rName][s] < 0) bonus[s] += racas[rName][s]; }
+            } else if (isNPC && rName === 'Outra') {
+                bonus.f += (parseInt(i['customBuffF' + suffix]) || 0) / 100;
+                bonus.d += (parseInt(i['customBuffD' + suffix]) || 0) / 100;
+                bonus.r += (parseInt(i['customBuffR' + suffix]) || 0) / 100;
+                bonus.v += (parseInt(i['customBuffV' + suffix]) || 0) / 100;
             }
             if (selVal) {
                 if (rName === "Humano") bonus[selVal] += 0.20;
@@ -1536,6 +1555,8 @@ function updateUI() {
                 else if (racas[rName] && racas[rName][selVal] > 0) bonus[selVal] += racas[rName][selVal];
             }
         };
+        applyCharlotteBuff(rc, i.selCharR1);
+        applyCharlotteBuff(rc2, i.selCharR2, "2");
         applyCharlotteBuff(rc, i.selCharR1);
         applyCharlotteBuff(rc2, i.selCharR2);
     }
@@ -2203,7 +2224,10 @@ function updateUI() {
     let c5Out = i.classe5 ? getClassDisplayName(i.classe5, i.sexo) : '35.000';
 
     let racaOutput = (isNPC && i.raca === 'Outra') ? (i.racaNomeCustom || 'Raça Custom') : (formatRaceStr(i.raca, i.animal, i.sexo === "Feminino") || '🔒');
-    if (i.linhagem === "Charlotte") { let raca2Output = formatRaceStr(i.raca2, i.animal2, i.sexo === "Feminino"); racaOutput += ` / ${raca2Output}`; }
+    if (i.linhagem === "Charlotte") { 
+        let raca2Output = (isNPC && i.raca2 === 'Outra') ? (i.racaNomeCustom2 || '2ª Raça Custom') : (formatRaceStr(i.raca2, i.animal2, i.sexo === "Feminino") || '🔒');
+        racaOutput += ` / ${raca2Output}`; 
+    }
 
     let alcunhaOut = "";
     if (!i.alcunhasList || i.alcunhasList.length === 0) {
