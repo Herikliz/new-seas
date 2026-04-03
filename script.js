@@ -1240,7 +1240,7 @@ function updateUI() {
         if (i.linhagem === "Charlotte") {
             boxCharRacas.style.display = "flex";
             let nomes = {d: "Destreza", f: "Força", r: "Resistência", v: "Velocidade"};
-            let buildOpts = (racaName) => {
+            let buildOpts = (racaName, suffix = "") => {
                 let html = '<option value="">-- Escolher Buff --</option>';
                 if (racaName === "Humano" || racaName === "Kuja") {
                     for (let s in nomes) html += `<option value="${s}">${nomes[s]} (+${racaName === "Kuja" && (s === "f" || s === "d") ? "30" : "20"}%)</option>`;
@@ -1250,20 +1250,29 @@ function updateUI() {
                             html += `<option value="${s}">${nomes[s]} (+${(racas[racaName][s]*100).toFixed(0)}%)</option>`;
                         }
                     }
+                } else if (isNPC && racaName === "Outra") {
+                    let f = parseInt(i['customBuffF' + suffix]) || 0;
+                    let d = parseInt(i['customBuffD' + suffix]) || 0;
+                    let r = parseInt(i['customBuffR' + suffix]) || 0;
+                    let v = parseInt(i['customBuffV' + suffix]) || 0;
+                    if (f > 0) html += `<option value="f">${nomes["f"]} (+${f}%)</option>`;
+                    if (d > 0) html += `<option value="d">${nomes["d"]} (+${d}%)</option>`;
+                    if (r > 0) html += `<option value="r">${nomes["r"]} (+${r}%)</option>`;
+                    if (v > 0) html += `<option value="v">${nomes["v"]} (+${v}%)</option>`;
                 }
                 return html;
             };
 
             let sC1 = document.getElementById('info-selCharR1');
             if (sC1) {
-                let h1 = buildOpts(i.raca);
+                let h1 = buildOpts(i.raca, "");
                 if (sC1.innerHTML !== h1) sC1.innerHTML = h1;
                 if (Array.from(sC1.options).some(o => o.value === i.selCharR1)) sC1.value = i.selCharR1; else { sC1.value = ""; i.selCharR1 = ""; }
             }
 
             let sC2 = document.getElementById('info-selCharR2');
             if (sC2) {
-                let h2 = buildOpts(i.raca2);
+                let h2 = buildOpts(i.raca2, "2");
                 if (sC2.innerHTML !== h2) sC2.innerHTML = h2;
                 if (Array.from(sC2.options).some(o => o.value === i.selCharR2)) sC2.value = i.selCharR2; else { sC2.value = ""; i.selCharR2 = ""; }
             }
