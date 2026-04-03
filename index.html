@@ -97,6 +97,15 @@
                   <div class="input-group">
                       <label>Raça</label>
                       <select id="info-raca" onchange="updateField('info', 'raca', this.value)"></select>
+                      <div id="box-racaCustom" style="display:none; margin-top:5px; flex-direction:column; gap:5px; background:rgba(0,0,0,0.2); padding:8px; border-radius:4px; border:1px solid var(--danger);">
+                          <input type="text" id="info-racaNomeCustom" placeholder="Nome da Raça Customizada" oninput="updateField('info', 'racaNomeCustom', this.value)">
+                          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                              <div><label style="font-size:9px;">Buff F (%)</label><input type="number" id="info-customBuffF" placeholder="Ex: 20" oninput="updateField('info', 'customBuffF', this.value)"></div>
+                              <div><label style="font-size:9px;">Buff D (%)</label><input type="number" id="info-customBuffD" placeholder="Ex: 20" oninput="updateField('info', 'customBuffD', this.value)"></div>
+                              <div><label style="font-size:9px;">Buff R (%)</label><input type="number" id="info-customBuffR" placeholder="Ex: 20" oninput="updateField('info', 'customBuffR', this.value)"></div>
+                              <div><label style="font-size:9px;">Buff V (%)</label><input type="number" id="info-customBuffV" placeholder="Ex: 20" oninput="updateField('info', 'customBuffV', this.value)"></div>
+                          </div>
+                      </div>
                       <input type="text" id="info-animal" placeholder="Qual animal?" style="display:none; margin-top:5px;" oninput="updateField('info', 'animal', this.value)">
                       <select id="info-raca2" style="display:none; margin-top:5px;" onchange="updateField('info', 'raca2', this.value)"></select>
                       <div id="box-charlotteRacas" class="conditional-selects" style="display: none; flex-direction: row; gap: 5px;">

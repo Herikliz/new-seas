@@ -603,7 +603,7 @@ function runFallbackChecks() {
           if (typeof c.info.boxRes === 'undefined') c.info.boxRes = c.info.resumoColapsado || false;
 
           const defInfo = { 
-              classe: "", classe2: "", classe3: "", classe4: "", classe5: "", raca: "", raca2: "", animal: "", animal2: "", 
+              classe: "", classe2: "", classe3: "", classe4: "", classe5: "", raca: "", raca2: "", animal: "", animal2: "", racaNomeCustom: "", customBuffF: "", customBuffD: "", customBuffR: "", customBuffV: "", 
               linhagem: "", selClasseDF: "d", selDF: "d", selRV: "r", selLinDF: "d", selLinRV: "r", selLin4: "d", selLinEspAmi: "esp", 
               alcunha: "", alcunhasList: [], alcunhaAtiva: "", recompensa: "", altura: "", idade: "", sexo: "", sangue: "", nacionalidade: "", localizacao: "", 
               telefone: "", orgTipo: "", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", 
@@ -672,7 +672,7 @@ function renderNpcsComuns() {
     if(!container) return;
     let finalHtml = '';
     (currentChar.info.npcsComunsList || []).forEach((n, idx) => {
-        let rHtml = '';
+        let rHtml = `<option value="Outra" ${(!racas[n.raca] && n.raca) ? 'selected' : ''}>Outra...</option>`;
         Object.keys(racas).forEach(r => {
             let isSelected = (n.raca || "Humano") === r ? 'selected' : '';
             rHtml += `<option value="${r}" ${isSelected}>${r}</option>`;
@@ -682,7 +682,12 @@ function renderNpcsComuns() {
         finalHtml += `
             <div style="background: rgba(0,0,0,0.3); padding: 5px; border: 1px dashed #555; border-radius: 6px; margin-bottom: 5px; display: flex; gap: 5px; align-items: center;">
                 <input type="text" placeholder="Qtd" value="${cQtd ? numQtd.toLocaleString('pt-BR') : ''}" oninput="updateNpcComum(${idx}, 'quantidade', formatNpcNumber(this))" style="width: 60px;">
-                <select onchange="updateNpcComum(${idx}, 'raca', this.value)" style="flex: 1;">${rHtml}</select>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                    <select onchange="updateNpcComum(${idx}, 'raca', this.value)" style="width: 100%;">${rHtml}</select>
+                    <input type="text" placeholder="Nome da Raça" value="${(!racas[n.raca] && n.raca) ? n.raca : ''}" 
+                           style="display: ${(!racas[n.raca] && n.raca) ? 'block' : 'none'};" 
+                           oninput="updateNpcComum(${idx}, 'raca', this.value)">
+                </div>
                 <input type="text" placeholder="Pontos" value="${cPts ? numPts.toLocaleString('pt-BR') : ''}" oninput="updateNpcComum(${idx}, 'pontos', formatNpcNumber(this))" style="width: 80px;">
                 <button type="button" class="btn btn-outline btn-danger" style="padding: 2px 6px; font-size: 10px; margin: 0;" onclick="removeNpcComum(${idx})">X</button>
             </div>
@@ -1178,6 +1183,7 @@ function updateUI() {
     }
 
     let rHtml = '<option value="">-- Selecione --</option>';
+    if (isNPC) rHtml += `<option value="Outra" ${i.raca === 'Outra' ? 'selected' : ''}>Outra...</option>`;
     for(let r in racas) {
         if (r === "Kuja" && i.sexo !== "Feminino") continue;
         if (i.linhagem === "Charlotte" && noCharlotteRaces.includes(r)) continue;
@@ -1186,6 +1192,19 @@ function updateUI() {
     let sRaca = document.getElementById('info-raca');
     if (sRaca.innerHTML !== rHtml) sRaca.innerHTML = rHtml;
     sRaca.value = i.raca;
+    let boxCustom = document.getElementById('box-racaCustom');
+    if (boxCustom) {
+        if (isNPC && i.raca === 'Outra') {
+            boxCustom.style.display = 'flex';
+            document.getElementById('info-racaNomeCustom').value = i.racaNomeCustom || "";
+            document.getElementById('info-customBuffF').value = i.customBuffF || "";
+            document.getElementById('info-customBuffD').value = i.customBuffD || "";
+            document.getElementById('info-customBuffR').value = i.customBuffR || "";
+            document.getElementById('info-customBuffV').value = i.customBuffV || "";
+        } else {
+            boxCustom.style.display = 'none';
+        }
+    }
 
     let sRaca2 = document.getElementById('info-raca2');
     if (i.linhagem === "Charlotte") {
@@ -1497,7 +1516,14 @@ function updateUI() {
     if(combatenteLevel > 0) { bonus[i.selClasseDF] += combatenteLevel * 0.05; }
 
     if(ln !== "Charlotte") {
-        if(racas[rc]) { bonus.d += racas[rc].d || 0; bonus.f += racas[rc].f || 0; bonus.r += racas[rc].r || 0; bonus.v += racas[rc].v || 0; }
+        if(racas[rc]) { 
+            bonus.d += racas[rc].d || 0; bonus.f += racas[rc].f || 0; bonus.r += racas[rc].r || 0; bonus.v += racas[rc].v || 0; 
+        } else if (isNPC && rc === 'Outra') {
+            bonus.f += (parseInt(i.customBuffF) || 0) / 100;
+            bonus.d += (parseInt(i.customBuffD) || 0) / 100;
+            bonus.r += (parseInt(i.customBuffR) || 0) / 100;
+            bonus.v += (parseInt(i.customBuffV) || 0) / 100;
+        }
         if(rc === "Humano") { bonus[i.selDF] += 0.20; bonus[i.selRV] += 0.20; } else if(rc === "Kuja") { bonus[i.selDF] += 0.30; bonus[i.selRV] += 0.20; } else if(rc === "Três-Olhos" || rc === "Mink") { bonus[i.selDF] += 0.15; }
     } else {
         let applyCharlotteBuff = (rName, selVal) => {
@@ -2176,7 +2202,7 @@ function updateUI() {
     let c4Out = i.classe4 ? getClassDisplayName(i.classe4, i.sexo) : '20.000';
     let c5Out = i.classe5 ? getClassDisplayName(i.classe5, i.sexo) : '35.000';
 
-    let racaOutput = formatRaceStr(i.raca, i.animal, i.sexo === "Feminino") || '🔒';
+    let racaOutput = (isNPC && i.raca === 'Outra') ? (i.racaNomeCustom || 'Raça Custom') : (formatRaceStr(i.raca, i.animal, i.sexo === "Feminino") || '🔒');
     if (i.linhagem === "Charlotte") { let raca2Output = formatRaceStr(i.raca2, i.animal2, i.sexo === "Feminino"); racaOutput += ` / ${raca2Output}`; }
 
     let alcunhaOut = "";
