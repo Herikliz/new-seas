@@ -1490,7 +1490,8 @@ function updateUI() {
 
     let reqEsp = (rc === "Kuja" || ln === "Silvers") ? 12000 : 15000;
     let espEl = document.getElementById('stat-esp');
-    if(totalBase >= reqEsp) { 
+    let hasEspPoints = currentChar.stats.esp > 0 || currentChar.substats.hArm > 0 || currentChar.substats.hObs > 0 || currentChar.substats.hRei > 0;
+    if(totalBase >= reqEsp || hasEspPoints) { 
         espEl.disabled = isReadOnly ? true : false; 
         espEl.placeholder = "0"; 
         document.getElementById('box-haki').style.display = "block"; 
@@ -1718,6 +1719,9 @@ function updateUI() {
             if(HR >= diff) { HR -= diff; currentChar.substats.hRei = HR; } else if(HO >= diff) { HO -= diff; currentChar.substats.hObs = HO; } else if(HA >= diff) { HA -= diff; currentChar.substats.hArm = HA; }
         }
         document.getElementById('avisoEsp').style.display = "block"; document.getElementById('avisoEsp').textContent = `Limite atingido! Máx: ${totalEsp.toLocaleString("pt-BR")}`;
+    } else if (totalHaki < totalEsp && totalEsp > 0) {
+        let diff = totalEsp - totalHaki;
+        document.getElementById('avisoEsp').style.display = "block"; document.getElementById('avisoEsp').textContent = `Pontos não distribuídos nos sub-atributos de Espírito: ${diff.toLocaleString("pt-BR")}`;
     } else { document.getElementById('avisoEsp').style.display = "none"; }
     
     document.getElementById('sub-hArm').value = currentChar.substats.hArm ? currentChar.substats.hArm.toLocaleString("pt-BR") : "";
