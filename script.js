@@ -1490,7 +1490,7 @@ function updateUI() {
 
     let reqEsp = (rc === "Kuja" || ln === "Silvers") ? 12000 : 15000;
     let espEl = document.getElementById('stat-esp');
-    let hasEspPoints = currentChar.stats.esp > 0 || currentChar.substats.hArm > 0 || currentChar.substats.hObs > 0 || currentChar.substats.hRei > 0;
+    let hasEspPoints = currentChar.stats.esp > 0;
     if(totalBase >= reqEsp || hasEspPoints) { 
         espEl.disabled = isReadOnly ? true : false; 
         espEl.placeholder = "0"; 
