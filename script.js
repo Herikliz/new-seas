@@ -2576,3 +2576,9 @@ setInterval(() => {
         if(selectLoc.value !== expectedLoc && selectLoc.querySelector(`option[value="${expectedLoc}"]`)) selectLoc.value = expectedLoc;
     }
 }, 1000);
+
+function openInfoModal(title, msg) {
+    document.getElementById('info-modal-title').textContent = title;
+    document.getElementById('info-modal-msg').textContent = msg;
+    document.getElementById('info-modal-overlay').style.display = 'flex';
+}
