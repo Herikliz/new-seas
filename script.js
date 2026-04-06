@@ -1583,6 +1583,9 @@ function updateUI() {
     statFields.forEach(f => { let el = document.getElementById('stat-'+f); if(el) el.value = currentChar.stats[f] ? currentChar.stats[f].toLocaleString("pt-BR") : ""; });
 
     let estTotalVal = Math.round((R + flatBonus.r) * (1 + bonus.r)) * 2;
+    if (typeof i.lastEstTotal === 'undefined') i.lastEstTotal = estTotalVal;
+    if (estTotalVal > i.lastEstTotal && (i.estaminaAtual === 0 || i.estaminaAtual === i.lastEstTotal)) i.estaminaAtual = estTotalVal;
+    i.lastEstTotal = estTotalVal;
     if (typeof i.estaminaAtual === 'undefined' || i.estaminaAtual === -1) i.estaminaAtual = estTotalVal;
     if (i.estaminaAtual > estTotalVal) i.estaminaAtual = estTotalVal;
 
@@ -2211,10 +2214,12 @@ function updateUI() {
     let orgOut = "";
     if(i.orgTipo === "Pirata") {
         if(i.tripulacao && i.tripulacao.trim() !== "") { orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ:_\n* Pirata: ${i.tripulacao}\n`; } else { orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ:_\n* Pirata\n`; }
-    } else if (i.orgTipo !== "") {
+    } else if (i.orgTipo && i.orgTipo !== "") {
         let displayPatente = i.patente || '';
         if (displayPatente !== "") { let gKey = i.sexo === 'Feminino' ? 'f' : 'm'; displayPatente = patenteGender[displayPatente] ? patenteGender[displayPatente][gKey] : displayPatente; }
         orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ | 𝐏ᴀᴛᴇɴᴛᴇ | 𝐒ᴀʟᴀ́ʀɪᴏ:_\n* ${i.orgTipo}\n* ${displayPatente}\n* ${i.salario ? '฿' + i.salario : ''}\n`;
+    } else {
+        orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ:_\n> \n`;
     }
 
     let outRecompensa = i.recompensa ? `฿${i.recompensa.toLocaleString("pt-BR")}` : '🔒';
