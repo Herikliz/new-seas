@@ -1567,8 +1567,6 @@ function updateUI() {
         };
         applyCharlotteBuff(rc, i.selCharR1);
         applyCharlotteBuff(rc2, i.selCharR2, "2");
-        applyCharlotteBuff(rc, i.selCharR1);
-        applyCharlotteBuff(rc2, i.selCharR2);
     }
 
     if(document.getElementById('container-linhagem').style.display === "block" && linhagens[ln]) {
