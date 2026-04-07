@@ -2197,7 +2197,7 @@ function updateUI() {
         });
 
         estilosKeys.forEach(stKey => {
-            tecnicasOut += `« ${stKey} »\n\n`;
+            tecnicasOut += `« ${stKey} »\n`;
             agrupado[stKey].forEach(t => {
                 if (t.nome) tecnicasOut += `* ${t.nome}\n`;
                 if (t.desc) { t.desc.split('\n').forEach(line => { let trimLine = line.trim(); if(trimLine !== "") tecnicasOut += `> ${trimLine.replace(/^>\s*/, '')}\n`; }); }
