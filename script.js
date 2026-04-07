@@ -2405,9 +2405,28 @@ function updateUI() {
         } else {
             habilidadesOut = `  : ᓩ _𝐇ᴀʙɪʟɪᴅᴀᴅᴇꜱ 𝐄xᴄʟᴜꜱɪᴠᴀꜱ:_\n`;
         }
+        
+        let getHabDesc = (hab, tb) => {
+            if (hab === "Arte da Esgrima") { if (tb >= 15000) return "+20% Destreza, -20% gasto de Estamina."; if (tb >= 10000) return "+15% Destreza, -20% gasto de Estamina."; if (tb >= 5000) return "+10% Destreza, -20% gasto de Estamina."; return ""; }
+            if (hab === "Batedor de Carteiras") { if (tb >= 15000) return "+25% Destreza."; if (tb >= 10000) return "+20% Destreza."; if (tb >= 5000) return "+15% Destreza."; return ""; }
+            if (hab === "Caminho do Atirador") { if (tb >= 15000) return "+15% Destreza (+20% atirando)."; if (tb >= 10000) return "+10% Destreza (+15% atirando)."; if (tb >= 5000) return "+5% Destreza (+10% atirando)."; return ""; }
+            if (hab === "Constituição Única") return "+10% Força, +15% Resistência.";
+            if (hab === "Contração Muscular") { if (tb >= 10000) return "+20% Força e Resistência."; if (tb >= 5000) return "+10% Força e Resistência."; return ""; }
+            if (hab === "Espírito Contagiante") return "Aliados recebem +5% em todos os atributos.";
+            if (hab === "Favoritismo Armista") { if (tb >= 15000) return "Bônus massivos em Resistência, Velocidade, Dano e Red. de Dano (Arma/Criações)."; if (tb >= 10000) return "+10% Resistência e Velocidade, +10% Força/Destreza (Criações)."; return ""; }
+            if (hab === "Filho do Mar") { if (tb >= 15000) return "+15% Reflexo e Resistência."; if (tb >= 10000) return "+10% Reflexo e Resistência."; if (tb >= 5000) return "+5% Reflexo e Resistência."; return ""; }
+            if (hab === "Flexibilidade") { if (tb >= 10000) return "+20% Velocidade."; if (tb >= 5000) return "+10% Velocidade."; return ""; }
+            if (hab === "Fúria Ardente") { if (tb >= 15000) return "+15% Força."; if (tb >= 10000) return "+10% Força."; if (tb >= 5000) return "+5% Força."; return ""; }
+            if (hab === "O Escolhido") { if (tb >= 20000) return "+15% em todos os Hakis."; if (tb >= 10000) return "+10% em todos os Hakis."; if (tb >= 5000) return "+5% em todos os Hakis."; return ""; }
+            if (hab === "Pensamento Acelerado") { if (tb >= 10000) return "+25% Reflexos."; if (tb >= 5000) return "+20% Reflexos."; return ""; }
+            if (hab === "QI Avançado") return "-50% gasto de Estamina. +5% Reflexos se durar >3 turnos.";
+            return "oculta";
+        };
+
         i.habilidadesExclusivas.forEach(hab => {
-            if (habilidadesExclusivasDict[hab] && habilidadesExclusivasDict[hab] !== "Habilidade oculta.") {
-                habilidadesOut += `> ${hab}: ${habilidadesExclusivasDict[hab]}\n`;
+            let desc = getHabDesc(hab, totalBase);
+            if (desc && desc !== "oculta") {
+                habilidadesOut += `> ${hab}: ${desc}\n`;
             } else {
                 habilidadesOut += `> ${hab}\n`;
             }
