@@ -38,7 +38,30 @@ const akumasFixas = {
 
 const baseClassesList = ["Arqueólogo", "Artista", "Atirador", "Carpinteiro", "Cientista", "Combatente", "Cozinheiro", "Ferreiro", "Inventor", "Médico", "Musicista", "Navegador"];
 const racas = { "Braços Longos":{f:.40}, "Bucaneiro":{f:.40,r:.40}, "Gigante":{f:.30,r:.30,v:-.15}, "Humano":{}, "Kuja":{}, "Kumate":{d:.40}, "Lunariano":{v:.35,r:.45}, "Meio-Gigante":{f:.25,r:.25}, "Mink":{v:.15,r:.15}, "Oni":{f:.35,r:.45}, "Pernas Longas":{v:.40}, "Povo do Céu: Birkan":{d:.20,v:.20}, "Povo do Céu: Shandia":{d:.20,v:.20}, "Povo do Céu: Skypieano":{d:.20,v:.20}, "Sereiano":{v:.40}, "Tontatta":{f:.20,v:.20}, "Três-Olhos":{v:.15,r:.15}, "Tritão":{f:.20,r:.20,v:.30}, "Wotan":{f:.25,r:.25} };
-const linhagens = { "Nenhuma":{}, "Augur":{v:.10,d:.20,req:["Humano"]}, "Barnum":{req:["Braços Longos","Pernas Longas","Kumate","Três-Olhos"]}, "Boa":{f:.15,ha:.15,req:["Kuja"]}, "Capone":{v:.10,d:.15,req:["Humano"]}, "Charlotte":{charlotte:true}, "Chinjao":{f:.15,r:.15,req:["Humano"]}, "D.":{}, "Dracule":{d:.20,ho:.10,req:["Humano"]}, "Drole":{f:.20,r:.10,v:.10,req:["Gigante","Meio-Gigante","Wotan"]}, "Família do Sol":{f:.15,r:.15,req:["Tritão","Sereiano","Wotan"]}, "Gan":{esp:.15,req:["Povo do Céu: Birkan","Povo do Céu: Shandia","Povo do Céu: Skypieano"]}, "Kong":{req:["Humano"]}, "Kozuki":{v:.10,d:.10,esp:.10,req:["Humano"]}, "Kurozumi":{v:.10,d:.20,req:["Humano"]}, "Laufey":{f:.15,r:.15,v:-.5,req:["Gigante"]}, "Mokomo":{v:.10,req:["Mink"]}, "Nefertari":{d:.15,v:.15,req:["Humano"]}, "Neptune":{v:.25,req:["Sereiano"]}, "Newgate":{f:.10,r:.20,req:["Humano","Meio-Gigante"]}, "Sakazuki":{r:.10,f:.20,req:["Humano"]}, "Silvers":{esp:.15,req:["Humano"]}, "Tenryūbito: Família Donquixote":{d:.15,ami:.15,req:["Humano"]}, "Tenryūbito: Família Figarland":{d:.15,esp:.15,req:["Humano"]} };
+const linhagens = { "Nenhuma":{}, "Augur":{v:.10,d:.20,req:["Humano"]}, "Barnum":{req:["Braços Longos","Pernas Longas","Kumate","Três-Olhos"]}, "Beckman":{d:.20,v:.15,ho:.15,req:["Humano"]}, "Boa":{f:.15,ha:.15,req:["Kuja"]}, "Capone":{v:.10,d:.15,req:["Humano"]}, "Charlotte":{charlotte:true}, "Chinjao":{f:.15,r:.15,req:["Humano"]}, "D.":{}, "Dracule":{d:.20,ho:.10,req:["Humano"]}, "Drole":{f:.20,r:.10,v:.10,req:["Gigante","Meio-Gigante","Wotan"]}, "Família do Sol":{f:.15,r:.15,req:["Tritão","Sereiano","Wotan"]}, "Gan":{esp:.15,req:["Povo do Céu: Birkan","Povo do Céu: Shandia","Povo do Céu: Skypieano"]}, "Kong":{req:["Humano"]}, "Kozuki":{v:.10,d:.10,esp:.10,req:["Humano"]}, "Kurozumi":{v:.10,d:.20,req:["Humano"]}, "Laufey":{f:.15,r:.15,v:-.5,req:["Gigante"]}, "Mokomo":{v:.10,req:["Mink"]}, "Nefertari":{d:.15,v:.15,req:["Humano"]}, "Neptune":{v:.25,req:["Sereiano"]}, "Newgate":{f:.10,r:.20,req:["Humano","Meio-Gigante"]}, "Sakazuki":{r:.10,f:.20,req:["Humano"]}, "Silvers":{esp:.15,req:["Humano"]}, "Tenryūbito: Família Donquixote":{d:.15,ami:.15,req:["Humano"]}, "Tenryūbito: Família Figarland":{d:.15,esp:.15,req:["Humano"]} };
+
+const habilidadesExclusivasDict = {
+    "Arte da Esgrima": "+10% em Destreza quando tiver 5.000 pontos (15% aos 10k, 20% aos 15k). -20% de gasto de Estamina.",
+    "Batedor de Carteiras": "+15% em Destreza quando tiver 5.000 pontos (20% aos 10k, 25% aos 15k).",
+    "Caminho do Atirador": "+5% em Destreza quando tiver 5.000 pontos (10% aos 10k, 15% aos 15k). +10% em Destreza ao atirar com armas de fogo (15% aos 10k, 20% aos 15k).",
+    "Constituição Única": "+10% de Força e +15% de Resistência.",
+    "Contração Muscular": "+10% de Força e Resistência quando tiver 5.000 pontos (20% aos 10k).",
+    "Espírito Contagiante": "Aliados recebem um bônus passivo de +5% em todos os atributos.",
+    "Favoritismo Armista": "Aos 10.000: Ao empunhar criações: +10% R e V, e F ou D. Aos 15.000: Bônus massivos de R, V, Dano e Redução de Dano.",
+    "Filho do Mar": "+5% em Reflexo e Resistência aos 5.000 (10% aos 10k, 15% aos 15k).",
+    "Flexibilidade": "+10% em Velocidade aos 5.000 (20% aos 10k).",
+    "Fúria Ardente": "+5% em Força aos 5.000 (10% aos 10k, 15% aos 15k).",
+    "O Escolhido": "+5% em todos os tipos de Haki aos 5.000 (10% aos 10k, 15% aos 20k).",
+    "Pensamento Acelerado": "+20% em Reflexo aos 5.000 (25% aos 10k).",
+    "Último Recurso": "Habilidade oculta.",
+    "Vontade Inabalável": "Habilidade oculta.",
+    "Treinamento de Cavaleiro": "Habilidade oculta.",
+    "QI Avançado": "O gasto de estamina é reduzido em 50%. Caso dure mais de 3 turnos, Reflexos aumentados em 5%."
+};
+
+const linhagemHabilidades = {
+    "Dracule": ["Arte da Esgrima"], "Capone": ["Batedor de Carteiras"], "Augur": ["Caminho do Atirador"], "Drole": ["Constituição Única"], "Laufey": ["Constituição Única", "Vontade Inabalável"], "Mokomo": ["Constituição Única", "Vontade Inabalável"], "Newgate": ["Contração Muscular", "Espírito Contagiante"], "Kozuki": ["Favoritismo Armista"], "Kurozumi": ["Favoritismo Armista"], "Neptune": ["Filho do Mar", "Flexibilidade"], "Boa": ["Flexibilidade"], "Sakazuki": ["Fúria Ardente"], "Silvers": ["O Escolhido", "Pensamento Acelerado"], "D.": ["Espírito Contagiante", "Vontade Inabalável"], "Gan": ["Treinamento de Cavaleiro"], "Beckman": ["QI Avançado"]
+};
 
 const allStyles = ["Nenhum", "Armadilha de Cores", "Arsenal", "Arte do Tempo", "Artista Marcial", "Atirador", "Black Cat", "Boujutsu", "Boxe", "Combate Gigante", "Combate Tontatta", "Cortes Precisos", "Electro", "Escultura de Forma", "Fencing", "Freestyle", "Fúria das Marés", "Galaxy Combat", "Hasshoken", "Impacto Estrutural", "Instinto Animal", "Jao Kun Dō", "Karatê Homem-Peixe", "Kitsunebi-ryū", "Kozuki-Nitōryū", "Kung Fu", "Melodia Impactante", "Mutōryū", "Ninjutsu", "Okama Kenpō", "Paladino", "Perna Negra", "Punchstyle", "Punho Suave", "Ranger", "Rokushiki", "Rope Action", "Seimei Kikan", "Sinfonia Ilusória", "Stinstyle", "Sumô", "Swordstyle", "Tōryū", "Yaristyle"];
 const classStyles = {"Arqueólogo":["Instinto Animal"],"Artista":["Armadilha de Cores","Escultura de Forma"],"Atirador":["Atirador"],"Carpinteiro":["Impacto Estrutural","Rope Action"],"Cientista":["Punho Suave"],"Combatente":["Freestyle"],"Cozinheiro":["Cortes Precisos","Perna Negra"],"Ferreiro":["Impacto Estrutural","Rope Action"],"Inventor":["Impacto Estrutural","Rope Action"],"Médico":["Punho Suave"],"Musicista":["Melodia Impactante","Sinfonia Ilusória"],"Navegador":["Arte do Tempo","Fúria das Marés"]};
@@ -611,7 +634,7 @@ function runFallbackChecks() {
               personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, hasAmiDesp: false,
               amiResPct: "", amiAlcMult: "1", calcUseAttr: "d", calcInimigoRes: "", calcBuffFlat: "", calcBuffPct: "", calcUseAmi: "sim", calcUseHaki: "nao", sceneType: "Treino Padrão", sceneText: "",
               boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxEsp: false, boxAmi: false, boxHist: false, 
-              boxInv: false, boxCalc: false, boxEstamina: false, estaminaAtual: -1, estaminaVelocidade: "", estaminaDano: "", estaminaBuffPct: "", estaminaHakiArm: "nao", estaminaHakiObs: "nao", boxScene: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0, ordemTecnicas: "alfabetica", hideHistoria: false, exaustaoCompleta: false 
+              boxInv: false, boxCalc: false, boxEstamina: false, estaminaAtual: -1, estaminaVelocidade: "", estaminaDano: "", estaminaBuffPct: "", estaminaHakiArm: "nao", estaminaHakiObs: "nao", boxScene: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0, ordemTecnicas: "alfabetica", hideHistoria: false, exaustaoCompleta: false, habilidadesExclusivas: [], habCaminhoAtiradorAtivo: false, habFavArmistaAtivo: "nenhum", habFavArmistaAttr: "d", habQIAvancadoAtivo: false, linhagemBeckmanArma: false
           };
           for(let k in defInfo) if (typeof c.info[k] === 'undefined') c.info[k] = defInfo[k];
           
@@ -636,12 +659,44 @@ window.toggleBox = function(id) {
     updateUI();
 };
 
+window.toggleBox = function(id) {
+    if (!currentChar) return;
+    currentChar.info[id] = !currentChar.info[id];
+    saveData();
+    updateUI();
+};
+
 window.toggleAllBoxes = function(state) {
     if (!currentChar) return;
-    const boxKeys = ['boxIden', 'boxMec', 'boxSoc', 'boxBase', 'boxEsp', 'boxAmi', 'boxHist', 'boxLog', 'boxInv', 'boxTec', 'boxRes', 'boxCalc', 'boxEstamina', 'boxScene'];
+    const boxKeys = ['boxIden', 'boxMec', 'boxSoc', 'boxHab', 'boxBase', 'boxEsp', 'boxAmi', 'boxHist', 'boxLog', 'boxInv', 'boxTec', 'boxRes', 'boxCalc', 'boxEstamina', 'boxScene'];
     boxKeys.forEach(k => currentChar.info[k] = state);
     saveData();
     updateUI();
+};
+
+window.addHabilidade = function() {
+    if(isReadOnly) return;
+    let sel = document.getElementById('hab-select');
+    let val = sel.value;
+    if(val && !currentChar.info.habilidadesExclusivas.includes(val)) {
+        currentChar.info.habilidadesExclusivas.push(val);
+        saveData(); updateUI();
+    }
+    sel.value = "";
+};
+
+window.removeHabilidade = function(hab) {
+    if(isReadOnly) return;
+    let ln = currentChar.info.linhagem;
+    let mand = linhagemHabilidades[ln] || [];
+    if(mand.includes(hab)) return; 
+    currentChar.info.habilidadesExclusivas = currentChar.info.habilidadesExclusivas.filter(h => h !== hab);
+    
+    if(hab === "Caminho do Atirador") currentChar.info.habCaminhoAtiradorAtivo = false;
+    if(hab === "Favoritismo Armista") { currentChar.info.habFavArmistaAtivo = "nenhum"; currentChar.info.habFavArmistaAttr = "d"; }
+    if(hab === "QI Avançado") currentChar.info.habQIAvancadoAtivo = false;
+    
+    saveData(); updateUI();
 };
 
 function addNpcComum() {
@@ -1154,7 +1209,7 @@ function updateUI() {
     let i = currentChar.info;
     let isNPC = currentChar.isNPC;
 
-    ['boxIden', 'boxMec', 'boxSoc', 'boxBase', 'boxEsp', 'boxAmi', 'boxHist', 'boxLog', 'boxInv', 'boxTec', 'boxRes', 'boxCalc', 'boxEstamina', 'boxScene'].forEach(id => {
+    ['boxIden', 'boxMec', 'boxSoc', 'boxHab', 'boxBase', 'boxEsp', 'boxAmi', 'boxHist', 'boxLog', 'boxInv', 'boxTec', 'boxRes', 'boxCalc', 'boxEstamina', 'boxScene'].forEach(id => {
         let wrapper = document.getElementById('wrapper-' + id);
         let icon = document.getElementById('icon-' + id);
         let titleBlock = document.getElementById('title-' + id);
@@ -1570,19 +1625,79 @@ function updateUI() {
     }
 
     if(document.getElementById('container-linhagem').style.display === "block" && linhagens[ln]) {
-        bonus.d += linhagens[ln].d || 0; bonus.f += linhagens[ln].f || 0; bonus.r += linhagens[ln].r || 0; bonus.v += linhagens[ln].v || 0; bonus.esp += linhagens[ln].esp || 0; bonus.ha += linhagens[ln].ha || 0; bonus.ho += linhagens[ln].ho || 0; bonus.hr += linhagens[ln].hr || 0; bonus.ami += linhagens[ln].ami || 0;
+            bonus.d += linhagens[ln].d || 0; bonus.f += linhagens[ln].f || 0; bonus.r += linhagens[ln].r || 0; bonus.v += linhagens[ln].v || 0; bonus.esp += linhagens[ln].esp || 0; bonus.ha += linhagens[ln].ha || 0; bonus.ho += linhagens[ln].ho || 0; bonus.hr += linhagens[ln].hr || 0; bonus.ami += linhagens[ln].ami || 0;
+            
+            if(ln === "Barnum") { bonus[i.selLinDF] += 0.15; bonus[i.selLinRV] += 0.15; } else if(ln === "D.") { bonus[i.selLin4] += 0.15; bonus[i.selLinEspAmi] += 0.15; } else if(ln === "Gan") { bonus[i.selLinDF] += 0.15; } else if(ln === "Kong") { bonus[i.selLin4] += 0.10; } else if(ln === "Silvers") { bonus[i.selLin4] += 0.15; }
+        }
+
+        let mandHab = linhagemHabilidades[ln] || [];
+        let currentHabSet = new Set(i.habilidadesExclusivas || []);
+        mandHab.forEach(h => currentHabSet.add(h));
+        i.habilidadesExclusivas = Array.from(currentHabSet);
+
+        let habListHtml = "";
+        let habSelectHtml = '<option value="">-- Adicionar Habilidade --</option>';
+        Object.keys(habilidadesExclusivasDict).forEach(hab => {
+            if (!i.habilidadesExclusivas.includes(hab)) habSelectHtml += `<option value="${hab}">${hab}</option>`;
+        });
+        i.habilidadesExclusivas.forEach(hab => {
+            let isMandatory = mandHab.includes(hab);
+            habListHtml += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.3); padding:4px 8px; border-radius:4px; border:1px solid #444;">
+                <span style="font-size:12px;">${hab}</span>
+                ${isMandatory ? '<span style="font-size:10px; color:#aaa;">(Linhagem)</span>' : `<button class="btn btn-outline btn-danger" style="padding:2px 6px; font-size:10px; margin:0;" onclick="removeHabilidade('${hab}')">X</button>`}
+            </div>`;
+        });
+        let habSelEl = document.getElementById('hab-select'); if(habSelEl) habSelEl.innerHTML = habSelectHtml;
+        let habListEl = document.getElementById('hab-list'); if(habListEl) habListEl.innerHTML = habListHtml;
+
+        let hasHab = (hab) => i.habilidadesExclusivas.includes(hab);
+        let hasAtirador = hasHab("Caminho do Atirador");
+        let hasFavArm = hasHab("Favoritismo Armista");
+        let hasQI = hasHab("QI Avançado");
+        let isBeckman = ln === "Beckman";
         
-        if(ln === "Barnum") { bonus[i.selLinDF] += 0.15; bonus[i.selLinRV] += 0.15; } else if(ln === "D.") { bonus[i.selLin4] += 0.15; bonus[i.selLinEspAmi] += 0.15; } else if(ln === "Gan") { bonus[i.selLinDF] += 0.15; } else if(ln === "Kong") { bonus[i.selLin4] += 0.10; } else if(ln === "Silvers") { bonus[i.selLin4] += 0.15; }
-        
-        if(ln === "Dracule") { if(totalBase >= 15000) bonus.d += 0.20; else if(totalBase >= 10000) bonus.d += 0.15; else if(totalBase >= 5000) bonus.d += 0.10; } else if(ln === "Capone") { if(totalBase >= 15000) bonus.d += 0.25; else if(totalBase >= 10000) bonus.d += 0.20; else if(totalBase >= 5000) bonus.d += 0.15; } else if(ln === "Augur") { if(totalBase >= 20000) bonus.d += 0.15; else if(totalBase >= 10000) bonus.d += 0.10; else if(totalBase >= 5000) bonus.d += 0.05; } else if(ln === "Newgate") { if(totalBase >= 10000) { bonus.f += 0.20; bonus.r += 0.20; } else if(totalBase >= 5000) { bonus.f += 0.10; bonus.r += 0.10; } } else if(ln === "Boa") { if(totalBase >= 10000) bonus.v += 0.20; else if(totalBase >= 5000) bonus.v += 0.10; } else if(ln === "Neptune") { if(totalBase >= 15000) { bonus.v += 0.20; bonus.refl += 0.15; bonus.r += 0.15; } else if(totalBase >= 10000) { bonus.v += 0.20; bonus.refl += 0.10; bonus.r += 0.10; } else if(totalBase >= 5000) { bonus.v += 0.10; bonus.refl += 0.05; bonus.r += 0.05; } } else if(ln === "Sakazuki") { if(totalBase >= 15000) { bonus.f += 0.15; } else if(totalBase >= 10000) { bonus.f += 0.10; } else if(totalBase >= 5000) { bonus.f += 0.05; } } else if(ln === "Silvers") { if(totalBase >= 20000) { bonus.ha += 0.15; bonus.ho += 0.15; bonus.hr += 0.15; } else if(totalBase >= 10000) { bonus.ha += 0.10; bonus.ho += 0.10; bonus.hr += 0.10; } else if(totalBase >= 5000) { bonus.ha += 0.05; bonus.ho += 0.05; bonus.hr += 0.05; } }
-        
-        if(ln === "Drole" || ln === "Laufey" || ln === "Mokomo") { bonus.f += 0.10; bonus.r += 0.15; }
-    }
+        let habAtivosContainer = document.getElementById('hab-ativos');
+        if(habAtivosContainer) {
+            habAtivosContainer.style.display = (hasAtirador || hasFavArm || hasQI || isBeckman) ? 'block' : 'none';
+            let elAtirador = document.getElementById('hab-ativo-atirador'); if(elAtirador) { elAtirador.style.display = hasAtirador ? 'block' : 'none'; document.getElementById('chk-atirador').checked = i.habCaminhoAtiradorAtivo; }
+            let elQI = document.getElementById('hab-ativo-qi'); if(elQI) { elQI.style.display = hasQI ? 'block' : 'none'; document.getElementById('chk-qi').checked = i.habQIAvancadoAtivo; }
+            let elBeckman = document.getElementById('hab-ativo-beckman'); if(elBeckman) { elBeckman.style.display = isBeckman ? 'block' : 'none'; document.getElementById('chk-beckman').checked = i.linhagemBeckmanArma; }
+            let elArmista = document.getElementById('hab-ativo-armista'); if(elArmista) { elArmista.style.display = hasFavArm ? 'flex' : 'none'; document.getElementById('sel-armista-ativo').value = i.habFavArmistaAtivo; document.getElementById('sel-armista-attr').value = i.habFavArmistaAttr; }
+        }
+
+        if(hasHab("Arte da Esgrima")) { if(totalBase >= 15000) bonus.d += 0.20; else if(totalBase >= 10000) bonus.d += 0.15; else if(totalBase >= 5000) bonus.d += 0.10; }
+        if(hasHab("Batedor de Carteiras")) { if(totalBase >= 15000) bonus.d += 0.25; else if(totalBase >= 10000) bonus.d += 0.20; else if(totalBase >= 5000) bonus.d += 0.15; }
+        if(hasHab("Caminho do Atirador")) { 
+            if(totalBase >= 15000) bonus.d += 0.15; else if(totalBase >= 10000) bonus.d += 0.10; else if(totalBase >= 5000) bonus.d += 0.05; 
+            if(i.habCaminhoAtiradorAtivo) { if(totalBase >= 15000) bonus.d += 0.20; else if(totalBase >= 10000) bonus.d += 0.15; else if(totalBase >= 5000) bonus.d += 0.10; }
+        }
+        if(hasHab("Constituição Única")) { bonus.f += 0.10; bonus.r += 0.15; }
+        if(hasHab("Contração Muscular")) { if(totalBase >= 10000) { bonus.f += 0.20; bonus.r += 0.20; } else if(totalBase >= 5000) { bonus.f += 0.10; bonus.r += 0.10; } }
+        if(hasHab("Favoritismo Armista")) {
+            if(totalBase >= 15000) {
+                if(i.habFavArmistaAtivo === "favorita") { bonus.r += 0.15; bonus.v += 0.15; }
+                else if(i.habFavArmistaAtivo === "criacao") { bonus.r += 0.20; bonus.v += 0.20; }
+                else if(i.habFavArmistaAtivo === "criacao_favorita") { bonus.r += 0.25; bonus.v += 0.25; }
+            } else if(totalBase >= 10000) {
+                if(i.habFavArmistaAtivo === "criacao" || i.habFavArmistaAtivo === "criacao_favorita") { 
+                    bonus.r += 0.10; bonus.v += 0.10; 
+                    if(i.habFavArmistaAttr === 'f') bonus.f += 0.10; else bonus.d += 0.10;
+                }
+            }
+        }
+        if(hasHab("Filho do Mar")) { if(totalBase >= 15000) { bonus.refl += 0.15; bonus.r += 0.15; } else if(totalBase >= 10000) { bonus.refl += 0.10; bonus.r += 0.10; } else if(totalBase >= 5000) { bonus.refl += 0.05; bonus.r += 0.05; } }
+        if(hasHab("Flexibilidade")) { if(totalBase >= 10000) bonus.v += 0.20; else if(totalBase >= 5000) bonus.v += 0.10; }
+        if(hasHab("Fúria Ardente")) { if(totalBase >= 15000) bonus.f += 0.15; else if(totalBase >= 10000) bonus.f += 0.10; else if(totalBase >= 5000) bonus.f += 0.05; }
+        if(hasHab("O Escolhido")) { if(totalBase >= 20000) { bonus.ha += 0.15; bonus.ho += 0.15; bonus.hr += 0.15; } else if(totalBase >= 10000) { bonus.ha += 0.10; bonus.ho += 0.10; bonus.hr += 0.10; } else if(totalBase >= 5000) { bonus.ha += 0.05; bonus.ho += 0.05; bonus.hr += 0.05; } }
+        if(hasHab("Pensamento Acelerado")) { if(totalBase >= 10000) bonus.refl += 0.25; else if(totalBase >= 5000) bonus.refl += 0.20; }
+        if(hasHab("QI Avançado")) { if(i.habQIAvancadoAtivo) bonus.refl += 0.05; }
+        if(isBeckman && i.linhagemBeckmanArma) { bonus.v += 0.05; }
 
     const statFields = ['f', 'd', 'r', 'v', 'esp', 'ami'];
     statFields.forEach(f => { let el = document.getElementById('stat-'+f); if(el) el.value = currentChar.stats[f] ? currentChar.stats[f].toLocaleString("pt-BR") : ""; });
 
     let estTotalVal = Math.round((R + flatBonus.r) * (1 + bonus.r)) * 2;
+    if (ln === "Beckman") estTotalVal = Math.floor(estTotalVal * 1.10);
     if (typeof i.lastEstTotal === 'undefined') i.lastEstTotal = estTotalVal;
     if (estTotalVal > i.lastEstTotal && (i.estaminaAtual === 0 || i.estaminaAtual === i.lastEstTotal)) i.estaminaAtual = estTotalVal;
     i.lastEstTotal = estTotalVal;
@@ -1898,6 +2013,14 @@ function updateUI() {
     let calcAttrSemAmi = calcAttrVal;
     calcAttrVal += danoHaki + danoAmi;
 
+    let favArmDano = 0;
+    if (hasHab("Favoritismo Armista") && totalBase >= 15000) {
+        if(i.habFavArmistaAtivo === "favorita") favArmDano = 0.10;
+        else if(i.habFavArmistaAtivo === "criacao") favArmDano = 0.15;
+        else if(i.habFavArmistaAtivo === "criacao_favorita") favArmDano = 0.20;
+    }
+    if (favArmDano > 0) calcAttrVal += Math.floor(calcAttrVal * favArmDano);
+
     let calcFator = K / (K + calcRes);
     let danoFisico = Math.floor(calcAttrVal * calcFator);
     let calcDanoFinal = danoFisico;
@@ -1940,6 +2063,8 @@ function updateUI() {
     let custoHaki = eHArm + eHObs;
 
     let custoEstTotal = custoVel + custoDano + custoBuff + custoHaki;
+    if (hasHab("Arte da Esgrima") && totalBase >= 5000) custoEstTotal = Math.floor(custoEstTotal * 0.80);
+    if (hasHab("QI Avançado")) custoEstTotal = Math.floor(custoEstTotal * 0.50);
     document.getElementById('estamina-custo-final').textContent = custoEstTotal.toLocaleString("pt-BR");
 
     let estFormula = "";
@@ -2272,6 +2397,23 @@ function updateUI() {
     let displayLinhagem = i.linhagem ? i.linhagem.replace("Tenryūbito: Família ", "") : 'Nenhuma';
     let recompensaOutText = `\n  : ᓩ _𝐑ᴇᴄᴏᴍᴘᴇɴsᴀ:_\n> ${outRecompensa}\n`;
     let berriesOutText = !isNPC ? `\n : ᓩ _𝐁ᴇʀʀɪᴇs:_\n> ${outBerries}\n` : "";
+    
+    let habilidadesOut = "";
+    if (i.habilidadesExclusivas && i.habilidadesExclusivas.length > 0) {
+        if (i.habilidadesExclusivas.length === 1) {
+            habilidadesOut = `  : ᓩ _𝐇ᴀʙɪʟɪᴅᴀᴅᴇ 𝐄xᴄʟᴜꜱɪᴠᴀ:_\n`;
+        } else {
+            habilidadesOut = `  : ᓩ _𝐇ᴀʙɪʟɪᴅᴀᴅᴇꜱ 𝐄xᴄʟᴜꜱɪᴠᴀꜱ:_\n`;
+        }
+        i.habilidadesExclusivas.forEach(hab => {
+            if (habilidadesExclusivasDict[hab] && habilidadesExclusivasDict[hab] !== "Habilidade oculta.") {
+                habilidadesOut += `> ${hab}: ${habilidadesExclusivasDict[hab]}\n`;
+            } else {
+                habilidadesOut += `> ${hab}\n`;
+            }
+        });
+        habilidadesOut += `\n`;
+    }
     let npcsOutText = !isNPC ? `\n  : ᓩ _𝐍𝐏𝐂s ᴄᴏᴍᴜɴꜱ:_\n${outNpcsC}\n\n  : ᓩ _𝐍𝐏𝐂s ᴇꜱᴘᴇᴄɪᴀɪꜱ:_\n${outNpcsE}\n` : "";
 
     let inventarioFormatado = "";
@@ -2328,7 +2470,7 @@ ${berriesOutText}${npcsOutText}
 > _𝐈ɴᴠᴇɴᴛᴀ́ʀɪᴏ:_
 ${inventarioFormatado}
 
-  : ᓩ _𝐀ᴋᴜᴍᴀ ɴᴏ ᴍɪ:_
+${habilidadesOut}  : ᓩ _𝐀ᴋᴜᴍᴀ ɴᴏ ᴍɪ:_
 > ${i.akumaNome || '🔒'}
 
 ▬▬▬▬  [ 𝐒ᴛᴀᴛᴜs ]  ▬▬▬▬
