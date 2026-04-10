@@ -1426,8 +1426,29 @@ function updateUI() {
     let D = currentChar.stats.d, F = currentChar.stats.f, R = currentChar.stats.r, V = currentChar.stats.v;
     let totalBase = D + F + R + V;
 
+    let totalBaseDisplay = document.getElementById('totalBaseDisplay');
+    if(totalBaseDisplay) {
+        totalBaseDisplay.textContent = "Pontos Distribuídos: " + totalBase.toLocaleString("pt-BR");
+        totalBaseDisplay.style.color = totalBase > 1000 ? "var(--warning)" : "var(--info)";
+        totalBaseDisplay.style.borderColor = totalBase > 1000 ? "var(--warning)" : "var(--info)";
+    }
+
     let avisoBase = document.getElementById('avisoBase');
-    if(totalBase > 1000) { avisoBase.style.display = "block"; avisoBase.textContent = `Atenção: Limite inicial de 1.000 pontos ultrapassado! Total: ${totalBase.toLocaleString("pt-BR")}`; } else if(totalBase < 1000) { avisoBase.style.display = "block"; avisoBase.textContent = `Atenção: Faltam distribuir ${(1000 - totalBase).toLocaleString("pt-BR")} pontos iniciais!`; } else { avisoBase.style.display = "none"; }
+    let avisoBaseTop = document.getElementById('avisoBaseTop');
+    
+    let displayAviso = "none";
+    let textAviso = "";
+    
+    if(totalBase > 1000) { 
+        displayAviso = "block"; 
+        textAviso = `Atenção: Limite inicial de 1.000 pontos ultrapassado! Total: ${totalBase.toLocaleString("pt-BR")}`; 
+    } else if(totalBase < 1000) { 
+        displayAviso = "block"; 
+        textAviso = `Atenção: Faltam distribuir ${(1000 - totalBase).toLocaleString("pt-BR")} pontos iniciais!`; 
+    }
+    
+    if(avisoBase) { avisoBase.style.display = displayAviso; avisoBase.textContent = textAviso; }
+    if(avisoBaseTop) { avisoBaseTop.style.display = displayAviso; avisoBaseTop.textContent = textAviso; }
 
     let html1 = '<option value="">-- Selecione --</option>';
     baseClassesList.forEach(c => {
