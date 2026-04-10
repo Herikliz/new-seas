@@ -1427,7 +1427,7 @@ function updateUI() {
     let totalBase = D + F + R + V;
 
     let avisoBase = document.getElementById('avisoBase');
-    if(totalBase > 1000) { avisoBase.style.display = "block"; avisoBase.textContent = `Atenção: Limite inicial de 1.000 pontos ultrapassado! Total: ${totalBase.toLocaleString("pt-BR")}`; } else { avisoBase.style.display = "none"; }
+    if(totalBase > 1000) { avisoBase.style.display = "block"; avisoBase.textContent = `Atenção: Limite inicial de 1.000 pontos ultrapassado! Total: ${totalBase.toLocaleString("pt-BR")}`; } else if(totalBase < 1000) { avisoBase.style.display = "block"; avisoBase.textContent = `Atenção: Faltam distribuir ${(1000 - totalBase).toLocaleString("pt-BR")} pontos iniciais!`; } else { avisoBase.style.display = "none"; }
 
     let html1 = '<option value="">-- Selecione --</option>';
     baseClassesList.forEach(c => {
