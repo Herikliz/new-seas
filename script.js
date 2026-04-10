@@ -1434,7 +1434,6 @@ function updateUI() {
     }
 
     let avisoBase = document.getElementById('avisoBase');
-    let avisoBaseTop = document.getElementById('avisoBaseTop');
     
     let displayAviso = "none";
     let textAviso = "";
@@ -1448,7 +1447,6 @@ function updateUI() {
     }
     
     if(avisoBase) { avisoBase.style.display = displayAviso; avisoBase.textContent = textAviso; }
-    if(avisoBaseTop) { avisoBaseTop.style.display = displayAviso; avisoBaseTop.textContent = textAviso; }
 
     let html1 = '<option value="">-- Selecione --</option>';
     baseClassesList.forEach(c => {
