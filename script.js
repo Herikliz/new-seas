@@ -1428,7 +1428,7 @@ function updateUI() {
 
     let totalBaseDisplay = document.getElementById('totalBaseDisplay');
     if(totalBaseDisplay) {
-        totalBaseDisplay.textContent = "Pontos Distribuídos: " + totalBase.toLocaleString("pt-BR");
+        totalBaseDisplay.textContent = totalBase.toLocaleString("pt-BR");
         totalBaseDisplay.style.color = totalBase > 1000 ? "var(--warning)" : "var(--info)";
         totalBaseDisplay.style.borderColor = totalBase > 1000 ? "var(--warning)" : "var(--info)";
     }
