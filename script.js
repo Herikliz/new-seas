@@ -2714,6 +2714,24 @@ window.sofrerDano = async function() {
     await customAlert(`Dano de ${dano.toLocaleString('pt-BR')} recebido! HP atualizado para: ${novoHp.toLocaleString('pt-BR')}`);
 };
 
+window.copiarDano = async function() {
+    let finalStr = document.getElementById('calc-dano-final').textContent;
+    let formStr = document.getElementById('calc-formula').innerText;
+    let text = `*Dano Final:* ${finalStr}\n_Fórmula:_\n${formStr}`;
+    let tempArea = document.createElement("textarea"); tempArea.value = text;
+    document.body.appendChild(tempArea); tempArea.select(); document.execCommand("copy"); document.body.removeChild(tempArea);
+    await customAlert("Cálculo de Dano copiado para a área de transferência!");
+};
+
+window.copiarEstamina = async function() {
+    let finalStr = document.getElementById('estamina-custo-final').textContent;
+    let formStr = document.getElementById('estamina-formula').innerText;
+    let text = `*Custo de Estamina:* ${finalStr}\n_Fórmula:_\n${formStr}`;
+    let tempArea = document.createElement("textarea"); tempArea.value = text;
+    document.body.appendChild(tempArea); tempArea.select(); document.execCommand("copy"); document.body.removeChild(tempArea);
+    await customAlert("Cálculo de Estamina copiado para a área de transferência!");
+};
+
 window.puxarDano = function() {
     if(isReadOnly) return;
     let valStr = document.getElementById('calc-dano-final').textContent;
