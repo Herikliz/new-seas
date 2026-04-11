@@ -1722,7 +1722,7 @@ function updateUI() {
     let estTotalVal = Math.round((R + flatBonus.r) * (1 + bonus.r)) * 2;
     if (ln === "Beckman") estTotalVal = Math.floor(estTotalVal * 1.10);
     if (typeof i.lastEstTotal === 'undefined') i.lastEstTotal = estTotalVal;
-    if (estTotalVal > i.lastEstTotal && (i.estaminaAtual === 0 || i.estaminaAtual === i.lastEstTotal)) i.estaminaAtual = estTotalVal;
+    if (estTotalVal !== i.lastEstTotal && (i.estaminaAtual === 0 || i.estaminaAtual === i.lastEstTotal)) i.estaminaAtual = estTotalVal;
     i.lastEstTotal = estTotalVal;
     if (typeof i.estaminaAtual === 'undefined' || i.estaminaAtual === -1) i.estaminaAtual = estTotalVal;
     if (i.estaminaAtual > estTotalVal) i.estaminaAtual = estTotalVal;
@@ -2124,7 +2124,7 @@ function updateUI() {
 
     let totalHP = 10000 + Math.round((R + flatBonus.r) * (1 + bonus.r));
     if (typeof i.lastHPTotal === 'undefined') i.lastHPTotal = totalHP;
-    if (totalHP > i.lastHPTotal && (i.hpAtual === 0 || i.hpAtual === i.lastHPTotal)) i.hpAtual = totalHP;
+    if (totalHP !== i.lastHPTotal && (i.hpAtual === 0 || i.hpAtual === i.lastHPTotal)) i.hpAtual = totalHP;
     i.lastHPTotal = totalHP;
     if (typeof i.hpAtual === 'undefined' || i.hpAtual === -1) i.hpAtual = totalHP;
     if (i.hpAtual > totalHP) i.hpAtual = totalHP;
