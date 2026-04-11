@@ -1752,6 +1752,16 @@ function updateUI() {
     }
     bonus.v -= waterBuffV;
 
+    if (i.exaustaoCompleta && !currentChar.substats.exaustaoVelSaved) {
+        currentChar.substats.origRefl = currentChar.substats.refl || 0;
+        currentChar.substats.origVcorp = currentChar.substats.vcorp || 0;
+        currentChar.substats.exaustaoVelSaved = true;
+    } else if (!i.exaustaoCompleta && currentChar.substats.exaustaoVelSaved) {
+        currentChar.substats.refl = currentChar.substats.origRefl || 0;
+        currentChar.substats.vcorp = currentChar.substats.origVcorp || 0;
+        currentChar.substats.exaustaoVelSaved = false;
+    }
+
     let totalV = Math.round((V + flatBonus.v) * (1 + bonus.v)); document.getElementById('total-v').innerText = "Total: " + totalV.toLocaleString("pt-BR");
     document.getElementById('container-boxVel').style.display = totalV > 0 ? "block" : "none";
     
@@ -1766,8 +1776,16 @@ function updateUI() {
         if(active && active.id === 'sub-refl') { REF -= diff; currentChar.substats.refl = REF; }
         else if(active && active.id === 'sub-vcorp') { VCORP -= diff; currentChar.substats.vcorp = VCORP; }
         else {
-            if(VCORP >= diff) { VCORP -= diff; currentChar.substats.vcorp = VCORP; }
-            else if(REF >= diff) { REF -= diff; currentChar.substats.refl = REF; }
+            if (totalVelSub > 0) {
+                let pctRefl = REF / totalVelSub;
+                REF = Math.floor(totalV * pctRefl);
+                VCORP = totalV - REF;
+                currentChar.substats.refl = REF;
+                currentChar.substats.vcorp = VCORP;
+            } else {
+                REF = 0; VCORP = 0;
+                currentChar.substats.refl = 0; currentChar.substats.vcorp = 0;
+            }
         }
         document.getElementById('avisoVel').style.display = "block"; document.getElementById('avisoVel').textContent = `Limite atingido!\n Máx: ${totalV.toLocaleString("pt-BR")}`;
     } else if (totalVelSub < totalV && totalV > 0) {
@@ -1824,9 +1842,16 @@ function updateUI() {
                         else if(REFAgua - diff >= REF) { REFAgua -= diff; currentChar.substats.reflAgua = REFAgua; }
                         else { REFAgua = REF; VCORPAgua = VCORP; currentChar.substats.reflAgua = REFAgua; currentChar.substats.vcorpAgua = VCORPAgua; }
                     } else {
-                        if(VCORPAgua >= diff) { VCORPAgua -= diff; currentChar.substats.vcorpAgua = VCORPAgua; }
-                        else if(REFAgua >= diff) { REFAgua -= diff; currentChar.substats.reflAgua = REFAgua; }
-                        else { REFAgua = 0; VCORPAgua = 0; currentChar.substats.reflAgua = 0; currentChar.substats.vcorpAgua = 0; }
+                        if (totalVelSubAgua > 0) {
+                            let pctReflAgua = REFAgua / totalVelSubAgua;
+                            REFAgua = Math.floor(totalVAgua * pctReflAgua);
+                            VCORPAgua = totalVAgua - REFAgua;
+                            currentChar.substats.reflAgua = REFAgua;
+                            currentChar.substats.vcorpAgua = VCORPAgua;
+                        } else {
+                            REFAgua = 0; VCORPAgua = 0;
+                            currentChar.substats.reflAgua = 0; currentChar.substats.vcorpAgua = 0;
+                        }
                     }
                 }
                 document.getElementById('avisoVelAgua').style.display = "block"; document.getElementById('avisoVelAgua').textContent = `Limite atingido!\n Máx: ${totalVAgua.toLocaleString("pt-BR")}`;
