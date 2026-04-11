@@ -412,24 +412,37 @@
                 <span>Calculadora de Dano <span onclick="openInfoModal('Calculadora de Dano', 'Para uso em turnos de combate. 1. Insira a Resistência do Inimigo. 2. Escolha se ataca com Força ou Destreza. 3. Preencha os Buffs gerados por suas técnicas na rodada. 4. Selecione o nível do Haki e uso de Paramecia. O sistema pegará sua Potência e mostrará a fórmula completa, entregando o Dano Físico exato que você causará.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px; color: var(--info);">ⓘ</span></span><span id="icon-boxCalc" class="toggle-icon">▼</span>
             </div>
             <div id="wrapper-boxCalc" class="box-content">
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <span style="font-family: 'Cinzel', serif; font-weight: bold; color: var(--danger); font-size: 16px;">HP: <input type="text" id="hp-atual" value="0" class="no-sum" oninput="formatAndSave('info', 'hpAtual', this)" style="width: 70px; text-align: center; font-size: 16px; font-weight: bold; font-family: 'Cinzel', serif; background: transparent; border: none; border-bottom: 1px dashed var(--danger); color: var(--danger); padding: 0; outline: none;"> / <span id="hp-total">0</span></span>
+                </div>
                 <div class="input-row">
-                    <div class="input-group">
-                        <label>Atributo Físico</label>
-                        <select id="info-calcUseAttr" onchange="updateField('info', 'calcUseAttr', this.value)">
-                            <option value="d">Destreza</option>
-                            <option value="f">Força</option>
-                        </select>
+                    <div class="input-group" style="flex: 1.5;">
+                        <label>Atributo Físico <span style="font-size:8px;text-transform:none;">(Sem buffs de técnicas)</span></label>
+                        <div style="display: flex; gap: 5px;">
+                            <input type="text" id="info-calcUseAttr" placeholder="0" class="no-sum" oninput="formatAndSave('info', 'calcUseAttr', this)">
+                            <button class="btn btn-outline btn-info" style="padding: 4px 8px;" onclick="puxarDestrezaDano()">D</button>
+                            <button class="btn btn-outline btn-danger" style="padding: 4px 8px;" onclick="puxarForcaDano()">F</button>
+                        </div>
                     </div>
-                    <div class="input-group" id="box-calcUseAmi">
-                        <label>Somar Akuma no Mi?</label>
+                    <div class="input-group" id="box-calcUseAmi" style="flex: 1;">
+                        <label>Somar Akuma?</label>
                         <select id="info-calcUseAmi" onchange="updateField('info', 'calcUseAmi', this.value)">
                             <option value="sim">Sim</option>
                             <option value="nao">Não</option>
                         </select>
                     </div>
+                </div>
+                <div class="input-row">
                     <div class="input-group">
-                        <label>Resistência Inimiga</label>
-                        <input type="text" id="info-calcInimigoRes" placeholder="0" oninput="formatAndSave('info', 'calcInimigoRes', this)">
+                        <label>Resistência</label>
+                        <div style="display: flex; gap: 5px;">
+                            <input type="text" id="info-calcInimigoRes" placeholder="0" class="no-sum" oninput="formatAndSave('info', 'calcInimigoRes', this)">
+                            <button class="btn btn-outline btn-warning" style="padding: 4px 8px;" onclick="puxarResistenciaDano()">Puxar</button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Res. Ignorada (%)</label>
+                        <input type="text" id="info-calcResIgnorada" placeholder="0" class="no-sum" oninput="formatAndSave('info', 'calcResIgnorada', this)">
                     </div>
                 </div>
                 <div class="input-row">
@@ -457,6 +470,7 @@
                 <div style="background: rgba(0,0,0,0.3); padding: 15px; border: 1px dashed #555; border-radius: 6px; text-align: center; margin-top: 5px;">
                     <div style="font-size: 18px; font-family: 'Cinzel', serif; font-weight: bold; color: var(--danger);">Dano Final: <span id="calc-dano-final">0</span></div>
                     <div style="font-size: 11px; color: #aaa; margin-top: 8px; line-height: 1.4;" id="calc-formula"></div>
+                    <button class="btn btn-outline" style="color:var(--danger); border-color:var(--danger); margin-top: 10px; width: 100%; font-size: 14px;" onclick="sofrerDano()">🩸 Receber Dano</button>
                 </div>
             </div>
         </div>

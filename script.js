@@ -632,7 +632,7 @@ function runFallbackChecks() {
               telefone: "", orgTipo: "", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", 
               estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsComunsList: [], npcsEspeciaisList: [], akumaNome: "", 
               personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, hasAmiDesp: false,
-              amiResPct: "", amiAlcMult: "1", calcUseAttr: "d", calcInimigoRes: "", calcBuffFlat: "", calcBuffPct: "", calcUseAmi: "sim", calcUseHaki: "nao", sceneType: "Treino Padrão", sceneText: "",
+              amiResPct: "", amiAlcMult: "1", calcUseAttr: "", calcInimigoRes: "", calcResIgnorada: "", calcBuffFlat: "", calcBuffPct: "", calcUseAmi: "sim", calcUseHaki: "nao", sceneType: "Treino Padrão", sceneText: "", hpAtual: -1,
               boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxEsp: false, boxAmi: false, boxHist: false, 
               boxInv: false, boxCalc: false, boxEstamina: false, estaminaAtual: -1, estaminaVelocidade: "", estaminaDano: "", estaminaBuffPct: "", estaminaHakiArm: "nao", estaminaHakiObs: "nao", boxScene: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0, ordemTecnicas: "alfabetica", hideHistoria: false, exaustaoCompleta: false, habilidadesExclusivas: [], habCaminhoAtiradorAtivo: false, habFavArmistaAtivo: "nenhum", habFavArmistaAttr: "d", habQIAvancadoAtivo: false, linhagemBeckmanArma: false
           };
@@ -1347,7 +1347,7 @@ function updateUI() {
     } else { anim2.style.display = "none"; }
 
     document.getElementById('pc-name').value = currentChar.name;
-    const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'altura', 'idade', 'sexo', 'sangue', 'telefone', 'nacionalidade', 'localizacao', 'tripulacao', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2', 'sceneType', 'sceneText', 'calcUseAttr', 'calcUseAmi', 'calcUseHaki', 'amiAlcMult', 'ordemTecnicas', 'estaminaHakiArm', 'estaminaHakiObs'];
+    const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'altura', 'idade', 'sexo', 'sangue', 'telefone', 'nacionalidade', 'localizacao', 'tripulacao', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2', 'sceneType', 'sceneText', 'calcUseAmi', 'calcUseHaki', 'amiAlcMult', 'ordemTecnicas', 'estaminaHakiArm', 'estaminaHakiObs'];
     textFields.forEach(f => { let el = document.getElementById('info-'+f); if(el) el.value = i[f] || ""; });
     let chkHideHist = document.getElementById('info-hideHistoria'); if (chkHideHist) chkHideHist.checked = i.hideHistoria || false;
     let chkExaustao = document.getElementById('info-exaustaoCompleta'); if (chkExaustao) chkExaustao.checked = i.exaustaoCompleta || false;
@@ -1360,8 +1360,12 @@ function updateUI() {
         selAlcunha.value = i.alcunhaAtiva || "";
     }
 
+    let calcAttrEl = document.getElementById('info-calcUseAttr');
+    if(calcAttrEl) calcAttrEl.value = i.calcUseAttr ? i.calcUseAttr.toLocaleString("pt-BR") : "";
     let calcResEl = document.getElementById('info-calcInimigoRes');
     if(calcResEl) calcResEl.value = i.calcInimigoRes ? i.calcInimigoRes.toLocaleString("pt-BR") : "";
+    let calcResIgnEl = document.getElementById('info-calcResIgnorada');
+    if(calcResIgnEl) calcResIgnEl.value = i.calcResIgnorada ? i.calcResIgnorada.toLocaleString("pt-BR") : "";
     let calcBuffFlatEl = document.getElementById('info-calcBuffFlat');
     if(calcBuffFlatEl) calcBuffFlatEl.value = i.calcBuffFlat ? i.calcBuffFlat.toLocaleString("pt-BR") : "";
     let calcBuffPctEl = document.getElementById('info-calcBuffPct');
@@ -1973,7 +1977,7 @@ function updateUI() {
         document.getElementById('ami-res-total').textContent = `(${aDur.toLocaleString("pt-BR")} + ${amiResPctVal}% = ${totalDurCalc.toLocaleString("pt-BR")})`;
     } else { document.getElementById('ami-res-total').textContent = ""; }
 
-    let baseCalcAttr = (i.calcUseAttr === 'f') ? totalF : totalD;
+    let baseCalcAttr = parseInt(i.calcUseAttr) || 0;
     let buffFlat = parseInt(i.calcBuffFlat) || 0;
     let buffPct = parseInt(i.calcBuffPct) || 0;
     let step1Attr = baseCalcAttr + buffFlat;
@@ -1982,7 +1986,10 @@ function updateUI() {
         calcAttrVal = step1Attr + Math.floor(step1Attr * (buffPct / 100));
     }
 
-    let calcRes = parseInt(i.calcInimigoRes) || 0;
+    let calcResInimiga = parseInt(i.calcInimigoRes) || 0;
+    let calcResIgn = parseInt(i.calcResIgnorada) || 0;
+    let calcRes = calcResInimiga - Math.floor(calcResInimiga * (calcResIgn / 100));
+    if (calcRes < 0) calcRes = 0;
     let K = 25000;
     
     let isParamecia = false;
@@ -2063,6 +2070,9 @@ function updateUI() {
         }
         calcFormTexto += `<br>`;
     }
+    if (calcResIgn > 0) {
+        calcFormTexto += `Resistência Ignorada: ${calcResInimiga.toLocaleString("pt-BR")} - ${calcResIgn}% = ${calcRes.toLocaleString("pt-BR")}<br>`;
+    }
     calcFormTexto += `Dano Básico: ${calcAttrVal.toLocaleString("pt-BR")} × (${K.toLocaleString("pt-BR")} / (${K.toLocaleString("pt-BR")} + ${calcRes.toLocaleString("pt-BR")})) = ${danoFisico.toLocaleString("pt-BR")}`;
     document.getElementById('calc-formula').innerHTML = calcFormTexto;
 
@@ -2113,6 +2123,15 @@ function updateUI() {
     else { statusEl.textContent = `(❌ Faltam ${minW - sWords})`; statusEl.style.color = "var(--danger)"; }
 
     let totalHP = 10000 + Math.round((R + flatBonus.r) * (1 + bonus.r));
+    if (typeof i.lastHPTotal === 'undefined') i.lastHPTotal = totalHP;
+    if (totalHP > i.lastHPTotal && (i.hpAtual === 0 || i.hpAtual === i.lastHPTotal)) i.hpAtual = totalHP;
+    i.lastHPTotal = totalHP;
+    if (typeof i.hpAtual === 'undefined' || i.hpAtual === -1) i.hpAtual = totalHP;
+    if (i.hpAtual > totalHP) i.hpAtual = totalHP;
+    let elHPTotal = document.getElementById('hp-total');
+    if (elHPTotal) elHPTotal.textContent = totalHP.toLocaleString("pt-BR");
+    let elHPAtual = document.getElementById('hp-atual');
+    if (elHPAtual) elHPAtual.value = i.hpAtual.toLocaleString("pt-BR");
 
     let formatHistPers = (text) => { return text.split('\n').map(l => { let trimL = l.trim(); if (trimL === "") return ""; return '> ' + trimL.replace(/^>\s*/, ''); }).join('\n'); };
     let histPersOut = "";
@@ -2512,14 +2531,14 @@ ${habilidadesOut}  : ᓩ _𝐀ᴋᴜᴍᴀ ɴᴏ ᴍɪ:_
 > ${i.akumaNome || '🔒'}
 
 ▬▬▬▬  [ 𝐒ᴛᴀᴛᴜs ]  ▬▬▬▬
-HP: ${totalHP.toLocaleString("pt-BR")}
+HP: ${i.hpAtual.toLocaleString("pt-BR")} / ${totalHP.toLocaleString("pt-BR")}
 
 ↠  *𝐀ᴛʀɪʙᴜᴛᴏs*
 * ${totalBase.toLocaleString("pt-BR")}
 
 ${attrOut}${tecnicasOut}`;
 
-    window.copyDataAtributos = `▬▬▬▬  [ 𝐒ᴛᴀᴛᴜs ]  ▬▬▬▬\nHP: ${totalHP.toLocaleString("pt-BR")}\n\n↠  *𝐀ᴛʀɪʙᴜᴛᴏs*\n* ${totalBase.toLocaleString("pt-BR")}\n\n${attrOut}`.trim();
+    window.copyDataAtributos = `▬▬▬▬  [ 𝐒ᴛᴀᴛᴜs ]  ▬▬▬▬\nHP: ${i.hpAtual.toLocaleString("pt-BR")} / ${totalHP.toLocaleString("pt-BR")}\n\n↠  *𝐀ᴛʀɪʙᴜᴛᴏs*\n* ${totalBase.toLocaleString("pt-BR")}\n\n${attrOut}`.trim();
     window.copyDataTecnicas = tecnicasOut.trim();
     document.getElementById('resBox').textContent = out.trim();
 
@@ -2644,6 +2663,55 @@ window.puxarVelocidade = function() {
     document.getElementById('info-estaminaVelocidade').value = val.toLocaleString("pt-BR");
     currentChar.info.estaminaVelocidade = val;
     saveData(); updateUI();
+};
+
+window.puxarDestrezaDano = function() {
+    if(isReadOnly) return;
+    let valStr = document.getElementById('total-d').textContent;
+    let val = parseInt(valStr.replace(/\D/g, '')) || 0;
+    document.getElementById('info-calcUseAttr').value = val.toLocaleString("pt-BR");
+    currentChar.info.calcUseAttr = val;
+    saveData(); updateUI();
+};
+
+window.puxarForcaDano = function() {
+    if(isReadOnly) return;
+    let valStr = document.getElementById('total-f').textContent;
+    let val = parseInt(valStr.replace(/\D/g, '')) || 0;
+    document.getElementById('info-calcUseAttr').value = val.toLocaleString("pt-BR");
+    currentChar.info.calcUseAttr = val;
+    saveData(); updateUI();
+};
+
+window.puxarResistenciaDano = function() {
+    if(isReadOnly) return;
+    let valStr = document.getElementById('total-r').textContent;
+    let val = parseInt(valStr.replace(/\D/g, '')) || 0;
+    document.getElementById('info-calcInimigoRes').value = val.toLocaleString("pt-BR");
+    currentChar.info.calcInimigoRes = val;
+    saveData(); updateUI();
+};
+
+window.sofrerDano = async function() {
+    if(isReadOnly) { await customAlert("A ficha está no modo leitura."); return; }
+    let danoStr = document.getElementById('calc-dano-final').textContent;
+    let dano = parseInt(danoStr.replace(/\D/g, '')) || 0;
+    if (dano === 0) { await customAlert("O dano calculado é 0."); return; }
+
+    let conf = await customPrompt(`ATENÇÃO: Você está prestes a subtrair ${dano.toLocaleString('pt-BR')} de dano da SUA PRÓPRIA VIDA (HP Atual), e não da vida do inimigo. Digite 'SIM' para confirmar que deseja receber esse dano:`);
+    if (conf !== "SIM" && conf !== "sim" && conf !== "Sim") {
+        if (conf !== null) await customAlert("Operação cancelada.");
+        return; 
+    }
+
+    let hpAtual = currentChar.info.hpAtual;
+    let novoHp = hpAtual - dano;
+    if (novoHp < 0) novoHp = 0;
+    
+    currentChar.info.hpAtual = novoHp;
+    saveData(); updateUI();
+    
+    await customAlert(`Dano de ${dano.toLocaleString('pt-BR')} recebido! HP atualizado para: ${novoHp.toLocaleString('pt-BR')}`);
 };
 
 window.puxarDano = function() {
