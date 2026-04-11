@@ -2122,7 +2122,8 @@ function updateUI() {
     if (sWords >= minW) { statusEl.textContent = `(✔️ Alcançou o mínimo de ${minW})`; statusEl.style.color = "var(--success)"; } 
     else { statusEl.textContent = `(❌ Faltam ${minW - sWords})`; statusEl.style.color = "var(--danger)"; }
 
-    let totalHP = 10000 + Math.round((R + flatBonus.r) * (1 + bonus.r));
+    let rHP = i.exaustaoCompleta ? Math.round(R / 0.8) : R;
+    let totalHP = 10000 + Math.round((rHP + flatBonus.r) * (1 + bonus.r));
     if (typeof i.lastHPTotal === 'undefined') i.lastHPTotal = totalHP;
     if (totalHP !== i.lastHPTotal && (i.hpAtual === 0 || i.hpAtual === i.lastHPTotal)) i.hpAtual = totalHP;
     i.lastHPTotal = totalHP;
