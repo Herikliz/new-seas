@@ -189,12 +189,13 @@
                       <select id="info-orgTipo" onchange="updateField('info', 'orgTipo', this.value)">
                           <option value="">-- Selecione --</option>
                           <option value="Pirata">Pirata</option>
+                          <option value="Caçador de Recompensa">Caçador de Recompensa</option>
                           <option value="Marinha">Marinha</option>
                           <option value="Governo Mundial">Governo Mundial</option>
                       </select>
                   </div>
                   <div class="input-group" id="box-tripulacao">
-                      <label>Nome da Tripulação</label>
+                      <label id="label-tripulacao">Nome da Tripulação</label>
                       <input type="text" id="info-tripulacao" oninput="updateField('info', 'tripulacao', this.value)">
                   </div>
               </div>

@@ -1393,9 +1393,11 @@ function updateUI() {
 
     let orgTipo = i.orgTipo || "";
     document.getElementById('info-orgTipo').value = orgTipo;
-    if(orgTipo === "Pirata") {
+    let labelTripulacao = document.getElementById('label-tripulacao');
+    if(orgTipo === "Pirata" || orgTipo === "Caçador de Recompensa") {
         document.getElementById('box-tripulacao').style.display = "block";
         document.getElementById('box-patente-salario').style.display = "none";
+        if(labelTripulacao) labelTripulacao.textContent = orgTipo === "Pirata" ? "Nome da Tripulação" : "Nome do Grupo";
         i.patente = ""; i.salario = "";
         let selPatente = document.getElementById('info-patente');
         if(selPatente) selPatente.value = "";
@@ -2401,8 +2403,9 @@ function updateUI() {
     }
 
     let orgOut = "";
-    if(i.orgTipo === "Pirata") {
-        if(i.tripulacao && i.tripulacao.trim() !== "") { orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ:_\n* Pirata: ${i.tripulacao}\n`; } else { orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ:_\n* Pirata\n`; }
+    if(i.orgTipo === "Pirata" || i.orgTipo === "Caçador de Recompensa") {
+        let labelOrg = i.orgTipo === "Pirata" ? "Pirata" : "Caçador de Recompensa";
+        if(i.tripulacao && i.tripulacao.trim() !== "") { orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ:_\n* ${labelOrg}: ${i.tripulacao}\n`; } else { orgOut = `  : ᓩ _𝐎ʀɢᴀɴɪᴢᴀᴄ̧ᴀ̃ᴏ:_\n* ${labelOrg}\n`; }
     } else if (i.orgTipo && i.orgTipo !== "") {
         let displayPatente = i.patente || '';
         if (displayPatente !== "") { let gKey = i.sexo === 'Feminino' ? 'f' : 'm'; displayPatente = patenteGender[displayPatente] ? patenteGender[displayPatente][gKey] : displayPatente; }
