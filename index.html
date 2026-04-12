@@ -200,7 +200,8 @@
                   </div>
               </div>
               <div class="input-row" id="box-patente-salario" style="display: none; margin-top: -5px;">
-                  <div class="input-group"><label>Patente</label><select id="info-patente" onchange="handlePatenteChange(this.value)"></select></div>
+                  <div class="input-group"><label>Patente</label><input type="text" id="info-patente" disabled><button id="btn-promover" class="btn btn-outline btn-success" style="display:none; font-size:10px; margin-top:5px; width:100%;" onclick="promoverCargo()">🎖️ Promover</button></div>
+                  <div class="input-group"><label>Mérito</label><input type="text" id="info-merito" oninput="formatAndSave('info', 'merito', this)"></div>
                   <div class="input-group"><label>Salário</label><input type="text" id="info-salario" disabled></div>
               </div>
               

@@ -38,7 +38,7 @@ const akumasFixas = {
 
 const baseClassesList = ["Arqueólogo", "Artista", "Atirador", "Carpinteiro", "Cientista", "Combatente", "Cozinheiro", "Ferreiro", "Inventor", "Médico", "Musicista", "Navegador"];
 const racas = { "Braços Longos":{f:.40}, "Bucaneiro":{f:.40,r:.40}, "Gigante":{f:.30,r:.30,v:-.15}, "Humano":{}, "Kuja":{}, "Kumate":{d:.40}, "Lunariano":{v:.35,r:.45}, "Meio-Gigante":{f:.25,r:.25}, "Mink":{v:.15,r:.15}, "Oni":{f:.35,r:.45}, "Pernas Longas":{v:.40}, "Povo do Céu: Birkan":{d:.20,v:.20}, "Povo do Céu: Shandia":{d:.20,v:.20}, "Povo do Céu: Skypieano":{d:.20,v:.20}, "Sereiano":{v:.40}, "Tontatta":{f:.20,v:.20}, "Três-Olhos":{v:.15,r:.15}, "Tritão":{f:.20,r:.20,v:.30}, "Wotan":{f:.25,r:.25} };
-const linhagens = { "Nenhuma":{}, "Augur":{v:.10,d:.20,req:["Humano"]}, "Barnum":{req:["Braços Longos","Pernas Longas","Kumate","Três-Olhos"]}, "Beckman":{d:.20,v:.15,ho:.15,req:["Humano"]}, "Boa":{f:.15,ha:.15,req:["Kuja"]}, "Capone":{v:.10,d:.15,req:["Humano"]}, "Charlotte":{charlotte:true}, "Chinjao":{f:.15,r:.15,req:["Humano"]}, "D.":{}, "Dracule":{d:.20,ho:.10,req:["Humano"]}, "Drole":{f:.20,r:.10,v:.10,req:["Gigante","Meio-Gigante","Wotan"]}, "Família do Sol":{f:.15,r:.15,req:["Tritão","Sereiano","Wotan"]}, "Gan":{esp:.15,req:["Povo do Céu: Birkan","Povo do Céu: Shandia","Povo do Céu: Skypieano"]}, "Kong":{req:["Humano"]}, "Kozuki":{v:.10,d:.10,esp:.10,req:["Humano"]}, "Kurozumi":{v:.10,d:.20,req:["Humano"]}, "Laufey":{f:.15,r:.15,v:-.5,req:["Gigante"]}, "Mokomo":{v:.10,req:["Mink"]}, "Nefertari":{d:.15,v:.15,req:["Humano"]}, "Neptune":{v:.25,req:["Sereiano"]}, "Newgate":{f:.10,r:.20,req:["Humano","Meio-Gigante"]}, "Sakazuki":{r:.10,f:.20,req:["Humano"]}, "Silvers":{esp:.15,req:["Humano"]}, "Tenryūbito: Família Donquixote":{d:.15,ami:.15,req:["Humano"]}, "Tenryūbito: Família Figarland":{d:.15,esp:.15,req:["Humano"]} };
+const linhagens = { "Nenhuma":{}, "Augur":{v:.10,d:.20,req:["Humano"]}, "Barnum":{req:["Braços Longos","Pernas Longas","Kumate","Três-Olhos"]}, "Beckman":{d:.20,v:.15,ho:.15,req:["Humano"]}, "Boa":{f:.15,ha:.15,req:["Kuja"]}, "Capone":{v:.10,d:.15,req:["Humano"]}, "Charlotte":{charlotte:true}, "Chinjao":{f:.15,r:.15,req:["Humano"]}, "D.":{}, "Dracule":{d:.20,ho:.10,req:["Humano"]}, "Drole":{f:.20,r:.10,v:.10,req:["Gigante","Meio-Gigante","Wotan"]}, "Família do Sol":{f:.15,r:.15,req:["Tritão","Sereiano","Wotan"]}, "Gan":{esp:.15,req:["Povo do Céu: Birkan","Povo do Céu: Shandia","Povo do Céu: Skypieano"]}, "Kong":{req:["Humano"]}, "Kozuki":{v:.10,d:.10,esp:.10,req:["Humano"]}, "Kurozumi":{v:.10,d:.20,req:["Humano"]}, "Laufey":{f:.15,r:.15,v:-.05,req:["Gigante"]}, "Mokomo":{v:.10,req:["Mink"]}, "Nefertari":{d:.15,v:.15,req:["Humano"]}, "Neptune":{v:.25,req:["Sereiano"]}, "Newgate":{f:.10,r:.20,req:["Humano","Meio-Gigante"]}, "Sakazuki":{r:.10,f:.20,req:["Humano"]}, "Silvers":{esp:.15,req:["Humano"]}, "Tenryūbito: Família Donquixote":{d:.15,ami:.15,req:["Humano"]}, "Tenryūbito: Família Figarland":{d:.15,esp:.15,req:["Humano"]} };
 
 const habilidadesExclusivasDict = {
     "Arte da Esgrima": "+10% em Destreza quando tiver 5.000 pontos (15% aos 10k, 20% aos 15k). -20% de gasto de Estamina.",
@@ -68,7 +68,7 @@ const classStyles = {"Arqueólogo":["Instinto Animal"],"Artista":["Armadilha de 
 
 const patenteGender = {
   "Aprendiz": {m: "Aprendiz", f: "Aprendiz"},
-  "Marinheiro": {m: "Marinheiro", f: "Marinheira"},
+  "Recruta": {m: "Recruta", f: "Recruta"},
   "Cabo": {m: "Cabo", f: "Cabo"},
   "Sargento": {m: "Sargento", f: "Sargento"},
   "Tenente": {m: "Tenente", f: "Tenente"},
@@ -124,7 +124,7 @@ const classTitles = {
   "Navegador": [{m:"Marujo",f:"Maruja"},{m:"Cartógrafo",f:"Cartógrafa"},{m:"Timoneiro",f:"Timoneira"},{m:"Capitão dos Ventos",f:"Capitã dos Ventos"},{m:"Semipeixe",f:"Semipeixe"}]
 };
 
-const salarios = {"Aprendiz":0,"Marinheiro":10000000,"Cabo":20000000,"Sargento":30000000,"Tenente":40000000,"Comandante":50000000,"Capitão":60000000,"Comodoro":80000000,"Contra-Almirante":90000000,"Vice-Almirante":100000000,"Almirante":150000000,"Almirante-de-Frota":200000000,"Agente Judicial":10000000,"CP-1":20000000,"CP-2":30000000,"CP-3":40000000,"CP-4":50000000,"CP-5":60000000,"CP-6":70000000,"CP-7":80000000,"CP-8":100000000,"CP-9":150000000,"CP-0":200000000,"Gorosei":500000000,"Líder do Governo":0};
+const salarios = {"Aprendiz":0,"Recruta":10000000,"Cabo":20000000,"Sargento":30000000,"Tenente":40000000,"Comandante":50000000,"Capitão":60000000,"Comodoro":80000000,"Contra-Almirante":90000000,"Vice-Almirante":100000000,"Almirante":150000000,"Almirante-de-Frota":200000000,"Agente Judicial":10000000,"CP-1":20000000,"CP-2":30000000,"CP-3":40000000,"CP-4":50000000,"CP-5":60000000,"CP-6":70000000,"CP-7":80000000,"CP-8":100000000,"CP-9":150000000,"CP-0":200000000,"Gorosei":500000000,"Líder do Governo":0};
 
 let charData = {
   password: "",
@@ -546,7 +546,7 @@ async function managePassword() {
 }
 
 function toggleEditability() {
-    const elements = document.querySelectorAll('.container input:not(#info-salario), .container select, .container textarea, .container button');
+    const elements = document.querySelectorAll('.container input:not(#info-salario):not(#info-patente), .container select, .container textarea, .container button');
     let isNPC = currentChar.isNPC;
     elements.forEach(el => {
         if((el.innerText && (el.innerText.includes("Copiar") || el.innerText.includes("Colapsar"))) || el.id === 'num-logs-copy') {
@@ -634,7 +634,7 @@ function runFallbackChecks() {
               personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, hasAmiDesp: false,
               amiResPct: "", amiAlcMult: "1", calcUseAttr: "", calcInimigoRes: "", calcResIgnorada: "", calcBuffFlat: "", calcBuffPct: "", calcUseAmi: "sim", calcUseHaki: "nao", sceneType: "Treino Padrão", sceneText: "", hpAtual: -1,
               boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxEsp: false, boxAmi: false, boxHist: false, 
-              boxInv: false, boxCalc: false, boxEstamina: false, estaminaAtual: -1, estaminaVelocidade: "", estaminaDano: "", estaminaBuffPct: "", estaminaHakiArm: "nao", estaminaHakiObs: "nao", boxScene: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0, ordemTecnicas: "alfabetica", hideHistoria: false, exaustaoCompleta: false, habilidadesExclusivas: [], habCaminhoAtiradorAtivo: false, habFavArmistaAtivo: "nenhum", habFavArmistaAttr: "d", habQIAvancadoAtivo: false, linhagemBeckmanArma: false
+              boxInv: false, boxCalc: false, boxEstamina: false, estaminaAtual: -1, estaminaVelocidade: "", estaminaDano: "", estaminaBuffPct: "", estaminaHakiArm: "nao", estaminaHakiObs: "nao", boxScene: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0, ordemTecnicas: "alfabetica", hideHistoria: false, exaustaoCompleta: false, habilidadesExclusivas: [], habCaminhoAtiradorAtivo: false, habFavArmistaAtivo: "nenhum", habFavArmistaAttr: "d", habQIAvancadoAtivo: false, linhagemBeckmanArma: false, merito: 0
           };
           for(let k in defInfo) if (typeof c.info[k] === 'undefined') c.info[k] = defInfo[k];
           
@@ -1115,24 +1115,9 @@ function updateField(category, field, value) {
 }
 
 async function handlePatenteChange(val) {
-    const restritas = ["Vice-Almirante", "Almirante", "Almirante-de-Frota", "CP-8", "CP-9", "CP-0", "Gorosei", "Líder do Governo"];
-    const senhasPatentes = { "CP-8": "dafne", "CP-9": "maackia", "CP-0": "ochna", "Gorosei": "abelia", "Líder do Governo": "Ἑρμής" };
-    let finalVal = val;
-    if (restritas.includes(val)) {
-        let pwd = await customPrompt("Você é merecedor deste cargo?");
-        if (senhasPatentes[val] ? pwd === senhasPatentes[val] : pwd === ADMIN_PASSWORD) {
-            let discurso = currentChar.info.orgTipo === "Marinha" ? "Você é merecedor sim! A Justiça Absoluta prevalecerá! Que os mares temam a nossa fúria!" : "Você é merecedor sim! A ordem do mundo reside em nossas mãos. O equilíbrio será mantido a qualquer custo!";
-            await customAlert(discurso);
-        } else {
-            await customAlert("Você não merece aquele cargo.");
-            document.getElementById('info-patente').value = "";
-            finalVal = "";
-        }
-    }
-    
-    currentChar.info.patente = finalVal;
-    if (finalVal !== "" && typeof salarios[finalVal] !== 'undefined') {
-        currentChar.info.salario = salarios[finalVal] === 0 ? "0" : salarios[finalVal].toLocaleString("pt-BR");
+    currentChar.info.patente = val;
+    if (val !== "" && typeof salarios[val] !== 'undefined') {
+        currentChar.info.salario = salarios[val] === 0 ? "0" : salarios[val].toLocaleString("pt-BR");
     } else {
         currentChar.info.salario = "";
     }
@@ -1405,21 +1390,91 @@ function updateUI() {
         document.getElementById('box-tripulacao').style.display = "none";
         document.getElementById('box-patente-salario').style.display = "flex";
         
-        let pMarinha = ["", "Aprendiz", "Marinheiro", "Cabo", "Sargento", "Tenente", "Comandante", "Capitão", "Comodoro", "Contra-Almirante", "Vice-Almirante", "Almirante", "Almirante-de-Frota"];
-        let pGoverno = ["", "Agente Judicial", "CP-1", "CP-2", "CP-3", "CP-4", "CP-5", "CP-6", "CP-7", "CP-8", "CP-9", "CP-0", "Gorosei", "Líder do Governo"];
-        let options = orgTipo === "Marinha" ? pMarinha : pGoverno;
+        let currentPts = currentChar.stats.d + currentChar.stats.f + currentChar.stats.r + currentChar.stats.v;
+        let modifier = 1.0;
+        const racasDesvantagem = ["Oni", "Lunariano", "Wotan", "Tritão", "Sereiano", "Tontatta", "Povo do Céu: Birkan", "Povo do Céu: Shandia", "Povo do Céu: Skypieano", "Mink", "Meio-Gigante", "Gigante", "Três-Olhos", "Pernas Longas", "Braços Longos"];
+        if (racasDesvantagem.includes(i.raca) || racasDesvantagem.includes(i.raca2) || i.linhagem === "D.") modifier = 1.1;
+
+        let potentialPatente = "";
+        let meritReq = 0;
+        let canPromote = false;
+
+        if (orgTipo === "Marinha") {
+            if (i.linhagem === "Tenryūbito: Família Donquixote" || i.linhagem === "Tenryūbito: Família Figarland" || i.linhagem === "Sakazuki" || i.linhagem === "Kong" || i.linhagem === "Nefertari") modifier = 0.9;
+            
+            if (currentPts >= 50000 * modifier) {
+                potentialPatente = "Almirante-de-Frota";
+                meritReq = 0;
+            } else if (currentPts >= 45000 * modifier) {
+                potentialPatente = "Almirante";
+                meritReq = modifier === 0.9 ? 16 : (modifier === 1.1 ? 20 : 18);
+            } else if (currentPts >= 30000 * modifier) {
+                potentialPatente = "Vice-Almirante";
+                meritReq = modifier === 0.9 ? 8 : (modifier === 1.1 ? 12 : 10);
+            } else if (currentPts >= 25000 * modifier) potentialPatente = "Contra-Almirante";
+            else if (currentPts >= 20000 * modifier) potentialPatente = "Comodoro";
+            else if (currentPts >= 15000 * modifier) potentialPatente = "Capitão";
+            else if (currentPts >= 10000 * modifier) potentialPatente = "Comandante";
+            else if (currentPts >= 5000 * modifier) potentialPatente = "Tenente";
+            else if (currentPts >= 3000 * modifier) potentialPatente = "Sargento";
+            else if (currentPts >= 2000 * modifier) potentialPatente = "Cabo";
+            else if (currentPts >= 1000 * modifier) potentialPatente = "Recruta";
+            else potentialPatente = "Aprendiz";
+        } else if (orgTipo === "Governo Mundial") {
+            if (i.linhagem === "Nefertari") modifier = 1.1;
+            if (i.linhagem === "Tenryūbito: Família Donquixote" || i.linhagem === "Tenryūbito: Família Figarland" || i.linhagem === "Sakazuki") modifier = 0.9;
+            
+            if (currentPts >= 50000 * modifier) {
+                potentialPatente = "CP-0";
+                meritReq = modifier === 0.9 ? 24 : (modifier === 1.1 ? Infinity : 26);
+            } else if (currentPts >= 40000 * modifier) {
+                potentialPatente = "CP-9";
+                meritReq = modifier === 0.9 ? 16 : (modifier === 1.1 ? 20 : 18);
+            } else if (currentPts >= 30000 * modifier) {
+                potentialPatente = "CP-8";
+                meritReq = modifier === 0.9 ? 8 : (modifier === 1.1 ? 12 : 10);
+            } else if (currentPts >= 25000 * modifier) potentialPatente = "CP-7";
+            else if (currentPts >= 20000 * modifier) potentialPatente = "CP-6";
+            else if (currentPts >= 15000 * modifier) potentialPatente = "CP-5";
+            else if (currentPts >= 10000 * modifier) potentialPatente = "CP-4";
+            else if (currentPts >= 7500 * modifier) potentialPatente = "CP-3";
+            else if (currentPts >= 5000 * modifier) potentialPatente = "CP-2";
+            else if (currentPts >= 2500 * modifier) potentialPatente = "CP-1";
+            else potentialPatente = "Agente Judicial";
+        }
+
+        const manualRanks = ["Vice-Almirante", "Almirante", "Almirante-de-Frota", "CP-8", "CP-9", "CP-0"];
+        if (!manualRanks.includes(potentialPatente)) {
+            i.patente = potentialPatente;
+            document.getElementById('btn-promover').style.display = 'none';
+        } else {
+            const rankOrder = orgTipo === "Marinha" ? ["Aprendiz", "Recruta", "Cabo", "Sargento", "Tenente", "Comandante", "Capitão", "Comodoro", "Contra-Almirante", "Vice-Almirante", "Almirante", "Almirante-de-Frota"] : ["Agente Judicial", "CP-1", "CP-2", "CP-3", "CP-4", "CP-5", "CP-6", "CP-7", "CP-8", "CP-9", "CP-0"];
+            let currentIdx = rankOrder.indexOf(i.patente);
+            let potentialIdx = rankOrder.indexOf(potentialPatente);
+            
+            if (potentialIdx > currentIdx) {
+                document.getElementById('btn-promover').style.display = 'inline-block';
+                document.getElementById('btn-promover').dataset.nextRank = potentialPatente;
+                document.getElementById('btn-promover').dataset.meritReq = meritReq;
+                document.getElementById('btn-promover').disabled = (i.merito < meritReq && potentialPatente !== "Almirante-de-Frota");
+            } else {
+                document.getElementById('btn-promover').style.display = 'none';
+            }
+        }
+        document.getElementById('info-merito').value = i.merito || 0;
+        
+        i.salario = typeof salarios[i.patente] !== 'undefined' ? (salarios[i.patente] === 0 ? "0" : salarios[i.patente].toLocaleString("pt-BR")) : "";
         
         let selPatente = document.getElementById('info-patente');
         if (selPatente) {
-            let html = "";
             let gKey = i.sexo === 'Feminino' ? 'f' : 'm';
-            options.forEach(p => {
-                let dName = (p !== "" && patenteGender[p]) ? patenteGender[p][gKey] : (p === "" ? "-- Selecione --" : p);
-                html += `<option value="${p}">${dName}</option>`;
-            });
-            if(selPatente.innerHTML !== html) selPatente.innerHTML = html;
-            if(options.includes(i.patente)) { selPatente.value = i.patente; } 
-            else { i.patente = options[0]; selPatente.value = options[0]; i.salario = ""; }
+            let dName = patenteGender[i.patente] ? patenteGender[i.patente][gKey] : i.patente;
+            if (selPatente.tagName.toLowerCase() === 'select') {
+                selPatente.innerHTML = `<option value="${i.patente}">${dName}</option>`;
+                selPatente.value = i.patente;
+            } else {
+                selPatente.value = dName;
+            }
         }
     } else {
         document.getElementById('box-tripulacao').style.display = "none";
@@ -2884,3 +2939,35 @@ function openInfoModal(title, msg) {
     document.getElementById('info-modal-msg').textContent = msg;
     document.getElementById('info-modal-overlay').style.display = 'flex';
 }
+
+window.promoverCargo = async function() {
+    if (isReadOnly) return;
+    let btn = document.getElementById('btn-promover');
+    let nextRank = btn.dataset.nextRank;
+    let req = parseFloat(btn.dataset.meritReq);
+    
+    if (nextRank === "Almirante-de-Frota") {
+        let pwd = await customPrompt("A promoção para Almirante-de-Frota exige autorização. Digite a senha de ADM:");
+        if (pwd !== ADMIN_PASSWORD) {
+            await customAlert("Senha incorreta.");
+            return;
+        }
+    } else if (currentChar.info.merito < req) {
+        await customAlert("Você não possui Méritos suficientes.");
+        return;
+    }
+
+    let gKey = currentChar.info.sexo === 'Feminino' ? 'f' : 'm';
+    let dName = patenteGender[nextRank] ? patenteGender[nextRank][gKey] : nextRank;
+    let conf = await customPrompt(`Deseja aceitar a promoção para ${dName}? Digite 'SIM' para confirmar:`);
+    
+    if (conf === "SIM" || conf === "sim") {
+        if (nextRank !== "Almirante-de-Frota") {
+            currentChar.info.merito -= req;
+        }
+        currentChar.info.patente = nextRank;
+        saveData();
+        updateUI();
+        await customAlert("Promoção realizada com sucesso!");
+    }
+};
