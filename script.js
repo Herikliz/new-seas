@@ -488,6 +488,9 @@ async function loadFromCloud() {
 function saveData() {
   if (isReadOnly) return;
 
+  let isSheetEmpty = charData.pcs.every(p => (p.pc.name || "").trim() === "" && (!p.npcs || p.npcs.every(n => (n.name || "").trim() === "")));
+  if (isSheetEmpty) return;
+
   if (isFirebaseReady && db && currentDocId !== '') {
       document.getElementById('db-status').classList.add('syncing');
       
