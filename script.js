@@ -635,7 +635,7 @@ function runFallbackChecks() {
               telefone: "", orgTipo: "", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", 
               estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsComunsList: [], npcsEspeciaisList: [], akumaNome: "", 
               personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, hasAmiDesp: false,
-              amiResPct: "", amiAlcMult: "1", calcUseAttr: "", calcInimigoRes: "", calcResIgnorada: "", calcBuffFlat: "", calcBuffPct: "", calcUseAmi: "sim", calcUseHaki: "nao", sceneType: "Treino Padrão", sceneText: "", hpAtual: -1,
+              amiResPct: "", amiAlcMult: "1", calcUseAttr: "", calcInimigoRes: "", calcResIgnorada: "", calcBuffFlat: "", calcBuffPct: "", calcBuffDanoFinalPct: "", calcUseAmi: "sim", calcUseHaki: "nao", sceneType: "Treino Padrão", sceneText: "", hpAtual: -1,
               boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxEsp: false, boxAmi: false, boxHist: false, 
               boxInv: false, boxCalc: false, boxEstamina: false, estaminaAtual: -1, estaminaVelocidade: "", estaminaDano: "", estaminaBuffPct: "", estaminaHakiArm: "nao", estaminaHakiObs: "nao", boxScene: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0, ordemTecnicas: "alfabetica", hideHistoria: false, exaustaoCompleta: false, habilidadesExclusivas: [], habCaminhoAtiradorAtivo: false, habFavArmistaAtivo: "nenhum", habFavArmistaAttr: "d", habQIAvancadoAtivo: false, linhagemBeckmanArma: false, merito: 0
           };
@@ -1358,6 +1358,8 @@ function updateUI() {
     if(calcBuffFlatEl) calcBuffFlatEl.value = i.calcBuffFlat ? i.calcBuffFlat.toLocaleString("pt-BR") : "";
     let calcBuffPctEl = document.getElementById('info-calcBuffPct');
     if(calcBuffPctEl) calcBuffPctEl.value = i.calcBuffPct ? i.calcBuffPct.toLocaleString("pt-BR") : "";
+    let calcBuffDanoFinalPctEl = document.getElementById('info-calcBuffDanoFinalPct');
+    if(calcBuffDanoFinalPctEl) calcBuffDanoFinalPctEl.value = i.calcBuffDanoFinalPct ? i.calcBuffDanoFinalPct.toLocaleString("pt-BR") : "";
 
     let estVelEl = document.getElementById('info-estaminaVelocidade');
     if(estVelEl) estVelEl.value = i.estaminaVelocidade ? i.estaminaVelocidade.toLocaleString("pt-BR") : "";
@@ -2134,12 +2136,16 @@ function updateUI() {
 
     let calcFator = K / (K + calcRes);
     let danoFisico = Math.floor(calcAttrVal * calcFator);
+    let buffDanoFinalPct = parseInt(i.calcBuffDanoFinalPct) || 0;
     let calcDanoFinal = danoFisico;
+    if (buffDanoFinalPct !== 0) {
+        calcDanoFinal = danoFisico + Math.floor(danoFisico * (buffDanoFinalPct / 100));
+    }
     
     document.getElementById('calc-dano-final').textContent = calcDanoFinal.toLocaleString("pt-BR");
     
     let calcFormTexto = "";
-    if (buffFlat > 0 || buffPct !== 0 || danoAmi > 0 || danoHaki > 0) {
+    if (buffFlat > 0 || buffPct !== 0 || danoAmi > 0 || danoHaki > 0 || buffDanoFinalPct !== 0) {
         calcFormTexto += `<span style="color:#0dcaf0;">${baseCalcAttr.toLocaleString("pt-BR")} (Atributo)</span>`;
         if (buffFlat > 0) calcFormTexto += ` <span style="color:#ffc107;">+ ${buffFlat.toLocaleString("pt-BR")} (Bônus de Estilo) = ${step1Attr.toLocaleString("pt-BR")}</span>`;
         if (buffPct !== 0) calcFormTexto += ` <span style="color:#198754;">+ ${buffPct}% (Buff Ativo) = ${calcAttrSemAmi.toLocaleString("pt-BR")}</span>`;
@@ -2159,6 +2165,9 @@ function updateUI() {
         calcFormTexto += `Resistência Ignorada: ${calcResInimiga.toLocaleString("pt-BR")} - ${calcResIgn}% = ${calcRes.toLocaleString("pt-BR")}<br>`;
     }
     calcFormTexto += `Dano Básico: ${calcAttrVal.toLocaleString("pt-BR")} × (${K.toLocaleString("pt-BR")} / (${K.toLocaleString("pt-BR")} + ${calcRes.toLocaleString("pt-BR")})) = ${danoFisico.toLocaleString("pt-BR")}`;
+    if (buffDanoFinalPct !== 0) {
+        calcFormTexto += `<br><span style="color:#ffc107;">Dano com Buff Final: ${danoFisico.toLocaleString("pt-BR")} + ${buffDanoFinalPct}% = ${calcDanoFinal.toLocaleString("pt-BR")}</span>`;
+    }
     document.getElementById('calc-formula').innerHTML = calcFormTexto;
 
     document.getElementById('estamina-total').textContent = estTotalVal.toLocaleString("pt-BR");
