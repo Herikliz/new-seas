@@ -2493,21 +2493,21 @@ function updateUI() {
     let estilosText = ""; if(isMink) estilosText += "* Electro\n";
     
     let formatStyle = (n) => { let st = i['estilo'+n]; if (!st || st === "Nenhum") return null; if (st === "Freestyle") return i['freestyle'+n] && i['freestyle'+n].trim() !== "" ? `Freestyle: ${i['freestyle'+n]}` : "Freestyle"; return st; };
-    let e1 = formatStyle(1); if (e1) estilosText += `* ${e1}\n`;
-    let e2 = formatStyle(2); if (e2) estilosText += `* ${e2}\n`;
+    let e1 = formatStyle(1); if (e1) estilosText += `* ${e1}\n`; else estilosText += `* 𝙲𝚕𝚊𝚜𝚜𝚎\n`;
+    let e2 = formatStyle(2); if (e2) estilosText += `* ${e2}\n`; else estilosText += `* 𝙸𝚗𝚒𝚌𝚒𝚊𝚕\n`;
 
     if (totalBase >= 5000) { let e3 = formatStyle(3); if (e3) estilosText += `* ${e3}\n`; else estilosText += `* (Vazio)\n`; } else { estilosText += `* 🔒 (Libera com 5.000)\n`; }
     if (totalBase >= 10000) { let e4 = formatStyle(4); if (e4) estilosText += `* ${e4}\n`; else estilosText += `* (Vazio)\n`; } else { estilosText += `* 🔒 (Libera com 10.000)\n`; }
 
-    let c1Out = i.classe ? getClassDisplayName(i.classe, i.sexo) : '🔒';
+    let c1Out = i.classe ? getClassDisplayName(i.classe, i.sexo) : '𝙸𝚗𝚒𝚌𝚒𝚊𝚕';
     let c2Out = i.classe2 ? getClassDisplayName(i.classe2, i.sexo) : '5.000';
     let c3Out = i.classe3 ? getClassDisplayName(i.classe3, i.sexo) : '10.000';
     let c4Out = i.classe4 ? getClassDisplayName(i.classe4, i.sexo) : '20.000';
     let c5Out = i.classe5 ? getClassDisplayName(i.classe5, i.sexo) : '35.000';
 
-    let racaOutput = (isNPC && i.raca === 'Outra') ? (i.racaNomeCustom || 'Raça Custom') : (formatRaceStr(i.raca, i.animal, i.sexo === "Feminino") || '🔒');
+    let racaOutput = (isNPC && i.raca === 'Outra') ? (i.racaNomeCustom || 'Raça Custom') : (formatRaceStr(i.raca, i.animal, i.sexo === "Feminino") || '');
     if (i.linhagem === "Charlotte") { 
-        let raca2Output = (isNPC && i.raca2 === 'Outra') ? (i.racaNomeCustom2 || '2ª Raça Custom') : (formatRaceStr(i.raca2, i.animal2, i.sexo === "Feminino") || '🔒');
+        let raca2Output = (isNPC && i.raca2 === 'Outra') ? (i.racaNomeCustom2 || '2ª Raça Custom') : (formatRaceStr(i.raca2, i.animal2, i.sexo === "Feminino") || '');
         racaOutput += ` / ${raca2Output}`; 
     }
 
@@ -2577,7 +2577,10 @@ function updateUI() {
     let npcsOutText = !isNPC ? `\n  : ᓩ _𝐍𝐏𝐂s ᴄᴏᴍᴜɴꜱ:_\n${outNpcsC}\n\n  : ᓩ _𝐍𝐏𝐂s ᴇꜱᴘᴇᴄɪᴀɪꜱ:_\n${outNpcsE}\n` : "";
 
     let inventarioFormatado = "";
-    if (i.inventario && i.inventario.trim() !== "") { inventarioFormatado = i.inventario.split('\n').map(l => { let t = l.trim(); if (t === "") return ""; return t.startsWith("*") ? t : "* " + t; }).filter(l => l !== "").join('\n'); }
+    let invLines = [];
+    if (i.inventario && i.inventario.trim() !== "") { invLines = i.inventario.split('\n').map(l => { let t = l.trim(); if (t === "") return ""; return t.startsWith("*") ? t : "* " + t; }).filter(l => l !== ""); }
+    while (invLines.length < 3) { invLines.push("* "); }
+    inventarioFormatado = invLines.join('\n');
 
     let out = `*Nᴇᴡ sᴇᴀs*
 — ロールプレイングゲーム - 𝚁𝙿𝙶 [𝙾𝙽𝙴 𝙿𝙸𝙴𝙲𝙴]
@@ -2585,13 +2588,13 @@ function updateUI() {
                           ${isNPC ? 'ᖴIᑕᕼᗩ ᗞᕮ ᘉᑭᑕ' : 'ᖴIᑕᕼᗩ'}
 Iີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊
   : ᓩ _𝐍ᴏᴍᴇ:_
-> ${currentChar.name || '🔒'}
+> ${currentChar.name || ''}
 
   : ᓩ _𝐀ʟᴄᴜɴʜᴀ:_
 > ${alcunhaOut}
 ${recompensaOutText}
   : ᓩ _𝐀ʟᴛᴜʀᴀ:_
-> ${i.altura || '🔒'}
+> ${i.altura || ''}
 
   : ᓩ _𝐈ᴅᴀᴅᴇ:_
 > ${i.idade || '(Mínimo: 15)'}
@@ -2603,10 +2606,10 @@ ${recompensaOutText}
 > ${i.sexo || '🔒'}
 
   : ᓩ _𝐒ᴀɴɢᴜᴇ:_
-> ${i.sangue || '🔒'}
+> ${i.sangue || ''}
 ${histPersOut}
   : ᓩ _𝐀ᴘᴀʀᴇ̂ɴᴄɪᴀ:_
-> ${i.aparencia || '🔒'}
+> ${i.aparencia || ''}
 
   : ᓩ _𝐍ᴀᴄɪᴏɴᴀʟɪᴅᴀᴅᴇ:_
 > ${i.nacionalidade || 'Desconhecida'}
