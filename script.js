@@ -51,6 +51,7 @@ const habilidadesExclusivasDict = {
     "Filho do Mar": "+5% em Reflexo e Resistência aos 5.000 (10% aos 10k, 15% aos 15k).",
     "Flexibilidade": "+10% em Velocidade aos 5.000 (20% aos 10k).",
     "Fúria Ardente": "+5% em Força aos 5.000 (10% aos 10k, 15% aos 15k).",
+    "Golpe de Retorno": "Reflete a dor/dano para o oponente (3x/dia). 1º uso: Normal. 2º uso: -10% de Resistência. 3º uso: -20% de Resistência.",
     "O Escolhido": "+5% em todos os tipos de Haki aos 5.000 (10% aos 10k, 15% aos 20k).",
     "Pensamento Acelerado": "+20% em Reflexo aos 5.000 (25% aos 10k).",
     "Último Recurso": "Habilidade oculta.",
@@ -637,7 +638,7 @@ function runFallbackChecks() {
               personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, hasAmiDesp: false,
               amiResPct: "", amiAlcMult: "1", calcUseAttr: "", calcInimigoRes: "", calcResIgnorada: "", calcBuffFlat: "", calcBuffPct: "", calcBuffDanoFinalPct: "", calcUseAmi: "sim", calcUseHaki: "nao", sceneType: "Treino Padrão", sceneText: "", hpAtual: -1,
               boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxEsp: false, boxAmi: false, boxHist: false, 
-              boxInv: false, boxCalc: false, boxEstamina: false, estaminaAtual: -1, estaminaVelocidade: "", estaminaDano: "", estaminaBuffPct: "", estaminaHakiArm: "nao", estaminaHakiObs: "nao", boxScene: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0, ordemTecnicas: "alfabetica", hideHistoria: false, exaustaoCompleta: false, habilidadesExclusivas: [], habCaminhoAtiradorAtivo: false, habFavArmistaAtivo: "nenhum", habFavArmistaAttr: "d", habQIAvancadoAtivo: false, linhagemBeckmanArma: false, merito: 0
+              boxInv: false, boxCalc: false, boxEstamina: false, estaminaAtual: -1, estaminaVelocidade: "", estaminaDano: "", estaminaBuffPct: "", estaminaHakiArm: "nao", estaminaHakiObs: "nao", boxScene: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0, ordemTecnicas: "alfabetica", hideHistoria: false, exaustaoCompleta: false, habilidadesExclusivas: [], habCaminhoAtiradorAtivo: false, habFavArmistaAtivo: "nenhum", habFavArmistaAttr: "d", habQIAvancadoAtivo: false, linhagemBeckmanArma: false, habRetornoUso: 1, merito: 0
           };
           for(let k in defInfo) if (typeof c.info[k] === 'undefined') c.info[k] = defInfo[k];
           
@@ -1739,15 +1740,17 @@ function updateUI() {
         let hasAtirador = hasHab("Caminho do Atirador");
         let hasFavArm = hasHab("Favoritismo Armista");
         let hasQI = hasHab("QI Avançado");
+        let hasRetorno = hasHab("Golpe de Retorno");
         let isBeckman = ln === "Beckman";
         
         let habAtivosContainer = document.getElementById('hab-ativos');
         if(habAtivosContainer) {
-            habAtivosContainer.style.display = (hasAtirador || hasFavArm || hasQI || isBeckman) ? 'block' : 'none';
+            habAtivosContainer.style.display = (hasAtirador || hasFavArm || hasQI || isBeckman || hasRetorno) ? 'block' : 'none';
             let elAtirador = document.getElementById('hab-ativo-atirador'); if(elAtirador) { elAtirador.style.display = hasAtirador ? 'block' : 'none'; document.getElementById('chk-atirador').checked = i.habCaminhoAtiradorAtivo; }
             let elQI = document.getElementById('hab-ativo-qi'); if(elQI) { elQI.style.display = hasQI ? 'block' : 'none'; document.getElementById('chk-qi').checked = i.habQIAvancadoAtivo; }
             let elBeckman = document.getElementById('hab-ativo-beckman'); if(elBeckman) { elBeckman.style.display = isBeckman ? 'block' : 'none'; document.getElementById('chk-beckman').checked = i.linhagemBeckmanArma; }
             let elArmista = document.getElementById('hab-ativo-armista'); if(elArmista) { elArmista.style.display = hasFavArm ? 'flex' : 'none'; document.getElementById('sel-armista-ativo').value = i.habFavArmistaAtivo; document.getElementById('sel-armista-attr').value = i.habFavArmistaAttr; }
+            let elRetorno = document.getElementById('hab-ativo-retorno'); if(elRetorno) { elRetorno.style.display = hasRetorno ? 'flex' : 'none'; document.getElementById('sel-retorno-uso').value = i.habRetornoUso || 1; }
         }
 
         if(hasHab("Arte da Esgrima")) { if(totalBase >= 15000) bonus.d += 0.20; else if(totalBase >= 10000) bonus.d += 0.15; else if(totalBase >= 5000) bonus.d += 0.10; }
@@ -1777,6 +1780,7 @@ function updateUI() {
         if(hasHab("Pensamento Acelerado")) { if(totalBase >= 10000) bonus.refl += 0.25; else if(totalBase >= 5000) bonus.refl += 0.20; }
         if(hasHab("QI Avançado")) { if(i.habQIAvancadoAtivo) bonus.refl += 0.05; }
         if(isBeckman && i.linhagemBeckmanArma) { bonus.v += 0.05; }
+        if(hasHab("Golpe de Retorno")) { let usos = i.habRetornoUso || 1; if(usos === 2) bonus.r -= 0.10; else if(usos === 3) bonus.r -= 0.20; }
 
     const statFields = ['f', 'd', 'r', 'v', 'esp', 'ami'];
     statFields.forEach(f => { let el = document.getElementById('stat-'+f); if(el) el.value = currentChar.stats[f] ? currentChar.stats[f].toLocaleString("pt-BR") : ""; });
@@ -2558,6 +2562,7 @@ function updateUI() {
             if (hab === "Filho do Mar") { if (tb >= 15000) return "+15% Reflexo e Resistência."; if (tb >= 10000) return "+10% Reflexo e Resistência."; if (tb >= 5000) return "+5% Reflexo e Resistência."; return ""; }
             if (hab === "Flexibilidade") { if (tb >= 10000) return "+20% Velocidade."; if (tb >= 5000) return "+10% Velocidade."; return ""; }
             if (hab === "Fúria Ardente") { if (tb >= 15000) return "+15% Força."; if (tb >= 10000) return "+10% Força."; if (tb >= 5000) return "+5% Força."; return ""; }
+            if (hab === "Golpe de Retorno") return "Reflete o dano no oponente (Máx 3x/dia). 1º uso: Normal. 2º uso: -10% Resistência. 3º uso: -20% Resistência.";
             if (hab === "O Escolhido") { if (tb >= 20000) return "+15% em todos os Hakis."; if (tb >= 10000) return "+10% em todos os Hakis."; if (tb >= 5000) return "+5% em todos os Hakis."; return ""; }
             if (hab === "Pensamento Acelerado") { if (tb >= 10000) return "+25% Reflexos."; if (tb >= 5000) return "+20% Reflexos."; return ""; }
             if (hab === "QI Avançado") return "-50% gasto de Estamina. +5% Reflexos se durar >3 turnos.";

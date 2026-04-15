@@ -254,13 +254,21 @@
                 <div id="hab-ativos" style="margin-top: 15px; border-top: 1px dashed #444; padding-top: 10px; display: none;">
                     <label style="color: var(--primary); font-size: 11px;">Buffs Ativos</label>
                     <div id="hab-ativo-atirador" style="display:none; margin-top:5px;">
-                        <label style="font-size:11px; display:flex; align-items:center; gap:5px;"><input type="checkbox" id="chk-atirador" onchange="updateField('info', 'habCaminhoAtiradorAtivo', this.checked)"> Caminho do Atirador: Atirando com arma de fogo</label>
+                        <label style="font-size:11px; display:flex; align-items:center; gap:5px; width:fit-content;"><input type="checkbox" id="chk-atirador" onchange="updateField('info', 'habCaminhoAtiradorAtivo', this.checked)"> Caminho do Atirador: Atirando com arma de fogo</label>
                     </div>
                     <div id="hab-ativo-qi" style="display:none; margin-top:5px;">
-                        <label style="font-size:11px; display:flex; align-items:center; gap:5px;"><input type="checkbox" id="chk-qi" onchange="updateField('info', 'habQIAvancadoAtivo', this.checked)"> QI Avançado: Mais de 3 turnos na batalha</label>
+                        <label style="font-size:11px; display:flex; align-items:center; gap:5px; width:fit-content;"><input type="checkbox" id="chk-qi" onchange="updateField('info', 'habQIAvancadoAtivo', this.checked)"> QI Avançado: Mais de 3 turnos na batalha</label>
                     </div>
                     <div id="hab-ativo-beckman" style="display:none; margin-top:5px;">
-                        <label style="font-size:11px; display:flex; align-items:center; gap:5px;"><input type="checkbox" id="chk-beckman" onchange="updateField('info', 'linhagemBeckmanArma', this.checked)"> Linhagem Beckman: Segurando arma de fogo</label>
+                        <label style="font-size:11px; display:flex; align-items:center; gap:5px; width:fit-content;"><input type="checkbox" id="chk-beckman" onchange="updateField('info', 'linhagemBeckmanArma', this.checked)"> Linhagem Beckman: Segurando arma de fogo</label>
+                    </div>
+                    <div id="hab-ativo-retorno" style="display:none; margin-top:5px; flex-direction:column; gap:5px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 4px;">
+                        <label style="font-size:10px; color:#aaa; width:fit-content;">Golpe de Retorno (Usos no dia)</label>
+                        <select id="sel-retorno-uso" onchange="updateField('info', 'habRetornoUso', parseInt(this.value))" style="font-size: 11px; background-color: #222; color: #fff; border: 1px solid #444;">
+                            <option value="1">1º Uso (Nenhum debuff)</option>
+                            <option value="2">Já usou 2 vezes (-10% Res)</option>
+                            <option value="3">Já usou 3 vezes (-20% Res)</option>
+                        </select>
                     </div>
                     <div id="hab-ativo-armista" style="display:none; margin-top:5px; flex-direction:column; gap:5px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 4px;">
                         <label style="font-size:10px; color:#aaa;">Favoritismo Armista</label>
@@ -367,7 +375,7 @@
                 <div id="box-amiSub" style="display:none; padding-top:10px;">
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid #444;">
-                            <label style="font-size: 11px; display:flex; align-items:center; gap:5px; color: #ddd; margin-bottom: 5px;"><input type="checkbox" id="chk-amiAlc" onchange="toggleAmi('amiAlc', this.checked)"> Alcance</label>
+                            <label style="font-size: 11px; display:flex; align-items:center; gap:5px; color: #ddd; margin-bottom: 5px; width:fit-content;"><input type="checkbox" id="chk-amiAlc" onchange="toggleAmi('amiAlc', this.checked)"> Alcance</label>
                             <input type="text" id="sub-amiAlc" placeholder="0" oninput="formatAndSave('substats', 'amiAlc', this)" style="font-size: 14px; text-align: right; font-weight: bold;">
                             <div style="display:flex; align-items:center; justify-content: space-between; margin-top:5px;">
                               <label style="font-size:9px; margin:0; text-transform:none; color:#aaa;">Multiplicador (m):</label>
@@ -376,7 +384,7 @@
                         </div>
 
                         <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid #444;">
-                            <label style="font-size: 11px; display:flex; align-items:center; gap:5px; color: #ddd; margin-bottom: 5px;"><input type="checkbox" id="chk-amiDur" onchange="toggleAmi('amiDur', this.checked)"> Durabilidade</label>
+                            <label style="font-size: 11px; display:flex; align-items:center; gap:5px; color: #ddd; margin-bottom: 5px; width:fit-content;"><input type="checkbox" id="chk-amiDur" onchange="toggleAmi('amiDur', this.checked)"> Durabilidade</label>
                             <input type="text" id="sub-amiDur" placeholder="0" oninput="formatAndSave('substats', 'amiDur', this)" style="font-size: 14px; text-align: right; font-weight: bold;">
                             <div style="display:flex; align-items:center; justify-content: space-between; margin-top:5px;">
                               <label style="font-size:9px; margin:0; text-transform:none; color:#aaa;">Bônus Res (%):</label>
@@ -386,18 +394,18 @@
                         </div>
 
                         <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid #444;">
-                            <label style="font-size: 11px; display:flex; align-items:center; gap:5px; color: #ddd; margin-bottom: 5px;"><input type="checkbox" id="chk-amiPot" onchange="toggleAmi('amiPot', this.checked)"> Potência</label>
+                            <label style="font-size: 11px; display:flex; align-items:center; gap:5px; color: #ddd; margin-bottom: 5px; width:fit-content;"><input type="checkbox" id="chk-amiPot" onchange="toggleAmi('amiPot', this.checked)"> Potência</label>
                             <input type="text" id="sub-amiPot" placeholder="0" oninput="formatAndSave('substats', 'amiPot', this)" style="font-size: 14px; text-align: right; font-weight: bold;">
                         </div>
 
                         <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid #444;">
-                            <label style="font-size: 11px; display:flex; align-items:center; gap:5px; color: #ddd; margin-bottom: 5px;"><input type="checkbox" id="chk-amiVel" onchange="toggleAmi('amiVel', this.checked)"> Velocidade</label>
+                            <label style="font-size: 11px; display:flex; align-items:center; gap:5px; color: #ddd; margin-bottom: 5px; width:fit-content;"><input type="checkbox" id="chk-amiVel" onchange="toggleAmi('amiVel', this.checked)"> Velocidade</label>
                             <input type="text" id="sub-amiVel" placeholder="0" oninput="formatAndSave('substats', 'amiVel', this)" style="font-size: 14px; text-align: right; font-weight: bold;">
                         </div>
                     </div>
 
                     <div id="box-despertar" style="margin-top: 12px; background: rgba(164, 97, 255, 0.1); padding: 10px; border-radius: 6px; border: 1px dashed #a461ff; transition: opacity 0.3s;">
-                        <label style="font-size: 12px; display:flex; align-items:center; gap:5px; color: #a461ff; font-weight:bold; margin-bottom: 5px; font-family: 'Cinzel', serif;">
+                        <label style="font-size: 12px; display:flex; align-items:center; gap:5px; color: #a461ff; font-weight:bold; margin-bottom: 5px; font-family: 'Cinzel', serif; width:fit-content;">
                             <input type="checkbox" id="chk-amiDesp" onchange="toggleAmi('amiDesp', this.checked)"> 🌟 Despertar
                         </label>
                         <input type="text" id="sub-amiDesp" placeholder="0" oninput="formatAndSave('substats', 'amiDesp', this)" style="font-size: 16px; text-align: right; font-weight: bold; border-color: #a461ff; color: #a461ff;">
@@ -421,7 +429,7 @@
                         <button class="btn btn-outline" style="color:var(--success); border-color:var(--success); font-size: 11px; padding: 4px 8px;" onclick="recuperarEstamina(0.30)">Repouso Total (+30%)</button>
                     </div>
                     <div style="margin-top: 10px; display: flex; justify-content: center;">
-                        <label style="font-size:11px; color:var(--danger); font-weight:bold; cursor:pointer; display:flex; gap:5px; align-items:center;">
+                        <label style="font-size:11px; color:var(--danger); font-weight:bold; cursor:pointer; display:flex; gap:5px; align-items:center; width:fit-content; margin:0 auto;">
                             <input type="checkbox" id="info-exaustaoCompleta" onchange="updateField('info', 'exaustaoCompleta', this.checked)" style="width:auto; margin:0;"> Exaustão Completa (-20% Todos os Atributos)
                         </label>
                     </div>
@@ -557,7 +565,7 @@
                 <div class="input-group">
                     <label style="display:flex; justify-content:space-between; align-items:center;">
                         História
-                        <label style="margin:0; font-size:10px; color:var(--warning); text-transform:none; cursor:pointer; display:flex; gap:5px; align-items:center;">
+                        <label style="margin:0; font-size:10px; color:var(--warning); text-transform:none; cursor:pointer; display:flex; gap:5px; align-items:center; width:fit-content;">
                             <input type="checkbox" id="info-hideHistoria" onchange="updateField('info', 'hideHistoria', this.checked)" style="width:auto; margin:0;"> Ocultar na Ficha
                         </label>
                     </label>
@@ -722,7 +730,7 @@
   <div class="modal-box" style="width: 400px; max-height: 80vh; overflow-y: auto;">
     <div id="modal-alcunha-title" class="modal-msg" style="font-weight:bold; color:var(--info);">Criar Nova Alcunha</div>
     <input type="text" id="alcunha-nome" placeholder="Nome da Alcunha" style="margin-bottom: 10px; text-align:center;">
-    <label style="display:flex; align-items:center; gap:5px; justify-content:center; margin-bottom:10px; font-size:12px; cursor:pointer;">
+    <label style="display:flex; align-items:center; gap:5px; justify-content:center; margin:0 auto 10px auto; width:fit-content; font-size:12px; cursor:pointer;">
       <input type="checkbox" id="alcunha-has-buff" onchange="document.getElementById('alcunha-buffs-container').style.display = this.checked ? 'block' : 'none'"> Dá algum buff?
     </label>
     <div id="alcunha-buffs-container" style="display:none; text-align:left; border-top:1px dashed #555; padding-top:10px;">
