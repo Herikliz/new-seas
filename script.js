@@ -410,6 +410,54 @@ function init() {
   populateSelects();
   runFallbackChecks();
   currentChar = activeNpcIndex === -1 ? charData.pcs[activePcIndex].pc : charData.pcs[activePcIndex].npcs[activeNpcIndex];
+
+  document.querySelectorAll('.box').forEach(box => {
+      if(box.querySelector('.box-inner')) return;
+      let inner = document.createElement('div');
+      inner.className = 'box-inner';
+      let front = document.createElement('div');
+      front.className = 'box-front';
+      while(box.childNodes.length > 0) front.appendChild(box.childNodes[0]);
+      let back = document.createElement('div');
+      back.className = 'box-back';
+      let backTitle = document.createElement('h3');
+      backTitle.className = 'back-title';
+      let backMsg = document.createElement('p');
+      backMsg.className = 'back-msg';
+      let backBtn = document.createElement('button');
+      backBtn.className = 'btn btn-outline btn-info';
+      backBtn.innerText = 'Voltar';
+      backBtn.onclick = (e) => { e.stopPropagation(); box.classList.remove('flipped'); };
+      back.appendChild(backTitle);
+      back.appendChild(backMsg);
+      back.appendChild(backBtn);
+      inner.appendChild(front);
+      inner.appendChild(back);
+      box.appendChild(inner);
+
+      let infoBtn = front.querySelector('span[onclick*="openInfoModal"]');
+      if(infoBtn) {
+          let match = infoBtn.getAttribute('onclick').match(/openInfoModal\('(.*?)',\s*'(.*?)'\)/);
+          if(match) {
+              backTitle.innerText = match[1];
+              backMsg.innerText = match[2];
+              infoBtn.removeAttribute('onclick');
+              infoBtn.onclick = (e) => { 
+                  e.stopPropagation(); 
+                  let titleEl = front.querySelector('.box-title');
+                  if(titleEl && titleEl.id) {
+                      let bId = titleEl.id.replace('title-', '');
+                      if(currentChar && currentChar.info && currentChar.info[bId]) { 
+                          currentChar.info[bId] = false; 
+                          updateUI(); 
+                      }
+                  }
+                  box.classList.add('flipped'); 
+              };
+          }
+      }
+  });
+
   setupSumButtons();
   renderTabs();
   renderTecnicas();
