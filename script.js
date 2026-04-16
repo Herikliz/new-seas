@@ -722,6 +722,7 @@ window.toggleAllBoxes = function(state) {
     if (!currentChar) return;
     const boxKeys = ['boxIden', 'boxMec', 'boxSoc', 'boxHab', 'boxBase', 'boxEsp', 'boxAmi', 'boxHist', 'boxLog', 'boxInv', 'boxTec', 'boxRes', 'boxCalc', 'boxEstamina', 'boxScene'];
     boxKeys.forEach(k => currentChar.info[k] = state);
+    document.querySelectorAll('.box').forEach(box => box.classList.remove('flipped'));
     saveData();
     updateUI();
 };
