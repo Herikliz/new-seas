@@ -1717,9 +1717,11 @@ function updateUI() {
         }
 
         let mandHab = linhagemHabilidades[ln] || [];
-        let currentHabSet = new Set(i.habilidadesExclusivas || []);
-        mandHab.forEach(h => currentHabSet.add(h));
-        i.habilidadesExclusivas = Array.from(currentHabSet);
+        let allLineageHabs = [];
+        for (let key in linhagemHabilidades) { allLineageHabs = allLineageHabs.concat(linhagemHabilidades[key]); }
+        let currentList = (i.habilidadesExclusivas || []).filter(h => !allLineageHabs.includes(h) || mandHab.includes(h));
+        mandHab.forEach(h => { if (!currentList.includes(h)) currentList.push(h); });
+        i.habilidadesExclusivas = currentList;
 
         let habListHtml = "";
         let habSelectHtml = '<option value="">-- Adicionar Habilidade --</option>';
