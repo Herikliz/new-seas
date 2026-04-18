@@ -407,6 +407,15 @@ function setupSumButtons() {
 }
 
 function init() {
+  let savedMode = localStorage.getItem('newSeasSaveMode');
+  let saveModeEl = document.getElementById('save-mode');
+  if (saveModeEl) {
+      if (savedMode) {
+          saveModeEl.value = savedMode;
+      } else {
+          saveModeEl.value = 'manual';
+      }
+  }
   populateSelects();
   runFallbackChecks();
   currentChar = activeNpcIndex === -1 ? charData.pcs[activePcIndex].pc : charData.pcs[activePcIndex].npcs[activeNpcIndex];
@@ -534,8 +543,10 @@ async function loadFromCloud() {
   setTimeout(() => document.getElementById('db-status').classList.remove('syncing'), 500);
 }
 
-function saveData() {
+function saveData(force = false) {
   if (isReadOnly) return;
+  let saveMode = document.getElementById('save-mode');
+  if (saveMode && saveMode.value === 'manual' && !force) return;
 
   let isSheetEmpty = charData.pcs.every(p => (p.pc.name || "").trim() === "" && (!p.npcs || p.npcs.every(n => (n.name || "").trim() === "")));
   if (isSheetEmpty) return;
@@ -561,6 +572,14 @@ function saveData() {
         })
         .catch(error => { document.getElementById('db-status').classList.remove('syncing'); document.getElementById('db-status').classList.remove('online'); });
   }
+}
+
+function manualSave() {
+    saveData(true);
+}
+
+function updateSaveMode(mode) {
+    localStorage.setItem('newSeasSaveMode', mode);
 }
 
 async function managePassword() {
@@ -2666,6 +2685,8 @@ ${recompensaOutText}
 ${histPersOut}
   : ᓩ _𝐀ᴘᴀʀᴇ̂ɴᴄɪᴀ:_
 > ${i.aparencia || ''}
+
+  : ᓩ _𝐈ᴅ:_ ${currentDocId || ''}
 
   : ᓩ _𝐍ᴀᴄɪᴏɴᴀʟɪᴅᴀᴅᴇ:_
 > ${i.nacionalidade || 'Desconhecida'}
