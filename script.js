@@ -407,15 +407,6 @@ function setupSumButtons() {
 }
 
 function init() {
-  let savedMode = localStorage.getItem('newSeasSaveMode');
-  let saveModeEl = document.getElementById('save-mode');
-  if (saveModeEl) {
-      if (savedMode) {
-          saveModeEl.value = savedMode;
-      } else {
-          saveModeEl.value = 'manual';
-      }
-  }
   populateSelects();
   runFallbackChecks();
   currentChar = activeNpcIndex === -1 ? charData.pcs[activePcIndex].pc : charData.pcs[activePcIndex].npcs[activeNpcIndex];
@@ -579,7 +570,8 @@ function manualSave() {
 }
 
 function updateSaveMode(mode) {
-    localStorage.setItem('newSeasSaveMode', mode);
+    charData.saveMode = mode;
+    saveData(true);
 }
 
 async function managePassword() {
@@ -652,6 +644,9 @@ function toggleEditability() {
 
 function runFallbackChecks() {
   if (typeof charData.password === 'undefined') charData.password = "";
+  if (typeof charData.saveMode === 'undefined') charData.saveMode = "manual";
+  let saveModeEl = document.getElementById('save-mode');
+  if (saveModeEl) saveModeEl.value = charData.saveMode;
   
   if (!charData.pcs) {
       charData.pcs = [];
