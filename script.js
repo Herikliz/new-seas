@@ -1111,7 +1111,7 @@ function addAlcunhaBuffRow() {
         <select class="buff-stat" style="flex:2; font-size:11px; padding:4px; background:#2a2a2a; border:1px solid #444; color:#fff; border-radius:4px;">
             <optgroup label="Tudo"><option value="tudo">Todos os Atributos</option></optgroup>
             <optgroup label="Atributos"><option value="d">Destreza</option><option value="f">Força</option><option value="r">Resistência</option><option value="v">Velocidade</option><option value="refl">Reflexo</option><option value="vcorp">Vel. Corporal</option><option value="vAgua">Velocidade (Água)</option><option value="reflAgua">Reflexo (Água)</option><option value="vcorpAgua">Vel. Corporal (Água)</option></optgroup>
-            <optgroup label="Espírito"><option value="ha">Armamento</option><option value="ho">Observação</option><option value="hr">Rei</option></optgroup>
+            <optgroup label="Espírito"><option value="esp">Espírito</option><option value="ha">Armamento</option><option value="ho">Observação</option><option value="hr">Rei</option></optgroup>
             <optgroup label="Akuma no Mi"><option value="amiAlc">Alcance</option><option value="amiDur">Durabilidade</option><option value="amiPot">Potência</option><option value="amiVel">Velocidade</option></optgroup>
         </select>
         <select class="buff-type" style="flex:1; font-size:11px; padding:4px; background:#2a2a2a; border:1px solid #444; color:#fff; border-radius:4px;">
@@ -2588,7 +2588,7 @@ function updateUI() {
         let ativa = i.alcunhasList.find(a => a.nome === i.alcunhaAtiva);
         if (ativa && ativa.buffs && ativa.buffs.length > 0) {
             let buffGroups = {};
-            let names = {tudo:"Todos os Atributos",d:"Destreza",f:"Força",r:"Resistência",v:"Velocidade",refl:"Reflexo",vcorp:"Vel. Corporal",vAgua:"Velocidade (Água)",reflAgua:"Reflexo (Água)",vcorpAgua:"Vel. Corporal (Água)",ha:"Haki do Armamento",ho:"Haki da Observação",hr:"Haki do Rei",amiAlc:"Alcance",amiDur:"Durabilidade",amiPot:"Potência",amiVel:"Velocidade"};
+            let names = {tudo:"Todos os Atributos",d:"Destreza",f:"Força",r:"Resistência",v:"Velocidade",refl:"Reflexo",vcorp:"Vel. Corporal",vAgua:"Velocidade (Água)",reflAgua:"Reflexo (Água)",vcorpAgua:"Vel. Corporal (Água)",esp:"Espírito",ha:"Haki do Armamento",ho:"Haki da Observação",hr:"Haki do Rei",amiAlc:"Alcance",amiDur:"Durabilidade",amiPot:"Potência",amiVel:"Velocidade"};
             ativa.buffs.forEach(b => {
                 let key = (b.val >= 0 ? '+' : '') + b.val + (b.type === 'pct' ? '%' : '');
                 if(!buffGroups[key]) buffGroups[key] = [];
