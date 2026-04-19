@@ -37,8 +37,8 @@ const akumasFixas = {
 };
 
 const baseClassesList = ["Arqueólogo", "Artista", "Atirador", "Carpinteiro", "Cientista", "Combatente", "Cozinheiro", "Ferreiro", "Inventor", "Médico", "Musicista", "Navegador"];
-const racas = { "Braços Longos":{f:.40}, "Bucaneiro":{f:.40,r:.40}, "Gigante":{f:.30,r:.30,v:-.15}, "Humano":{}, "Kuja":{}, "Kumate":{d:.40}, "Lunariano":{v:.35,r:.45}, "Meio-Gigante":{f:.25,r:.25}, "Mink":{v:.15,r:.15}, "Oni":{f:.35,r:.45}, "Pernas Longas":{v:.40}, "Povo do Céu: Birkan":{d:.20,v:.20}, "Povo do Céu: Shandia":{d:.20,v:.20}, "Povo do Céu: Skypieano":{d:.20,v:.20}, "Sereiano":{v:.40}, "Tontatta":{f:.20,v:.20}, "Três-Olhos":{v:.15,r:.15}, "Tritão":{f:.20,r:.20,v:.30}, "Wotan":{f:.25,r:.25} };
-const linhagens = { "Nenhuma":{}, "Augur":{v:.10,d:.20,req:["Humano"]}, "Barnum":{req:["Braços Longos","Pernas Longas","Kumate","Três-Olhos"]}, "Beckman":{d:.20,v:.15,ho:.15,req:["Humano"]}, "Boa":{f:.15,ha:.15,req:["Kuja"]}, "Capone":{v:.10,d:.15,req:["Humano"]}, "Charlotte":{charlotte:true}, "Chinjao":{f:.15,r:.15,req:["Humano"]}, "D.":{}, "Dracule":{d:.20,ho:.10,req:["Humano"]}, "Drole":{f:.20,r:.10,v:.10,req:["Gigante","Meio-Gigante","Wotan"]}, "Família do Sol":{f:.15,r:.15,req:["Tritão","Sereiano","Wotan"]}, "Gan":{esp:.15,req:["Povo do Céu: Birkan","Povo do Céu: Shandia","Povo do Céu: Skypieano"]}, "Kong":{req:["Humano"]}, "Kozuki":{v:.10,d:.10,esp:.10,req:["Humano"]}, "Kurozumi":{v:.10,d:.20,req:["Humano"]}, "Laufey":{f:.15,r:.15,v:-.05,req:["Gigante"]}, "Mokomo":{v:.10,req:["Mink"]}, "Nefertari":{d:.15,v:.15,req:["Humano"]}, "Neptune":{v:.25,req:["Sereiano"]}, "Newgate":{f:.10,r:.20,req:["Humano","Meio-Gigante"]}, "Sakazuki":{r:.10,f:.20,req:["Humano"]}, "Silvers":{esp:.15,req:["Humano"]}, "Tenryūbito: Família Donquixote":{d:.15,ami:.15,req:["Humano"]}, "Tenryūbito: Família Figarland":{d:.15,esp:.15,req:["Humano"]} };
+const racas = { "Braços Longos":{f:.30,r:.15}, "Bucaneiro":{f:.35,r:.40}, "Gigante":{f:.40,r:.35,v:-.05}, "Humano":{}, "Kuja":{}, "Kumate":{d:.30,f:.15}, "Lunariano":{v:.45,r:.50}, "Meio-Gigante":{f:.25,r:.25}, "Mink":{v:.20,r:.15}, "Oni":{f:.40,r:.40}, "Pernas Longas":{v:.30,d:.15}, "Povo do Céu: Birkan":{d:.25,v:.25}, "Povo do Céu: Shandia":{d:.25,v:.25}, "Povo do Céu: Skypieano":{d:.25,v:.25}, "Sereiano":{d:.25,r:.15}, "Tontatta":{v:.25,f:.20}, "Três-Olhos":{v:.15,r:.15,d:.15}, "Tritão":{f:.25,r:.25}, "Wotan":{f:.30,r:.25} };
+const linhagens = { "Nenhuma":{}, "Augur":{d:.15,v:.15,req:["Humano"]}, "Barnum":{req:["Braços Longos","Pernas Longas","Kumate","Três-Olhos"]}, "Beckman":{d:.15,v:.15,ho:.15,req:["Humano"]}, "Boa":{f:.15,ha:.15,req:["Kuja"]}, "Capone":{d:.10,v:.10,req:["Humano"]}, "Charlotte":{charlotte:true}, "Chinjao":{f:.20,r:.10,req:["Humano"]}, "D.":{}, "Dracule":{d:.20,ho:.15,req:["Humano"]}, "Drole":{f:.10,r:.05,v:.10,ha:.10,req:["Gigante","Meio-Gigante","Wotan"]}, "Família do Sol":{f:.10,r:.10,req:["Tritão","Sereiano","Wotan"]}, "Gan":{esp:.10,req:["Povo do Céu: Birkan","Povo do Céu: Shandia","Povo do Céu: Skypieano"]}, "Kong":{req:["Humano"]}, "Kozuki":{d:.15,v:.15,esp:.10,req:["Humano"]}, "Kurozumi":{d:.10,v:.10,req:["Humano"]}, "Laufey":{f:.15,r:.15,v:-.05,req:["Gigante"]}, "Mokomo":{v:.15,req:["Mink"]}, "Nefertari":{d:.15,v:.15,req:["Humano"]}, "Neptune":{d:.15,req:["Sereiano"]}, "Newgate":{r:.20,f:.20,req:["Humano","Meio-Gigante"]}, "Sakazuki":{f:.25,r:.20,req:["Humano"]}, "Silvers":{esp:.20,req:["Humano"]}, "Tenryūbito: Família Donquixote":{d:.10,ami:.15,req:["Humano"]}, "Tenryūbito: Família Figarland":{d:.10,esp:.15,req:["Humano"]}, "Nico":{req:["Humano"]}, "Tom":{f:.10,r:.10,req:["Tritão"]}, "Vega":{v:.10,d:.05,req:["Humano"]} };
 
 const habilidadesExclusivasDict = {
     "Arte da Esgrima": "+10% em Destreza quando tiver 5.000 pontos (15% aos 10k, 20% aos 15k). -20% de gasto de Estamina.",
@@ -61,7 +61,7 @@ const habilidadesExclusivasDict = {
 };
 
 const linhagemHabilidades = {
-    "Dracule": ["Arte da Esgrima"], "Capone": ["Batedor de Carteiras"], "Augur": ["Caminho do Atirador"], "Drole": ["Constituição Única"], "Laufey": ["Constituição Única", "Vontade Inabalável"], "Mokomo": ["Constituição Única", "Vontade Inabalável"], "Newgate": ["Contração Muscular", "Espírito Contagiante"], "Kozuki": ["Favoritismo Armista"], "Kurozumi": ["Favoritismo Armista"], "Neptune": ["Filho do Mar", "Flexibilidade"], "Boa": ["Flexibilidade"], "Sakazuki": ["Fúria Ardente"], "Silvers": ["O Escolhido", "Pensamento Acelerado"], "D.": ["Espírito Contagiante", "Vontade Inabalável"], "Gan": ["Treinamento de Cavaleiro"], "Beckman": ["QI Avançado"]
+    "Dracule": ["Arte da Esgrima"], "Capone": ["Batedor de Carteiras"], "Augur": ["Caminho do Atirador"], "Drole": ["Constituição Única"], "Laufey": ["Constituição Única", "Vontade Inabalável"], "Mokomo": ["Vontade Inabalável"], "Newgate": ["Contração Muscular", "Espírito Contagiante"], "Kozuki": ["Favoritismo Armista"], "Neptune": ["Filho do Mar", "Flexibilidade"], "Boa": ["Flexibilidade"], "Sakazuki": ["Fúria Ardente"], "Silvers": ["O Escolhido", "Pensamento Acelerado"], "D.": ["Espírito Contagiante", "Vontade Inabalável"], "Gan": ["Treinamento de Cavaleiro"], "Beckman": ["QI Avançado"], "Família do Sol": ["Filho do Mar"]
 };
 
 const allStyles = ["Nenhum", "Armadilha de Cores", "Arsenal", "Arte do Tempo", "Artista Marcial", "Atirador", "Black Cat", "Boujutsu", "Boxe", "Combate Gigante", "Combate Tontatta", "Cortes Precisos", "Electro", "Escultura de Forma", "Fencing", "Freestyle", "Fúria das Marés", "Galaxy Combat", "Hasshoken", "Impacto Estrutural", "Instinto Animal", "Jao Kun Dō", "Karatê Homem-Peixe", "Kitsunebi-ryū", "Kozuki-Nitōryū", "Kung Fu", "Melodia Impactante", "Mutōryū", "Ninjutsu", "Okama Kenpō", "Paladino", "Perna Negra", "Punchstyle", "Punho Suave", "Ranger", "Rokushiki", "Rope Action", "Seimei Kikan", "Sinfonia Ilusória", "Stinstyle", "Sumô", "Swordstyle", "Tōryū", "Yaristyle"];
@@ -755,7 +755,17 @@ window.addHabilidade = function() {
 window.removeHabilidade = function(hab) {
     if(isReadOnly) return;
     let ln = currentChar.info.linhagem;
-    let mand = linhagemHabilidades[ln] || [];
+    let rc = currentChar.info.raca;
+    let rc2 = currentChar.info.raca2;
+    let mand = linhagemHabilidades[ln] ? [...linhagemHabilidades[ln]] : [];
+    if (rc === "Bucaneiro") mand.push("Constituição Única");
+    if (rc === "Lunariano") mand.push("Fúria Ardente");
+    if (rc === "Oni") mand.push("Contração Muscular");
+    if (ln === "Charlotte") {
+        if (rc2 === "Bucaneiro") mand.push("Constituição Única");
+        if (rc2 === "Lunariano") mand.push("Fúria Ardente");
+        if (rc2 === "Oni") mand.push("Contração Muscular");
+    }
     if(mand.includes(hab)) return; 
     currentChar.info.habilidadesExclusivas = currentChar.info.habilidadesExclusivas.filter(h => h !== hab);
     
@@ -1578,42 +1588,100 @@ function updateUI() {
     
     if(avisoBase) { avisoBase.style.display = displayAviso; avisoBase.textContent = textAviso; }
 
+    let isNico = i.linhagem === "Nico", isTom = i.linhagem === "Tom", isVega = i.linhagem === "Vega";
+    let isSp = isNico || isTom || isVega;
+    let allowedSpClasses = [];
+    if (isNico) allowedSpClasses = ["Arqueólogo"];
+    if (isTom) allowedSpClasses = ["Carpinteiro"];
+    if (isVega) allowedSpClasses = ["Cientista", "Inventor"];
+
     let html1 = '<option value="">-- Selecione --</option>';
-    baseClassesList.forEach(c => {
-        let display = getClassDisplayName(`${c} 1`, i.sexo);
-        html1 += `<option value="${c} 1">${display}</option>`;
-    });
+    if (isSp) {
+        allowedSpClasses.forEach(cls => {
+            let display = getClassDisplayName(`${cls} 1`, i.sexo);
+            html1 += `<option value="${cls} 1">${display}</option>`;
+        });
+    } else {
+        baseClassesList.forEach(c => {
+            let display = getClassDisplayName(`${c} 1`, i.sexo);
+            html1 += `<option value="${c} 1">${display}</option>`;
+        });
+    }
+
     let el1 = document.getElementById('info-classe');
     if(el1.innerHTML !== html1) el1.innerHTML = html1;
-    if(i.classe && el1.querySelector(`option[value="${i.classe}"]`)) el1.value = i.classe;
-    else el1.value = ""; 
+    
+    if (isSp) {
+        let validOptions = allowedSpClasses.map(c => `${c} 1`);
+        if (!validOptions.includes(i.classe)) {
+            i.classe = "";
+        }
+        if(i.classe && el1.querySelector(`option[value="${i.classe}"]`)) el1.value = i.classe;
+        else { el1.value = ""; }
+    } else {
+        if(i.classe && el1.querySelector(`option[value="${i.classe}"]`)) el1.value = i.classe;
+        else { el1.value = ""; i.classe = ""; }
+    }
 
-    const classSlots = [
-        {id: 'classe2', req: 5000, prev: [i.classe]},
-        {id: 'classe3', req: 10000, prev: [i.classe, i.classe2]},
-        {id: 'classe4', req: 20000, prev: [i.classe, i.classe2, i.classe3]},
-        {id: 'classe5', req: 35000, prev: [i.classe, i.classe2, i.classe3, i.classe4]}
-    ];
+    let chosenSpBase = i.classe ? i.classe.replace(/ \d+$/, "") : "";
+
+    let classSlots = [];
+    if (isSp) {
+        classSlots = [
+            {id: 'classe2', req: 0, spLvl: 2},
+            {id: 'classe3', req: 10000, spLvl: 3},
+            {id: 'classe4', req: 15000, spLvl: 4},
+            {id: 'classe5', req: 30000, spLvl: 5}
+        ];
+    } else {
+        classSlots = [
+            {id: 'classe2', req: 5000, prev: [i.classe]},
+            {id: 'classe3', req: 10000, prev: [i.classe, i.classe2]},
+            {id: 'classe4', req: 20000, prev: [i.classe, i.classe2, i.classe3]},
+            {id: 'classe5', req: 35000, prev: [i.classe, i.classe2, i.classe3, i.classe4]}
+        ];
+    }
 
     classSlots.forEach(slot => {
         let el = document.getElementById('info-' + slot.id);
         if (totalBase >= slot.req) {
             el.disabled = isReadOnly ? true : false;
-            let counts = {};
-            baseClassesList.forEach(c => counts[c] = 1);
-            slot.prev.forEach(p => {
-                if(p) { let match = p.match(/(.+) (\d+)/); if(match) counts[match[1]] = Math.max(counts[match[1]], parseInt(match[2]) + 1); }
-            });
             let html = `<option value="">-- Selecione --</option>`;
-            baseClassesList.forEach(c => {
-                if(counts[c] <= 5) {
-                    let display = getClassDisplayName(`${c} ${counts[c]}`, i.sexo);
-                    html += `<option value="${c} ${counts[c]}">${display}</option>`;
+            
+            if (isSp) {
+                if (chosenSpBase) {
+                    let display = getClassDisplayName(`${chosenSpBase} ${slot.spLvl}`, i.sexo);
+                    html += `<option value="${chosenSpBase} ${slot.spLvl}">${display}</option>`;
                 }
-            });
+            } else {
+                let counts = {};
+                baseClassesList.forEach(c => counts[c] = 1);
+                slot.prev.forEach(p => {
+                    if(p) { let match = p.match(/(.+) (\d+)/); if(match) counts[match[1]] = Math.max(counts[match[1]], parseInt(match[2]) + 1); }
+                });
+                
+                baseClassesList.forEach(c => {
+                    if(counts[c] <= 5) {
+                        let display = getClassDisplayName(`${c} ${counts[c]}`, i.sexo);
+                        html += `<option value="${c} ${counts[c]}">${display}</option>`;
+                    }
+                });
+            }
+            
             if(el.innerHTML !== html) el.innerHTML = html;
+            
             let currentVal = i[slot.id];
-            if(Array.from(el.options).some(o => o.value === currentVal) && currentVal !== "") { el.value = currentVal; } else { el.value = ""; i[slot.id] = ""; }
+            if (isSp && currentVal && !currentVal.startsWith(chosenSpBase)) {
+                currentVal = "";
+                i[slot.id] = "";
+            }
+
+            if(Array.from(el.options).some(o => o.value === currentVal) && currentVal !== "") { 
+                el.value = currentVal; 
+            } else { 
+                el.value = ""; 
+                i[slot.id] = ""; 
+            }
         } else {
             el.innerHTML = `<option value="">🔒 Requer ${slot.req.toLocaleString('pt-BR')}</option>`;
             el.disabled = true; i[slot.id] = "";
@@ -1640,14 +1708,14 @@ function updateUI() {
     let isLinhagemVisible = (rc && !["Bucaneiro","Oni","Lunariano"].includes(rc));
     document.getElementById('container-linhagem').style.display = isLinhagemVisible ? "block" : "none"; 
     
-    document.getElementById('box-extraRaca').style.display = (ln !== "Charlotte" && ["Humano","Kuja","Três-Olhos","Mink"].includes(rc)) ? "flex" : "none";
-    document.getElementById('info-selDF').style.display = (ln !== "Charlotte" && ["Humano","Kuja","Três-Olhos","Mink"].includes(rc)) ? "block" : "none";
+    document.getElementById('box-extraRaca').style.display = (ln !== "Charlotte" && ["Humano","Kuja","Mink"].includes(rc)) ? "flex" : "none";
+    document.getElementById('info-selDF').style.display = (ln !== "Charlotte" && ["Humano","Kuja","Mink"].includes(rc)) ? "block" : "none";
     document.getElementById('info-selRV').style.display = (ln !== "Charlotte" && ["Humano","Kuja"].includes(rc)) ? "block" : "none";
 
-    let showExtraLin = isLinhagemVisible && ["Barnum","Charlotte","D.","Gan","Kong","Silvers"].includes(ln);
+    let showExtraLin = isLinhagemVisible && ["Barnum","Charlotte","D.","Gan","Kong","Silvers","Nico"].includes(ln);
     document.getElementById('box-extraLin').style.display = showExtraLin ? "flex" : "none";
-    document.getElementById('info-selLinDF').style.display = ["Barnum","Gan"].includes(ln) ? "block" : "none";
-    document.getElementById('info-selLinRV').style.display = ["Barnum"].includes(ln) ? "block" : "none";
+    document.getElementById('info-selLinDF').style.display = ["Barnum","Gan","Nico"].includes(ln) ? "block" : "none";
+    document.getElementById('info-selLinRV').style.display = ["Barnum","Nico"].includes(ln) ? "block" : "none";
     document.getElementById('info-selLin4').style.display = ["D.","Kong","Silvers"].includes(ln) ? "block" : "none";
     document.getElementById('info-selLinEspAmi').style.display = ["D."].includes(ln) ? "block" : "none";
 
@@ -1752,7 +1820,7 @@ function updateUI() {
             bonus.r += (parseInt(i.customBuffR) || 0) / 100;
             bonus.v += (parseInt(i.customBuffV) || 0) / 100;
         }
-        if(rc === "Humano") { bonus[i.selDF] += 0.20; bonus[i.selRV] += 0.20; } else if(rc === "Kuja") { bonus[i.selDF] += 0.30; bonus[i.selRV] += 0.20; } else if(rc === "Três-Olhos" || rc === "Mink") { bonus[i.selDF] += 0.15; }
+        if(rc === "Humano") { bonus[i.selDF] += 0.20; bonus[i.selRV] += 0.20; } else if(rc === "Kuja") { bonus[i.selDF] += 0.30; bonus[i.selRV] += 0.15; } else if(rc === "Mink") { bonus[i.selDF] += 0.10; }
     } else {
         let applyCharlotteBuff = (rName, selVal, suffix = "") => {
             if (racas[rName]) {
@@ -1776,12 +1844,20 @@ function updateUI() {
     if(document.getElementById('container-linhagem').style.display === "block" && linhagens[ln]) {
             bonus.d += linhagens[ln].d || 0; bonus.f += linhagens[ln].f || 0; bonus.r += linhagens[ln].r || 0; bonus.v += linhagens[ln].v || 0; bonus.esp += linhagens[ln].esp || 0; bonus.ha += linhagens[ln].ha || 0; bonus.ho += linhagens[ln].ho || 0; bonus.hr += linhagens[ln].hr || 0; bonus.ami += linhagens[ln].ami || 0;
             
-            if(ln === "Barnum") { bonus[i.selLinDF] += 0.15; bonus[i.selLinRV] += 0.15; } else if(ln === "D.") { bonus[i.selLin4] += 0.15; bonus[i.selLinEspAmi] += 0.15; } else if(ln === "Gan") { bonus[i.selLinDF] += 0.15; } else if(ln === "Kong") { bonus[i.selLin4] += 0.10; } else if(ln === "Silvers") { bonus[i.selLin4] += 0.15; }
+            if(ln === "Barnum") { bonus[i.selLinDF] += 0.10; bonus[i.selLinRV] += 0.20; } else if(ln === "D.") { bonus[i.selLin4] += 0.25; bonus[i.selLinEspAmi] += 0.20; } else if(ln === "Gan") { bonus[i.selLinDF] += 0.20; } else if(ln === "Kong") { bonus[i.selLin4] += 0.20; } else if(ln === "Silvers") { bonus[i.selLin4] += 0.15; } else if(ln === "Nico") { bonus[i.selLinDF] += 0.10; bonus[i.selLinRV] += 0.05; }
         }
 
-        let mandHab = linhagemHabilidades[ln] || [];
-        let allLineageHabs = [];
-        for (let key in linhagemHabilidades) { allLineageHabs = allLineageHabs.concat(linhagemHabilidades[key]); }
+        let mandHab = linhagemHabilidades[ln] ? [...linhagemHabilidades[ln]] : [];
+        if (rc === "Bucaneiro") mandHab.push("Constituição Única");
+        if (rc === "Lunariano") mandHab.push("Fúria Ardente");
+        if (rc === "Oni") mandHab.push("Contração Muscular");
+        if (i.linhagem === "Charlotte") {
+            if (rc2 === "Bucaneiro") mandHab.push("Constituição Única");
+            if (rc2 === "Lunariano") mandHab.push("Fúria Ardente");
+            if (rc2 === "Oni") mandHab.push("Contração Muscular");
+        }
+        
+        let allLineageHabs = ["Arte da Esgrima", "Batedor de Carteiras", "Caminho do Atirador", "Constituição Única", "Contração Muscular", "Espírito Contagiante", "Favoritismo Armista", "Filho do Mar", "Flexibilidade", "Fúria Ardente", "O Escolhido", "Pensamento Acelerado", "Vontade Inabalável", "Treinamento de Cavaleiro", "QI Avançado"];
         let currentList = (i.habilidadesExclusivas || []).filter(h => !allLineageHabs.includes(h) || mandHab.includes(h));
         mandHab.forEach(h => { if (!currentList.includes(h)) currentList.push(h); });
         i.habilidadesExclusivas = currentList;
@@ -1792,10 +1868,13 @@ function updateUI() {
             if (!i.habilidadesExclusivas.includes(hab)) habSelectHtml += `<option value="${hab}">${hab}</option>`;
         });
         i.habilidadesExclusivas.forEach(hab => {
-            let isMandatory = mandHab.includes(hab);
+            let isMandatoryLin = linhagemHabilidades[ln] && linhagemHabilidades[ln].includes(hab);
+            let isMandatoryRace = !isMandatoryLin && mandHab.includes(hab);
+            let mandText = isMandatoryLin ? "(Linhagem)" : (isMandatoryRace ? "(Raça Exclusiva)" : "");
+            
             habListHtml += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.3); padding:4px 8px; border-radius:4px; border:1px solid #444;">
                 <span style="font-size:12px;">${hab}</span>
-                ${isMandatory ? '<span style="font-size:10px; color:#aaa;">(Linhagem)</span>' : `<button class="btn btn-outline btn-danger" style="padding:2px 6px; font-size:10px; margin:0;" onclick="removeHabilidade('${hab}')">X</button>`}
+                ${mandText ? `<span style="font-size:10px; color:#aaa;">${mandText}</span>` : `<button class="btn btn-outline btn-danger" style="padding:2px 6px; font-size:10px; margin:0;" onclick="removeHabilidade('${hab}')">X</button>`}
             </div>`;
         });
         let habSelEl = document.getElementById('hab-select'); if(habSelEl) habSelEl.innerHTML = habSelectHtml;
@@ -1868,18 +1947,19 @@ function updateUI() {
     
     let waterBuffV = 0;
     if(ln !== "Charlotte") {
-        if(rc === "Sereiano") waterBuffV += 0.40;
+        if(rc === "Sereiano") waterBuffV += 0.30;
         if(rc === "Tritão") waterBuffV += 0.30;
+        if(rc === "Wotan") waterBuffV += 0.15;
     } else {
-        if(rc === "Sereiano" && i.selCharR1 === "v") waterBuffV += 0.40;
+        if(rc === "Sereiano" && i.selCharR1 === "v") waterBuffV += 0.30;
         if(rc === "Tritão" && i.selCharR1 === "v") waterBuffV += 0.30;
-        if(rc2 === "Sereiano" && i.selCharR2 === "v") waterBuffV += 0.40;
+        if(rc === "Wotan" && i.selCharR1 === "v") waterBuffV += 0.15;
+        if(rc2 === "Sereiano" && i.selCharR2 === "v") waterBuffV += 0.30;
         if(rc2 === "Tritão" && i.selCharR2 === "v") waterBuffV += 0.30;
+        if(rc2 === "Wotan" && i.selCharR2 === "v") waterBuffV += 0.15;
     }
     if(document.getElementById('container-linhagem').style.display === "block" && ln === "Neptune") {
-        waterBuffV += 0.25;
-        if(totalBase >= 10000) waterBuffV += 0.20;
-        else if(totalBase >= 5000) waterBuffV += 0.10;
+        waterBuffV += 0.30;
     }
     bonus.v -= waterBuffV;
 
@@ -2611,9 +2691,9 @@ function updateUI() {
     let habilidadesOut = "";
     if (i.habilidadesExclusivas && i.habilidadesExclusivas.length > 0) {
         if (i.habilidadesExclusivas.length === 1) {
-            habilidadesOut = `  : ᓩ _𝐇ᴀʙɪʟɪᴅᴀᴅᴇ 𝐄xᴄʟᴜꜱɪᴠᴀ:_\n`;
+            habilidadesOut = `  : ᓩ _𝐇ᴀʙɪʟɪᴅᴀᴅᴇ 𝐔́ɴɪᴄᴀ:_\n`;
         } else {
-            habilidadesOut = `  : ᓩ _𝐇ᴀʙɪʟɪᴅᴀᴅᴇꜱ 𝐄xᴄʟᴜꜱɪᴠᴀꜱ:_\n`;
+            habilidadesOut = `  : ᓩ _𝐇ᴀʙɪʟɪᴅᴀᴅᴇꜱ 𝐔́ɴɪᴄᴀꜱ:_\n`;
         }
         
         let getHabDesc = (hab, tb) => {
