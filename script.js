@@ -1009,7 +1009,7 @@ function renderTecnicas() {
     container.innerHTML = '';
     let i = currentChar.info;
     let availableStyles = [];
-    let isMink = (i.raca === "Mink" || (i.linhagem === "Charlotte" && i.raca2 === "Mink"));
+    let isMink = (i.raca === "Mink" || (i.linhagem === "Charlotte" && i.raca2 === "Mink") || (currentChar.isNPC && i.raca === 'Outra'));
     if (isMink) availableStyles.push({ id: "Electro", name: "Electro" });
     [1, 2, 3, 4].forEach(n => {
         let st = i['estilo'+n];
@@ -1489,12 +1489,12 @@ function updateUI() {
     }
 
     let anim1 = document.getElementById('info-animal');
-    if (["Tritão", "Wotan", "Mink"].includes(i.raca)) {
+    if (["Tritão", "Wotan", "Mink"].includes(i.raca) || (isNPC && i.raca === 'Outra')) {
         anim1.style.display = "block"; anim1.placeholder = i.raca === "Mink" ? "Mamífero" : "Animal Marinho";
     } else { anim1.style.display = "none"; }
 
     let anim2 = document.getElementById('info-animal2');
-    if (i.linhagem === "Charlotte" && ["Tritão", "Wotan", "Mink"].includes(i.raca2)) {
+    if (i.linhagem === "Charlotte" && (["Tritão", "Wotan", "Mink"].includes(i.raca2) || (isNPC && i.raca2 === 'Outra'))) {
         anim2.style.display = "block"; anim2.placeholder = i.raca2 === "Mink" ? "Mamífero" : "Animal Marinho";
     } else { anim2.style.display = "none"; }
 
@@ -1790,7 +1790,7 @@ function updateUI() {
     const selLin = document.getElementById('info-linhagem');
     let currentLin = i.linhagem; 
     let htmlLin = '<option value="">-- Selecione --</option>';
-    for(let l in linhagens) { if(l!=="Nenhuma" && (!linhagens[l].req || linhagens[l].req.includes(i.raca))) { htmlLin += `<option value="${l}">${l}</option>`; } }
+    for(let l in linhagens) { if(l!=="Nenhuma" && (!linhagens[l].req || linhagens[l].req.includes(i.raca) || (isNPC && i.raca === 'Outra'))) { htmlLin += `<option value="${l}">${l}</option>`; } }
     if(selLin.innerHTML !== htmlLin) selLin.innerHTML = htmlLin;
     if(Array.from(selLin.options).some(o => o.value === currentLin)) { selLin.value = currentLin; } else { i.linhagem = ""; selLin.value = ""; currentLin = ""; }
 
@@ -1798,9 +1798,9 @@ function updateUI() {
     let isLinhagemVisible = (rc && !["Bucaneiro","Oni","Lunariano"].includes(rc));
     document.getElementById('container-linhagem').style.display = isLinhagemVisible ? "block" : "none"; 
     
-    document.getElementById('box-extraRaca').style.display = (ln !== "Charlotte" && ["Humano","Kuja","Mink"].includes(rc)) ? "flex" : "none";
-    document.getElementById('info-selDF').style.display = (ln !== "Charlotte" && ["Humano","Kuja","Mink"].includes(rc)) ? "block" : "none";
-    document.getElementById('info-selRV').style.display = (ln !== "Charlotte" && ["Humano","Kuja"].includes(rc)) ? "block" : "none";
+    document.getElementById('box-extraRaca').style.display = (ln !== "Charlotte" && (["Humano","Kuja","Mink"].includes(rc) || (isNPC && rc === 'Outra'))) ? "flex" : "none";
+    document.getElementById('info-selDF').style.display = (ln !== "Charlotte" && (["Humano","Kuja","Mink"].includes(rc) || (isNPC && rc === 'Outra'))) ? "block" : "none";
+    document.getElementById('info-selRV').style.display = (ln !== "Charlotte" && (["Humano","Kuja"].includes(rc) || (isNPC && rc === 'Outra'))) ? "block" : "none";
 
     let showExtraLin = isLinhagemVisible && ["Barnum","Charlotte","D.","Gan","Kong","Silvers","Nico"].includes(ln);
     document.getElementById('box-extraLin').style.display = showExtraLin ? "flex" : "none";
@@ -1809,11 +1809,12 @@ function updateUI() {
     document.getElementById('info-selLin4').style.display = ["D.","Kong","Silvers"].includes(ln) ? "block" : "none";
     document.getElementById('info-selLinEspAmi').style.display = ["D."].includes(ln) ? "block" : "none";
 
-    let isMink = (rc === "Mink" || (ln === "Charlotte" && rc2 === "Mink"));
+    let isMink = (rc === "Mink" || (ln === "Charlotte" && rc2 === "Mink") || (isNPC && rc === 'Outra'));
     document.getElementById('box-estilo-mink').style.display = isMink ? "flex" : "none";
 
     let baseClass = (i.classe || "Arqueólogo 1").split(" ")[0];
     let allowedEstilo1 = classStyles[baseClass] || ["Freestyle"];
+    if (isNPC && i.raca === 'Outra') allowedEstilo1 = allStyles;
     let elEst1 = document.getElementById('info-estilo1');
     if (elEst1) {
         let htmlE1 = '<option value="">-- Selecione --</option>';
@@ -2672,7 +2673,7 @@ function updateUI() {
         }
 
         let availableStylesMap = {};
-        let isMinkEstilo = (i.raca === "Mink" || (i.linhagem === "Charlotte" && i.raca2 === "Mink"));
+        let isMinkEstilo = (i.raca === "Mink" || (i.linhagem === "Charlotte" && i.raca2 === "Mink") || (currentChar.isNPC && i.raca === 'Outra'));
         if (isMinkEstilo) availableStylesMap["Electro"] = "Electro";
         [1, 2, 3, 4].forEach(n => {
             let st = i['estilo'+n];
