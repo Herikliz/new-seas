@@ -36,6 +36,7 @@ header {
 .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; background: #dc3545; margin-right: 5px; }
 .status-dot.online { background: #198754; box-shadow: 0 0 5px #198754; }
 .status-dot.syncing { background: #ffc107; box-shadow: 0 0 5px #ffc107; }
+.status-dot.unsaved { background: #0dcaf0; box-shadow: 0 0 5px #0dcaf0; }
 .container { max-width: 1400px; margin: 20px auto; padding: 0 15px; }
 .char-tabs-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
 .char-row { display: flex; gap: 10px; align-items: center; overflow-x: auto; padding-bottom: 5px; }

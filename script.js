@@ -498,6 +498,7 @@ async function changeDocId(newId) {
 async function loadFromCloud() {
   if (!isFirebaseReady || !db || currentDocId === '') return;
   document.getElementById('db-status').classList.add('syncing');
+  document.getElementById('db-status').classList.remove('unsaved');
   try {
       const doc = await db.collection("fichas_op").doc(currentDocId).get();
       if (doc.exists) { 
@@ -537,7 +538,10 @@ async function loadFromCloud() {
 function saveData(force = false) {
   if (isReadOnly) return;
   let saveMode = document.getElementById('save-mode');
-  if (saveMode && saveMode.value === 'manual' && !force) return;
+  if (saveMode && saveMode.value === 'manual' && !force) {
+      document.getElementById('db-status').classList.add('unsaved');
+      return;
+  }
 
   let isSheetEmpty = charData.pcs.every(p => (p.pc.name || "").trim() === "" && (!p.npcs || p.npcs.every(n => (n.name || "").trim() === "")));
   if (isSheetEmpty) return;
@@ -558,6 +562,7 @@ function saveData(force = false) {
       db.collection('fichas_op').doc(currentDocId).set(dataToSave)
         .then(() => { 
             setTimeout(() => document.getElementById('db-status').classList.remove('syncing'), 300); 
+            document.getElementById('db-status').classList.remove('unsaved');
             let toast = document.getElementById('save-toast');
             if(toast) { toast.style.opacity = '1'; setTimeout(() => toast.style.opacity = '0', 2000); }
         })
@@ -571,6 +576,7 @@ function manualSave() {
 
 function updateSaveMode(mode) {
     charData.saveMode = mode;
+    if (mode === 'auto') document.getElementById('db-status').classList.remove('unsaved');
     saveData(true);
 }
 
