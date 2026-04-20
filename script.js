@@ -499,6 +499,8 @@ async function loadFromCloud() {
   if (!isFirebaseReady || !db || currentDocId === '') return;
   document.getElementById('db-status').classList.add('syncing');
   document.getElementById('db-status').classList.remove('unsaved');
+  let toast = document.getElementById('save-toast');
+  if (toast && toast.textContent === "Falta clicar em Salvar!") toast.style.opacity = "0";
   try {
       const doc = await db.collection("fichas_op").doc(currentDocId).get();
       if (doc.exists) { 
@@ -540,6 +542,12 @@ function saveData(force = false) {
   let saveMode = document.getElementById('save-mode');
   if (saveMode && saveMode.value === 'manual' && !force) {
       document.getElementById('db-status').classList.add('unsaved');
+      let toast = document.getElementById('save-toast');
+      if (toast) {
+          toast.textContent = "Falta clicar em Salvar!";
+          toast.style.color = "#0dcaf0";
+          toast.style.opacity = "1";
+      }
       return;
   }
 
@@ -564,6 +572,10 @@ function saveData(force = false) {
             setTimeout(() => document.getElementById('db-status').classList.remove('syncing'), 300); 
             document.getElementById('db-status').classList.remove('unsaved');
             let toast = document.getElementById('save-toast');
+            if (toast) {
+                toast.textContent = "Salvo!";
+                toast.style.color = "var(--success)";
+            }
             if(toast) { toast.style.opacity = '1'; setTimeout(() => toast.style.opacity = '0', 2000); }
         })
         .catch(error => { document.getElementById('db-status').classList.remove('syncing'); document.getElementById('db-status').classList.remove('online'); });
@@ -576,7 +588,13 @@ function manualSave() {
 
 function updateSaveMode(mode) {
     charData.saveMode = mode;
-    if (mode === 'auto') document.getElementById('db-status').classList.remove('unsaved');
+    if (mode === 'auto') {
+        document.getElementById('db-status').classList.remove('unsaved');
+        let toast = document.getElementById('save-toast');
+        if (toast && toast.textContent === "Falta clicar em Salvar!") {
+            toast.style.opacity = "0";
+        }
+    }
     saveData(true);
 }
 
