@@ -93,6 +93,7 @@ textarea { overflow: hidden; resize: none; min-height: 80px; text-align: justify
 .avisoErro { color: var(--danger); font-size: 11px; font-family: 'Segoe UI', sans-serif; font-weight: bold; margin-top: 5px; display: none; text-align: right;}
 pre#resBox, pre#logBox { background: #111; padding: 20px; border-radius: 6px; border: 1px solid #444; white-space: pre-wrap; word-wrap: break-word; font-family: 'Segoe UI', monospace; font-size: 14px; min-height: 500px; color: #ddd; line-height: 1.4; overflow-x: auto;}
 optgroup { color: var(--info); font-family: 'Cinzel', serif; font-weight: bold; }
+.vertical-mode .three-col-grid, .vertical-mode .main-grid { grid-template-columns: 1fr !important; }
 option { color: var(--text); font-family: 'Lora', serif; font-weight: normal; }
 .modal-overlay {
   display: none;

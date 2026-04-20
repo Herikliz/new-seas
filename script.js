@@ -1332,7 +1332,22 @@ function toggleAmi(field, isChecked) {
     updateUI();
 }
 
+function toggleLayout() {
+    charData.layoutMode = charData.layoutMode === 'vertical' ? 'desktop' : 'vertical';
+    updateUI();
+    saveData();
+}
+
 function updateUI() {
+    const container = document.querySelector('.container');
+    const btn = document.getElementById('btn-layout');
+    if (charData.layoutMode === 'vertical') {
+        container.classList.add('vertical-mode');
+        if (btn) btn.textContent = "🖥️Modo PC";
+    } else {
+        container.classList.remove('vertical-mode');
+        if (btn) btn.textContent = "📱Modo Lista";
+    }
     let i = currentChar.info;
     let isNPC = currentChar.isNPC;
 
