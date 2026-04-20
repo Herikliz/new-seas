@@ -1864,8 +1864,16 @@ function updateUI() {
 
         let habListHtml = "";
         let habSelectHtml = '<option value="">-- Adicionar Habilidade --</option>';
+        let formatHabDisplay = (h) => {
+            if (i.sexo === "Feminino") {
+                if (h === "Filho do Mar") return "Filha do Mar";
+                if (h === "O Escolhido") return "A Escolhida";
+                if (h === "Batedor de Carteiras") return "Batedora de Carteiras";
+            }
+            return h;
+        };
         Object.keys(habilidadesExclusivasDict).forEach(hab => {
-            if (!i.habilidadesExclusivas.includes(hab)) habSelectHtml += `<option value="${hab}">${hab}</option>`;
+            if (!i.habilidadesExclusivas.includes(hab)) habSelectHtml += `<option value="${hab}">${formatHabDisplay(hab)}</option>`;
         });
         i.habilidadesExclusivas.forEach(hab => {
             let isMandatoryLin = linhagemHabilidades[ln] && linhagemHabilidades[ln].includes(hab);
@@ -1873,7 +1881,7 @@ function updateUI() {
             let mandText = isMandatoryLin ? "(Linhagem)" : (isMandatoryRace ? "(Raça Exclusiva)" : "");
             
             habListHtml += `<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.3); padding:4px 8px; border-radius:4px; border:1px solid #444;">
-                <span style="font-size:12px;">${hab}</span>
+                <span style="font-size:12px;">${formatHabDisplay(hab)}</span>
                 ${mandText ? `<span style="font-size:10px; color:#aaa;">${mandText}</span>` : `<button class="btn btn-outline btn-danger" style="padding:2px 6px; font-size:10px; margin:0;" onclick="removeHabilidade('${hab}')">X</button>`}
             </div>`;
         });
@@ -2715,10 +2723,11 @@ function updateUI() {
 
         i.habilidadesExclusivas.forEach(hab => {
             let desc = getHabDesc(hab, totalBase);
+            let displayHab = formatHabDisplay(hab);
             if (desc && desc !== "oculta") {
-                habilidadesOut += `> ${hab}: ${desc}\n`;
+                habilidadesOut += `> ${displayHab}: ${desc}\n`;
             } else {
-                habilidadesOut += `> ${hab}\n`;
+                habilidadesOut += `> ${displayHab}\n`;
             }
         });
         habilidadesOut += `\n`;
