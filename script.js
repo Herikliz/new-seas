@@ -1961,7 +1961,6 @@ function updateUI() {
     if(document.getElementById('container-linhagem').style.display === "block" && ln === "Neptune") {
         waterBuffV += 0.30;
     }
-    bonus.v -= waterBuffV;
 
     if (i.exaustaoCompleta && !currentChar.substats.exaustaoVelSaved) {
         currentChar.substats.origRefl = currentChar.substats.refl || 0;
