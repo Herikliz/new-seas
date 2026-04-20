@@ -1191,6 +1191,43 @@ function updateField(category, field, value) {
     if (field.startsWith('estilo') || field.startsWith('freestyle') || field === 'raca' || field === 'raca2' || field === 'linhagem') renderTecnicas();
 }
 
+function formatAltura(val) {
+    let clean = val.replace(',', '.').trim();
+    let isCm = clean.toLowerCase().includes('cm');
+    let num = parseFloat(clean.replace(/[^\d.]/g, ''));
+    
+    if (isNaN(num)) { 
+        updateField('info', 'altura', ""); 
+        return; 
+    }
+    
+    if (isCm || (!clean.includes('.') && num >= 100)) {
+        num = num / 100;
+    }
+    
+    let formatted = "";
+    if (num < 1 && num > 0) {
+        formatted = Math.round(num * 100) + "cm";
+    } else {
+        formatted = num.toLocaleString('pt-BR') + "m";
+    }
+    
+    updateField('info', 'altura', formatted);
+}
+
+function formatIdade(val) {
+    let digits = val.replace(/\D/g, "");
+    if (!digits) { updateField('info', 'idade', ""); return; }
+    let age = parseInt(digits, 10);
+    
+    if (!currentChar.isNPC && age < 15) {
+        age = 15;
+    }
+    
+    let textoIdade = age === 1 ? " ano" : " anos";
+    updateField('info', 'idade', age + textoIdade);
+}
+
 async function handlePatenteChange(val) {
     currentChar.info.patente = val;
     if (val !== "" && typeof salarios[val] !== 'undefined') {

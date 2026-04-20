@@ -55,7 +55,7 @@
                           <button class="btn btn-outline btn-warning" style="padding: 4px 8px;" onclick="editAlcunhaModal()">✏️</button>
                       </div>
                   </div>
-                  <div class="input-group"><label>Idade</label><input type="text" id="info-idade" placeholder="Mín: 15" oninput="updateField('info', 'idade', this.value)"></div>
+                  <div class="input-group"><label>Idade</label><input type="text" id="info-idade" placeholder="Mín: 15" onchange="formatIdade(this.value)"></div>
               </div>
               <div class="input-row">
                   <div class="input-group">
@@ -76,7 +76,7 @@
                           <option value="O+">O+</option><option value="O-">O-</option>
                       </select>
                   </div>
-                  <div class="input-group"><label>Altura</label><input type="text" id="info-altura" oninput="updateField('info', 'altura', this.value)"></div>
+                  <div class="input-group"><label>Altura</label><input type="text" id="info-altura" onchange="formatAltura(this.value)"></div>
               </div>
               <div class="input-row">
                   <div class="input-group">
