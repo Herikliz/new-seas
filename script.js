@@ -2921,6 +2921,97 @@ async function deleteFichaID() {
     } catch (e) { document.getElementById('db-status').classList.remove('syncing'); await customAlert("Erro de conexão ao tentar apagar o ID."); }
 }
 
+async function saveBackup() {
+    if (!isFirebaseReady || !db || currentDocId === '') {
+        await customAlert("Carregue ou crie uma ficha com ID primeiro.");
+        return;
+    }
+    if (isReadOnly) {
+        await customAlert("Você está no modo de leitura. Insira a senha da ficha para criar um backup.");
+        return;
+    }
+    let backupRef = db.collection('fichas_op').doc('BACKUP-' + currentDocId);
+    document.getElementById('db-status').classList.add('syncing');
+    let doc = await backupRef.get();
+    document.getElementById('db-status').classList.remove('syncing');
+    if (doc.exists) {
+        let data = doc.data();
+        if (data.backupPassword) {
+            let pass = await customPrompt("Digite a senha atual do backup para autorizar a substituição:");
+            if (pass !== data.backupPassword && pass !== ADMIN_PASSWORD) {
+                if (pass !== null) await customAlert("Senha do backup incorreta!");
+                return;
+            }
+        }
+    }
+    let newPass = await customPrompt("Digite a senha exclusiva de backup (deve ser diferente da senha principal):");
+    if (newPass === null) return;
+    if (newPass.trim() === "") {
+        await customAlert("A senha do backup não pode ser vazia.");
+        return;
+    }
+    if (newPass === charData.password) {
+        await customAlert("A senha do backup DEVE ser diferente da senha normal da ficha.");
+        return;
+    }
+    document.getElementById('db-status').classList.add('syncing');
+    let dataToSave = JSON.parse(JSON.stringify(charData));
+    dataToSave.pcs.forEach(p => {
+        if (p.pc && p.pc.info && p.pc.info.sceneType !== "Extra-Narrada") p.pc.info.sceneText = "";
+        if (p.npcs) {
+            p.npcs.forEach(n => {
+                if (n.info && n.info.sceneType !== "Extra-Narrada") n.info.sceneText = "";
+            });
+        }
+    });
+    dataToSave.backupPassword = newPass;
+    try {
+        await backupRef.set(dataToSave);
+        document.getElementById('db-status').classList.remove('syncing');
+        await customAlert("Backup salvo com sucesso!");
+    } catch (e) {
+        document.getElementById('db-status').classList.remove('syncing');
+        await customAlert("Erro ao salvar backup.");
+    }
+}
+
+async function loadBackup() {
+    if (!isFirebaseReady || !db || currentDocId === '') {
+        await customAlert("Carregue uma ficha com ID primeiro para puxar seu backup.");
+        return;
+    }
+    let backupRef = db.collection('fichas_op').doc('BACKUP-' + currentDocId);
+    document.getElementById('db-status').classList.add('syncing');
+    let doc = await backupRef.get();
+    document.getElementById('db-status').classList.remove('syncing');
+    if (!doc.exists) {
+        await customAlert("Não há nenhum backup salvo para este ID.");
+        return;
+    }
+    let data = doc.data();
+    let pass = await customPrompt("Digite a senha do backup para carregá-lo:");
+    if (pass !== data.backupPassword && pass !== ADMIN_PASSWORD) {
+        if (pass !== null) await customAlert("Senha do backup incorreta!");
+        return;
+    }
+    let conf = await customPrompt("Isso irá SOBRESCREVER sua ficha atual com o backup. Digite 'SIM' para confirmar:");
+    if (conf !== "SIM" && conf !== "sim") return;
+    delete data.backupPassword;
+    charData = data;
+    isReadOnly = false;
+    runFallbackChecks();
+    currentChar = activeNpcIndex === -1 ? charData.pcs[activePcIndex].pc : charData.pcs[activePcIndex].npcs[activeNpcIndex];
+    renderTabs();
+    renderTecnicas();
+    renderNpcsComuns();
+    renderNpcsEspeciais();
+    renderLogs();
+    updateUI();
+    toggleEditability();
+    saveData(true);
+    await customAlert("Backup carregado e restaurado com sucesso!");
+}
+
 window.onload = init;
 
 window.puxarVelocidade = function() {

@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=1400">
 <title>Ficha New Seas OP RPG</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
@@ -17,17 +17,19 @@
         <option value="manual">Save Manual</option>
         <option value="auto">Save Auto</option>
     </select>
-    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 6px; color: var(--success); border-color: var(--success);" onclick="manualSave()" title="Salvar Ficha">💾 Salvar</button>
+    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 6px; color: var(--success); border-color: var(--success);" onclick="manualSave()" title="Salvar Ficha">💾Salvar</button>
+    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 6px; color: #a461ff; border-color: #a461ff;" onclick="saveBackup()" title="Salvar Backup">🗄️Salvar Backup</button>
     <input type="text" id="doc-id" maxlength="4" placeholder="ID (4 Números)" title="Digite 4 números para salvar/puxar na nuvem" onchange="changeDocId(this.value)" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 6px;" onclick="loadFromCloud()" title="Puxar dados">⬇️ Puxar</button>
-    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 6px; color: var(--info); border-color: var(--info);" onclick="changeFichaID()" title="Mudar ID da Ficha">🔄 Mudar ID</button>
-    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 6px; color: var(--danger); border-color: var(--danger);" onclick="deleteFichaID()" title="Apagar Ficha Inteira da Nuvem">🗑️ Apagar ID</button>
-    <button id="btn-senha" class="btn btn-outline" style="font-size: 0.8rem; padding: 6px; color: var(--warning); border-color: var(--warning);" onclick="managePassword()" title="Definir ou remover senha">🔑 Senha</button>
+    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 6px;" onclick="loadFromCloud()" title="Puxar dados">⬇️Puxar</button>
+    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 6px; color: #a461ff; border-color: #a461ff;" onclick="loadBackup()" title="Puxar Backup">📂Puxar Backup</button>
+    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 6px; color: var(--info); border-color: var(--info);" onclick="changeFichaID()" title="Mudar ID da Ficha">🔄Mudar ID</button>
+    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 6px; color: var(--danger); border-color: var(--danger);" onclick="deleteFichaID()" title="Apagar Ficha Inteira da Nuvem">🗑️Apagar ID</button>
+    <button id="btn-senha" class="btn btn-outline" style="font-size: 0.8rem; padding: 6px; color: var(--warning); border-color: var(--warning);" onclick="managePassword()" title="Definir ou remover senha">🔑Senha</button>
   </div>
   <span style="display:flex; align-items:center; gap:10px;">
-    <button class="btn btn-outline" style="font-size: 12px; padding: 4px 8px;" onclick="toggleAllBoxes(true)">⬆️ Colapsar Tudo</button>
+    <button class="btn btn-outline" style="font-size: 12px; padding: 4px 8px;" onclick="toggleAllBoxes(true)">⬆️Colapsar Tudo</button>
     🏴‍☠️Ficha: New Seas🏴‍☠️
-    <button class="btn btn-outline" style="font-size: 12px; padding: 4px 8px;" onclick="toggleAllBoxes(false)">⬇️ Descolapsar Tudo</button>
+    <button class="btn btn-outline" style="font-size: 12px; padding: 4px 8px;" onclick="toggleAllBoxes(false)">⬇️Descolapsar Tudo</button>
     <div id="db-status" class="status-dot" title="Status do Banco de Dados"></div>
     <span id="save-toast" style="opacity: 0; transition: opacity 0.3s; font-size: 14px; color: var(--success); font-weight: bold; margin-left: 8px;">Salvo!</span>
   </span>
@@ -205,7 +207,7 @@
                   </div>
               </div>
               <div class="input-row" id="box-patente-salario" style="display: none; margin-top: -5px;">
-                  <div class="input-group"><label>Patente</label><input type="text" id="info-patente" disabled><button id="btn-promover" class="btn btn-outline btn-success" style="display:none; font-size:10px; margin-top:5px; width:100%;" onclick="promoverCargo()">🎖️ Promover</button></div>
+                  <div class="input-group"><label>Patente</label><input type="text" id="info-patente" disabled><button id="btn-promover" class="btn btn-outline btn-success" style="display:none; font-size:10px; margin-top:5px; width:100%;" onclick="promoverCargo()">🎖️Promover</button></div>
                   <div class="input-group"><label>Mérito</label><input type="text" id="info-merito" oninput="formatAndSave('info', 'merito', this)"></div>
                   <div class="input-group"><label>Salário</label><input type="text" id="info-salario" disabled></div>
               </div>
@@ -479,8 +481,8 @@
                     <div style="font-size: 18px; font-family: 'Cinzel', serif; font-weight: bold; color: var(--warning);">Custo de Estamina: <span id="estamina-custo-final">0</span></div>
                     <div style="font-size: 11px; color: #aaa; margin-top: 8px; line-height: 1.4;" id="estamina-formula"></div>
                     <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button class="btn btn-outline" style="color:var(--info); border-color:var(--info); flex: 1; font-size: 14px;" onclick="copiarEstamina()">📋 Copiar</button>
-                        <button class="btn btn-outline" style="color:var(--danger); border-color:var(--danger); flex: 1; font-size: 14px;" onclick="gastarEstamina()">🔥 Gastar Estamina</button>
+                        <button class="btn btn-outline" style="color:var(--info); border-color:var(--info); flex: 1; font-size: 14px;" onclick="copiarEstamina()">📋Copiar</button>
+                        <button class="btn btn-outline" style="color:var(--danger); border-color:var(--danger); flex: 1; font-size: 14px;" onclick="gastarEstamina()">🔥Gastar Estamina</button>
                     </div>
                 </div>
             </div>
@@ -554,8 +556,8 @@
                     <div style="font-size: 18px; font-family: 'Cinzel', serif; font-weight: bold; color: var(--danger);">Dano Final: <span id="calc-dano-final">0</span></div>
                     <div style="font-size: 11px; color: #aaa; margin-top: 8px; line-height: 1.4;" id="calc-formula"></div>
                     <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button class="btn btn-outline" style="color:var(--info); border-color:var(--info); flex: 1; font-size: 14px;" onclick="copiarDano()">📋 Copiar</button>
-                        <button class="btn btn-outline" style="color:var(--danger); border-color:var(--danger); flex: 1; font-size: 14px;" onclick="sofrerDano()">🩸 Receber Dano</button>
+                        <button class="btn btn-outline" style="color:var(--info); border-color:var(--info); flex: 1; font-size: 14px;" onclick="copiarDano()">📋Copiar</button>
+                        <button class="btn btn-outline" style="color:var(--danger); border-color:var(--danger); flex: 1; font-size: 14px;" onclick="sofrerDano()">🩸Receber Dano</button>
                     </div>
                 </div>
             </div>
@@ -625,9 +627,9 @@
                 </div>
                 <div style="margin-top: 15px; border-top: 1px dashed #444; padding-top: 15px;">
                     <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center; flex-wrap: wrap;">
-                        <button class="btn btn-outline" style="color:var(--warning); border-color:var(--warning);" onclick="copyLog()">📋 Copiar Tudo</button>
+                        <button class="btn btn-outline" style="color:var(--warning); border-color:var(--warning);" onclick="copyLog()">📋Copiar Tudo</button>
                         <div style="display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 6px; border: 1px dashed #555;">
-                            <button class="btn btn-outline" style="color:#0dcaf0; border-color:#0dcaf0; padding: 6px 10px; font-size: 11px;" onclick="copyPartialLog()">📋 Copiar Últimas:</button>
+                            <button class="btn btn-outline" style="color:#0dcaf0; border-color:#0dcaf0; padding: 6px 10px; font-size: 11px;" onclick="copyPartialLog()">📋Copiar Últimas:</button>
                             <input type="number" id="num-logs-copy" value="1" min="1" style="width: 50px; text-align: center; padding: 4px; font-size: 12px; margin: 0; background-color: #1a1a1a; color: var(--text); border: 1px solid #444; border-radius: 4px;">
                         </div>
                     </div>
@@ -694,9 +696,9 @@
             </div>
             <div id="wrapper-boxRes" class="box-content">
                 <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
-                    <button class="btn btn-outline" style="color:var(--success); border-color:var(--success);" onclick="copyFicha()">📋 Copiar Ficha</button>
-                    <button class="btn btn-outline" style="color:var(--info); border-color:var(--info);" onclick="copyAtributos()">📋 Copiar Atributos</button>
-                    <button class="btn btn-outline" style="color:var(--warning); border-color:var(--warning);" onclick="copyTecnicas()">📋 Copiar Técnicas</button>
+                    <button class="btn btn-outline" style="color:var(--success); border-color:var(--success);" onclick="copyFicha()">📋Copiar Ficha</button>
+                    <button class="btn btn-outline" style="color:var(--info); border-color:var(--info);" onclick="copyAtributos()">📋Copiar Atributos</button>
+                    <button class="btn btn-outline" style="color:var(--warning); border-color:var(--warning);" onclick="copyTecnicas()">📋Copiar Técnicas</button>
                 </div>
                 <pre id="resBox"></pre>
             </div>
