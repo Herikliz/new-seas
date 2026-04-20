@@ -31,7 +31,8 @@ header {
   font-family: 'Segoe UI', sans-serif;
   gap: 15px;
 }
-.cloud-controls { display: flex; align-items: center; justify-content: center; gap: 5px; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 6px; border: 1px dashed #555; }
+header > span { flex-wrap: wrap; justify-content: center; }
+.cloud-controls { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 5px; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 6px; border: 1px dashed #555; }
 .cloud-controls input { width: 180px; padding: 6px 10px; font-size: 13px; font-family: 'Segoe UI', sans-serif; border-radius: 4px; text-align: center;}
 .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; background: #dc3545; margin-right: 5px; }
 .status-dot.online { background: #198754; box-shadow: 0 0 5px #198754; }
@@ -94,6 +95,13 @@ textarea { overflow: hidden; resize: none; min-height: 80px; text-align: justify
 pre#resBox, pre#logBox { background: #111; padding: 20px; border-radius: 6px; border: 1px solid #444; white-space: pre-wrap; word-wrap: break-word; font-family: 'Segoe UI', monospace; font-size: 14px; min-height: 500px; color: #ddd; line-height: 1.4; overflow-x: auto;}
 optgroup { color: var(--info); font-family: 'Cinzel', serif; font-weight: bold; }
 .vertical-mode .three-col-grid, .vertical-mode .main-grid { grid-template-columns: 1fr !important; }
+.vertical-mode .input-row { flex-direction: column !important; gap: 10px !important; margin-bottom: 10px; }
+.vertical-mode .conditional-selects, .vertical-mode .attr-row { flex-direction: column !important; gap: 8px !important; align-items: stretch !important; }
+.vertical-mode input, .vertical-mode select, .vertical-mode button.btn, .vertical-mode textarea { font-size: 16px !important; padding: 12px !important; }
+.vertical-mode .box-title { font-size: 18px !important; padding: 15px !important; }
+.vertical-mode .box-content { padding: 15px !important; }
+.vertical-mode label { font-size: 14px !important; margin-bottom: 5px; }
+.vertical-mode .attr-input-group { width: 100% !important; justify-content: space-between; }
 option { color: var(--text); font-family: 'Lora', serif; font-weight: normal; }
 .modal-overlay {
   display: none;

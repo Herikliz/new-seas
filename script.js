@@ -1341,11 +1341,21 @@ function toggleLayout() {
 function updateUI() {
     const container = document.querySelector('.container');
     const btn = document.getElementById('btn-layout');
+    let metaViewport = document.querySelector('meta[name="viewport"]');
+    
+    if (!metaViewport) {
+        metaViewport = document.createElement('meta');
+        metaViewport.name = "viewport";
+        document.head.appendChild(metaViewport);
+    }
+
     if (charData.layoutMode === 'vertical') {
         container.classList.add('vertical-mode');
+        metaViewport.setAttribute('content', 'width=device-width, initial-scale=1');
         if (btn) btn.textContent = "🖥️Modo PC";
     } else {
         container.classList.remove('vertical-mode');
+        metaViewport.setAttribute('content', 'width=1400');
         if (btn) btn.textContent = "📱Modo Lista";
     }
     let i = currentChar.info;
