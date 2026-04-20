@@ -1205,6 +1205,10 @@ function formatAltura(val) {
         num = num / 100;
     }
     
+    if (!currentChar.isNPC && num > 65) {
+        num = 65;
+    }
+    
     let formatted = "";
     if (num < 1 && num > 0) {
         formatted = Math.round(num * 100) + "cm";
