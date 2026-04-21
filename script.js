@@ -2783,7 +2783,8 @@ function updateUI() {
     }
 
     let displayLinhagem = i.linhagem ? i.linhagem.replace("Tenryūbito: Família ", "") : 'Nenhuma';
-    let recompensaOutText = `\n  : ᓩ _𝐑ᴇᴄᴏᴍᴘᴇɴsᴀ:_\n> ${outRecompensa}\n`;
+    let labelRecompensa = i.orgTipo === "Pirata" ? "𝐑ᴇᴄᴏᴍᴘᴇɴsᴀ" : "𝐑ᴇᴄᴏᴍᴘᴇɴsᴀ 𝐏ᴏᴛᴇɴᴄɪᴀʟ";
+    let recompensaOutText = `\n  : ᓩ _${labelRecompensa}:_\n> ${outRecompensa}\n`;
     let berriesOutText = !isNPC ? `\n : ᓩ _𝐁ᴇʀʀɪᴇs:_\n> ${outBerries}\n` : "";
     
     let habilidadesOut = "";
