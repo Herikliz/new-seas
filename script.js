@@ -1011,6 +1011,7 @@ function renderTecnicas() {
     let availableStyles = [];
     let isMink = (i.raca === "Mink" || (i.linhagem === "Charlotte" && i.raca2 === "Mink") || (currentChar.isNPC && i.raca === 'Outra'));
     if (isMink) availableStyles.push({ id: "Electro", name: "Electro" });
+    if (i.akumaNome && i.akumaNome !== "nenhuma" && i.akumaNome.trim() !== "") availableStyles.push({ id: "Akuma", name: i.akumaNome });
     [1, 2, 3, 4].forEach(n => {
         let st = i['estilo'+n];
         if (st && st !== "Nenhum") {
@@ -2675,6 +2676,7 @@ function updateUI() {
         let availableStylesMap = {};
         let isMinkEstilo = (i.raca === "Mink" || (i.linhagem === "Charlotte" && i.raca2 === "Mink") || (currentChar.isNPC && i.raca === 'Outra'));
         if (isMinkEstilo) availableStylesMap["Electro"] = "Electro";
+        if (i.akumaNome && i.akumaNome !== "nenhuma" && i.akumaNome.trim() !== "") availableStylesMap["Akuma"] = i.akumaNome;
         [1, 2, 3, 4].forEach(n => {
             let st = i['estilo'+n];
             if (st && st !== "Nenhum") {
@@ -3237,6 +3239,7 @@ window.selecionarAkuma = function(novoAkumaNome) {
     if(novoAkumaNome === "nenhuma" || !novoAkumaNome) { currentChar.info.akumaNome = ""; currentChar.info.akumaId = "nenhuma"; } 
     else { currentChar.info.akumaNome = novoAkumaNome; currentChar.info.akumaId = novoAkumaNome; }
     if(typeof saveData === 'function') saveData();
+    if(typeof renderTecnicas === 'function') renderTecnicas();
     if(typeof updateUI === 'function') updateUI();
 };
 
