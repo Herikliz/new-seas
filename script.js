@@ -2327,14 +2327,9 @@ function updateUI() {
     if (calcRes < 0) calcRes = 0;
     let K = 25000;
     
-    let isParamecia = false;
-    if (typeof akumasFixas !== 'undefined' && i.akumaNome) {
-        if (akumasFixas['Paramecia'].includes(i.akumaNome) || akumasFixas['Paramecia Especial'].includes(i.akumaNome)) isParamecia = true;
-    }
-    
     let calcAPot = Math.round((aPot + flatBonus.amiPot) * (1 + bonus.amiPot));
     let danoAmi = 0;
-    if (i.calcUseAmi !== 'nao' && isParamecia) {
+    if (i.calcUseAmi !== 'nao') {
         danoAmi = Math.floor(calcAPot * (controlePct / 100));
     }
 
@@ -2399,13 +2394,13 @@ function updateUI() {
         if (buffPct !== 0) calcFormTexto += ` <span style="color:#198754;">+ ${buffPct}% (Buff Ativo) = ${calcAttrSemAmi.toLocaleString("pt-BR")}</span>`;
         
         let somaAtual = calcAttrSemAmi;
+        if (danoAmi > 0) {
+            somaAtual += danoAmi;
+            calcFormTexto += ` <span style="color:#dc3545;">+ ${danoAmi.toLocaleString("pt-BR")} (Akuma no Mi: ${controlePct}% de ${aPot.toLocaleString("pt-BR")}) = ${somaAtual.toLocaleString("pt-BR")}</span>`;
+        }
         if (danoHaki > 0) {
             somaAtual += danoHaki;
             calcFormTexto += ` <span style="color:#a461ff;">+ ${danoHaki.toLocaleString("pt-BR")} (Haki) = ${somaAtual.toLocaleString("pt-BR")}</span>`;
-        }
-        if (danoAmi > 0) {
-            somaAtual += danoAmi;
-            calcFormTexto += ` <span style="color:#dc3545;">+ ${danoAmi.toLocaleString("pt-BR")} (Bônus Paramecia: ${controlePct}% de ${aPot.toLocaleString("pt-BR")}) = ${somaAtual.toLocaleString("pt-BR")}</span>`;
         }
         calcFormTexto += `<br>`;
     }
