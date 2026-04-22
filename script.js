@@ -724,7 +724,10 @@ function runFallbackChecks() {
               personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, hasAmiDesp: false,
               amiResPct: "", amiAlcMult: "1", calcUseAttr: "", calcInimigoRes: "", calcResIgnorada: "", calcBuffFlat: "", calcBuffPct: "", calcBuffDanoFinalPct: "", calcUseAmi: "sim", calcUseHaki: "nao", sceneType: "Treino Padrão", sceneText: "", hpAtual: -1,
               boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxEsp: false, boxAmi: false, boxHist: false, 
-              boxInv: false, boxCalc: false, boxEstamina: false, estaminaAtual: -1, estaminaVelocidade: "", estaminaDano: "", estaminaBuffPct: "", estaminaHakiArm: "nao", estaminaHakiObs: "nao", boxScene: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0, ordemTecnicas: "alfabetica", hideHistoria: false, exaustaoCompleta: false, habilidadesExclusivas: [], habCaminhoAtiradorAtivo: false, habFavArmistaAtivo: "nenhum", habFavArmistaAttr: "d", habQIAvancadoAtivo: false, linhagemBeckmanArma: false, habRetornoUso: 1, merito: 0
+              boxInv: false, boxCalc: false, boxEstamina: false, estaminaAtual: -1, estaminaVelocidade: "", estaminaDano: "", estaminaBuffPct: "", estaminaHakiArm: "nao", estaminaHakiObs: "nao", boxScene: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0, ordemTecnicas: "alfabetica", hideHistoria: false, exaustaoCompleta: false, habilidadesExclusivas: [], habCaminhoAtiradorAtivo: false, habFavArmistaAtivo: "nenhum", habFavArmistaAttr: "d", habQIAvancadoAtivo: false, linhagemBeckmanArma: false, habRetornoUso: 1, merito: 0, aliadosEspiritoContagiante: 0,
+              unlockHA1: false, unlockHA2: false, unlockHA3: false, unlockHA4: false, unlockHA5: false, unlockHA6: false,
+              unlockHO2: false, unlockHO3: false, unlockHO4: false,
+              unlockHR1: false, unlockHR2: false, unlockHR3: false, unlockHR4: false, unlockHR5: false, unlockHR6: false
           };
           for(let k in defInfo) if (typeof c.info[k] === 'undefined') c.info[k] = defInfo[k];
           
@@ -1502,6 +1505,10 @@ function updateUI() {
     document.getElementById('pc-name').value = currentChar.name;
     const textFields = ['selClasseDF', 'selDF', 'selRV', 'selLinDF', 'selLinRV', 'selLin4', 'selLinEspAmi', 'altura', 'idade', 'sexo', 'sangue', 'telefone', 'nacionalidade', 'localizacao', 'tripulacao', 'akumaNome', 'personalidade', 'historia', 'aparencia', 'inventario', 'animal', 'animal2', 'sceneType', 'sceneText', 'calcUseAmi', 'calcUseHaki', 'amiAlcMult', 'ordemTecnicas', 'estaminaHakiArm', 'estaminaHakiObs'];
     textFields.forEach(f => { let el = document.getElementById('info-'+f); if(el) el.value = i[f] || ""; });
+
+    const checkFields = ['unlockHA1', 'unlockHA2', 'unlockHA3', 'unlockHA4', 'unlockHA5', 'unlockHA6', 'unlockHO2', 'unlockHO3', 'unlockHO4', 'unlockHR1', 'unlockHR2', 'unlockHR3', 'unlockHR4', 'unlockHR5', 'unlockHR6'];
+    checkFields.forEach(f => { let el = document.getElementById('chk-'+f); if(el) el.checked = i[f] || false; });
+    let elAliados = document.getElementById('info-aliadosEspiritoContagiante'); if (elAliados) elAliados.value = i.aliadosEspiritoContagiante || 0;
     let chkHideHist = document.getElementById('info-hideHistoria'); if (chkHideHist) chkHideHist.checked = i.hideHistoria || false;
     let chkExaustao = document.getElementById('info-exaustaoCompleta'); if (chkExaustao) chkExaustao.checked = i.exaustaoCompleta || false;
 
@@ -2026,6 +2033,19 @@ function updateUI() {
         if(isBeckman && i.linhagemBeckmanArma) { bonus.v += 0.05; }
         if(hasHab("Golpe de Retorno")) { let usos = i.habRetornoUso || 1; if(usos === 2) bonus.r -= 0.10; else if(usos === 3) bonus.r -= 0.20; }
 
+        let qtdEspirito = parseInt(i.aliadosEspiritoContagiante) || 0;
+        if (qtdEspirito > 0) {
+            let buffEspirito = qtdEspirito * 0.05;
+            bonus.d += buffEspirito;
+            bonus.f += buffEspirito;
+            bonus.r += buffEspirito;
+            bonus.v += buffEspirito;
+        }
+
+        for (let key in bonus) {
+            if (bonus[key] > 1.0) bonus[key] = 1.0;
+        }
+
     const statFields = ['f', 'd', 'r', 'v', 'esp', 'ami'];
     statFields.forEach(f => { let el = document.getElementById('stat-'+f); if(el) el.value = currentChar.stats[f] ? currentChar.stats[f].toLocaleString("pt-BR") : ""; });
 
@@ -2202,6 +2222,28 @@ function updateUI() {
     document.getElementById('sub-hObs').value = currentChar.substats.hObs ? currentChar.substats.hObs.toLocaleString("pt-BR") : "";
     document.getElementById('sub-hRei').value = currentChar.substats.hRei ? currentChar.substats.hRei.toLocaleString("pt-BR") : "";
 
+    let haPts = currentChar.substats.hArm || 0;
+    let hoPts = currentChar.substats.hObs || 0;
+    let hrPts = currentChar.substats.hRei || 0;
+
+    document.getElementById('cont-ha1').style.display = haPts > 0 ? 'block' : 'none';
+    document.getElementById('cont-ha2').style.display = (haPts > 0 && i.unlockHA1) ? 'block' : 'none';
+    document.getElementById('cont-ha3').style.display = (haPts >= 3000 && i.unlockHA2) ? 'block' : 'none';
+    document.getElementById('cont-ha4').style.display = (haPts >= 5000 && i.unlockHA2) ? 'block' : 'none';
+    document.getElementById('cont-ha5').style.display = (haPts >= 7000 && i.unlockHA2) ? 'block' : 'none';
+    document.getElementById('cont-ha6').style.display = (haPts >= 8000 && i.unlockHA2) ? 'block' : 'none';
+
+    document.getElementById('cont-ho2').style.display = (hoPts >= 3000) ? 'block' : 'none';
+    document.getElementById('cont-ho3').style.display = (hoPts >= 5000 && i.unlockHO2) ? 'block' : 'none';
+    document.getElementById('cont-ho4').style.display = (hoPts >= 8000 && i.unlockHO3) ? 'block' : 'none';
+
+    document.getElementById('cont-hr1').style.display = hrPts > 0 ? 'block' : 'none';
+    document.getElementById('cont-hr2').style.display = (hrPts >= 1000 && i.unlockHR1) ? 'block' : 'none';
+    document.getElementById('cont-hr3').style.display = (hrPts >= 3000 && i.unlockHR2) ? 'block' : 'none';
+    document.getElementById('cont-hr4').style.display = (hrPts >= 5000 && i.unlockHR3) ? 'block' : 'none';
+    document.getElementById('cont-hr5').style.display = (hrPts >= 7500 && i.unlockHR4 && hoPts >= 8000 && i.unlockHO4) ? 'block' : 'none';
+    document.getElementById('cont-hr6').style.display = (hrPts >= 10000 && i.unlockHR4 && haPts >= 3000 && i.unlockHA3) ? 'block' : 'none';
+
     ['amiAlc', 'amiDur', 'amiPot', 'amiVel', 'amiDesp'].forEach(f => {
         let chk = document.getElementById('chk-' + f); let inp = document.getElementById('sub-' + f); let key = 'has' + f.charAt(0).toUpperCase() + f.slice(1);
         let has = i[key]; if (chk) chk.checked = has; if (inp) inp.disabled = !has || isReadOnly;
@@ -2337,14 +2379,12 @@ function updateUI() {
     let elCalcUseHaki = document.getElementById('info-calcUseHaki');
     if (elCalcUseHaki) {
         let htmlHaki = '<option value="nao">Não</option>';
-        if (calcHA > 0) {
-            htmlHaki += '<option value="invisivel">Haki do Armamento Invisível</option>';
-            htmlHaki += '<option value="visivel">Haki do Armamento Visível</option>';
-            if (calcHA >= 3000) htmlHaki += '<option value="imbuicao">Haki do Armamento: Imbuição</option>';
-            if (calcHA >= 5000) htmlHaki += '<option value="fullbody">Haki do Armamento: Full Body</option>';
-            if (calcHA >= 7000) htmlHaki += '<option value="emissao">Haki do Armamento: Emissão</option>';
-            if (calcHA >= 8000) htmlHaki += '<option value="avancado">Haki do Armamento: Avançado</option>';
-        }
+        if (i.unlockHA1) htmlHaki += '<option value="invisivel">Haki do Armamento Invisível</option>';
+        if (i.unlockHA2) htmlHaki += '<option value="visivel">Haki do Armamento Visível</option>';
+        if (i.unlockHA3) htmlHaki += '<option value="imbuicao">Haki do Armamento: Imbuição</option>';
+        if (i.unlockHA4) htmlHaki += '<option value="fullbody">Haki do Armamento: Full Body</option>';
+        if (i.unlockHA5) htmlHaki += '<option value="emissao">Haki do Armamento: Emissão</option>';
+        if (i.unlockHA6) htmlHaki += '<option value="avancado">Haki do Armamento: Avançado</option>';
         if (elCalcUseHaki.innerHTML !== htmlHaki) elCalcUseHaki.innerHTML = htmlHaki;
         if (Array.from(elCalcUseHaki.options).some(o => o.value === i.calcUseHaki)) {
             elCalcUseHaki.value = i.calcUseHaki;
@@ -2528,9 +2568,30 @@ function updateUI() {
     
     if (totalBase >= reqEsp && ESP > 0) {
         attrOut += `↠ *𝙴𝚜𝚙𝚒́𝚛𝚒𝚝𝚘:* ${strCalc(ESP, bonus.esp, flatBonus.esp)}\n`;
-        if (HA > 0) attrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚘 𝙰𝚛𝚖𝚊𝚖𝚎𝚗𝚝𝚘:_ ${strCalc(HA, bonus.ha, flatBonus.ha)}\n`;
-        if (HO > 0) attrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚊 𝙾𝚋𝚜𝚎𝚛𝚟𝚊𝚌̧𝚊̃𝚘:_ ${strCalc(HO, bonus.ho, flatBonus.ho)}\n`;
-        if (HR > 0) attrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚘 𝚁𝚎𝚒:_ ${strCalc(HR, bonus.hr, flatBonus.hr)}\n`;
+        if (HA > 0) {
+            attrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚘 𝙰𝚛𝚖𝚊𝚖𝚎𝚗𝚝𝚘:_ ${strCalc(HA, bonus.ha, flatBonus.ha)}\n`;
+            let hasHigherHA = (i.unlockHA3 || i.unlockHA4 || i.unlockHA5 || i.unlockHA6);
+            if (i.unlockHA1 && !i.unlockHA2 && !hasHigherHA) attrOut += `- 𝙸𝚗𝚟𝚒𝚜𝚒́𝚟𝚎𝚕\n`;
+            if (i.unlockHA2 && !hasHigherHA) attrOut += `- 𝚅𝚒𝚜𝚒́𝚟𝚎𝚕\n`;
+            if (i.unlockHA3) attrOut += `- 𝙸𝚖𝚋𝚞𝚒𝚌̧𝚊̃𝚘\n`;
+            if (i.unlockHA4) attrOut += `- 𝙵𝚞𝚕𝚕 𝙱𝚘𝚍𝚢\n`;
+            if (i.unlockHA5) attrOut += `- 𝙴𝚖𝚒𝚜𝚜𝚊̃𝚘\n`;
+            if (i.unlockHA6) attrOut += `- 𝙰𝚟𝚊𝚗𝚌̧𝚊𝚍𝚘\n`;
+        }
+        if (HO > 0) {
+            attrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚊 𝙾𝚋𝚜𝚎𝚛𝚟𝚊𝚌̧𝚊̃𝚘:_ ${strCalc(HO, bonus.ho, flatBonus.ho)}\n`;
+            if (i.unlockHO2) attrOut += `- 𝙸𝚗𝚝𝚎𝚗𝚌̧𝚊̃𝚘\n`;
+            if (i.unlockHO3) attrOut += `- 𝙿𝚛𝚎𝚖𝚘𝚗𝚒𝚌̧𝚊̃𝚘\n`;
+            if (i.unlockHO4) attrOut += `- 𝙰𝚟𝚊𝚗𝚌̧𝚊𝚍𝚘\n`;
+        }
+        if (HR > 0) {
+            attrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚘 𝚁𝚎𝚒:_ ${strCalc(HR, bonus.hr, flatBonus.hr)}\n`;
+            if (i.unlockHR2) attrOut += `- 𝙳𝚘𝚖𝚒𝚗𝚊𝚌̧𝚊̃𝚘\n`;
+            if (i.unlockHR3) attrOut += `- 𝙸𝚗𝚌𝚊𝚙𝚊𝚌𝚒𝚝𝚊𝚌̧𝚊̃𝚘\n`;
+            if (i.unlockHR4) attrOut += `- 𝙿𝚛𝚎𝚜𝚜𝚊̃𝚘\n`;
+            if (i.unlockHR5) attrOut += `- 𝙰𝚜𝚜𝚊𝚜𝚜𝚒𝚗𝚊𝚝𝚘 𝚍𝚎 𝙾𝚋𝚜𝚎𝚛𝚟𝚊𝚌̧𝚊̃𝚘\n`;
+            if (i.unlockHR6) attrOut += `- 𝙸𝚗𝚏𝚞𝚜𝚊̃𝚘\n`;
+        }
         attrOut += `\n`;
     }
     

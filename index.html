@@ -259,6 +259,13 @@
                 </div>
                 <div id="hab-list" style="margin-top: 10px; display: flex; flex-direction: column; gap: 5px;"></div>
                 
+                <div style="margin-top: 15px; border-top: 1px dashed #444; padding-top: 10px; display: flex; align-items: center; justify-content: space-between;">
+                    <label style="font-size: 11px; color: var(--text);">Buff: Aliados c/ Espírito Contagiante</label>
+                    <div style="display: flex; gap: 5px; align-items: center;">
+                        <input type="text" id="info-aliadosEspiritoContagiante" placeholder="0" oninput="formatAndSave('info', 'aliadosEspiritoContagiante', this)" style="width: 50px; text-align: center; padding: 4px; font-size: 12px; background-color: #2a2a2a; color: var(--text); border: 1px solid #444; border-radius: 4px;">
+                    </div>
+                </div>
+
                 <div id="hab-ativos" style="margin-top: 15px; border-top: 1px dashed #444; padding-top: 10px; display: none;">
                     <label style="color: var(--primary); font-size: 11px;">Buffs Ativos</label>
                     <div id="hab-ativo-atirador" style="display:none; margin-top:5px;">
@@ -357,6 +364,35 @@
                         <div style="flex:1"><label style="font-size: 10px;">Rei</label><input type="text" id="sub-hRei" placeholder="0" oninput="formatAndSave('substats', 'hRei', this)"></div>
                     </div>
                     <div id="avisoEsp" class="avisoErro"></div>
+                    <div style="margin-top:15px; display:grid; grid-template-columns: 1fr 1fr 1fr; font-size:11px; border-top: 1px dashed #444; padding-top: 15px;">
+                        <div style="padding: 0 10px; border-right: 1px solid #444; display: flex; flex-direction: column; align-items: center;">
+                            <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;">
+                                <div id="cont-ha1" style="display:none;"><label style="display:flex;align-items:center;gap:6px;text-transform:uppercase;font-weight:bold;color:#bbb;"><input type="checkbox" id="chk-unlockHA1" onchange="updateField('info', 'unlockHA1', this.checked)"> Invisível</label></div>
+                                <div id="cont-ha2" style="display:none;"><label style="display:flex;align-items:center;gap:6px;text-transform:uppercase;font-weight:bold;color:#bbb;"><input type="checkbox" id="chk-unlockHA2" onchange="updateField('info', 'unlockHA2', this.checked)"> Visível</label></div>
+                                <div id="cont-ha3" style="display:none;"><label style="display:flex;align-items:center;gap:6px;text-transform:uppercase;font-weight:bold;color:#bbb;"><input type="checkbox" id="chk-unlockHA3" onchange="updateField('info', 'unlockHA3', this.checked)"> Imbuição</label></div>
+                                <div id="cont-ha4" style="display:none;"><label style="display:flex;align-items:center;gap:6px;text-transform:uppercase;font-weight:bold;color:#bbb;"><input type="checkbox" id="chk-unlockHA4" onchange="updateField('info', 'unlockHA4', this.checked)"> Full Body</label></div>
+                                <div id="cont-ha5" style="display:none;"><label style="display:flex;align-items:center;gap:6px;text-transform:uppercase;font-weight:bold;color:#bbb;"><input type="checkbox" id="chk-unlockHA5" onchange="updateField('info', 'unlockHA5', this.checked)"> Emissão</label></div>
+                                <div id="cont-ha6" style="display:none;"><label style="display:flex;align-items:center;gap:6px;text-transform:uppercase;font-weight:bold;color:#bbb;"><input type="checkbox" id="chk-unlockHA6" onchange="updateField('info', 'unlockHA6', this.checked)"> Avançado</label></div>
+                            </div>
+                        </div>
+                        <div style="padding: 0 10px; border-right: 1px solid #444; display: flex; flex-direction: column; align-items: center;">
+                            <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;">
+                                <div id="cont-ho2" style="display:none;"><label style="display:flex;align-items:center;gap:6px;text-transform:uppercase;font-weight:bold;color:#bbb;"><input type="checkbox" id="chk-unlockHO2" onchange="updateField('info', 'unlockHO2', this.checked)"> Intenção</label></div>
+                                <div id="cont-ho3" style="display:none;"><label style="display:flex;align-items:center;gap:6px;text-transform:uppercase;font-weight:bold;color:#bbb;"><input type="checkbox" id="chk-unlockHO3" onchange="updateField('info', 'unlockHO3', this.checked)"> Premonição</label></div>
+                                <div id="cont-ho4" style="display:none;"><label style="display:flex;align-items:center;gap:6px;text-transform:uppercase;font-weight:bold;color:#bbb;"><input type="checkbox" id="chk-unlockHO4" onchange="updateField('info', 'unlockHO4', this.checked)"> Avançado</label></div>
+                            </div>
+                        </div>
+                        <div style="padding: 0 10px; display: flex; flex-direction: column; align-items: center;">
+                            <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;">
+                                <div id="cont-hr1" style="display:none;"><label style="display:flex;align-items:center;gap:6px;text-transform:uppercase;font-weight:bold;color:#bbb;"><input type="checkbox" id="chk-unlockHR1" onchange="updateField('info', 'unlockHR1', this.checked)"> Normal</label></div>
+                                <div id="cont-hr2" style="display:none;"><label style="display:flex;align-items:center;gap:6px;text-transform:uppercase;font-weight:bold;color:#bbb;"><input type="checkbox" id="chk-unlockHR2" onchange="updateField('info', 'unlockHR2', this.checked)"> Dominação</label></div>
+                                <div id="cont-hr3" style="display:none;"><label style="display:flex;align-items:center;gap:6px;text-transform:uppercase;font-weight:bold;color:#bbb;"><input type="checkbox" id="chk-unlockHR3" onchange="updateField('info', 'unlockHR3', this.checked)"> Incapacitação</label></div>
+                                <div id="cont-hr4" style="display:none;"><label style="display:flex;align-items:center;gap:6px;text-transform:uppercase;font-weight:bold;color:#bbb;"><input type="checkbox" id="chk-unlockHR4" onchange="updateField('info', 'unlockHR4', this.checked)"> Pressão</label></div>
+                                <div id="cont-hr5" style="display:none;"><label style="display:flex;align-items:center;gap:6px;text-transform:uppercase;font-weight:bold;color:#bbb;"><input type="checkbox" id="chk-unlockHR5" onchange="updateField('info', 'unlockHR5', this.checked)"> Assas. Obs.</label></div>
+                                <div id="cont-hr6" style="display:none;"><label style="display:flex;align-items:center;gap:6px;text-transform:uppercase;font-weight:bold;color:#bbb;"><input type="checkbox" id="chk-unlockHR6" onchange="updateField('info', 'unlockHR6', this.checked)"> Infusão</label></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
