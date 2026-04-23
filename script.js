@@ -129,7 +129,8 @@ const salarios = {"Aprendiz":0,"Recruta":10000000,"Cabo":20000000,"Sargento":300
 
 let charData = {
   password: "",
-  pcs: []
+  pcs: [],
+  layoutMode: "vertical"
 };
 let activePcIndex = 0;
 let activeNpcIndex = -1;
@@ -669,6 +670,7 @@ function toggleEditability() {
 function runFallbackChecks() {
   if (typeof charData.password === 'undefined') charData.password = "";
   if (typeof charData.saveMode === 'undefined') charData.saveMode = "manual";
+  if (typeof charData.layoutMode === 'undefined') charData.layoutMode = "vertical";
   let saveModeEl = document.getElementById('save-mode');
   if (saveModeEl) saveModeEl.value = charData.saveMode;
   
