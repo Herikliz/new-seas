@@ -1882,7 +1882,7 @@ function updateUI() {
     if (boxCalcAmi) boxCalcAmi.style.display = (temFruta && ln !== "Silvers") ? "block" : "none";
 
     let boxAmiPotBuff = document.getElementById('box-amiPotBuff');
-    if (boxAmiPotBuff) boxAmiPotBuff.style.display = (temFruta && ln !== "Silvers" && i.hasAmiPot) ? "block" : "none";
+    if (boxAmiPotBuff) boxAmiPotBuff.style.display = (temFruta && ln !== "Silvers" && i.hasAmiPot) ? "flex" : "none";
     
     let containerBoxAmi = document.getElementById('container-boxAmi');
     if (containerBoxAmi) containerBoxAmi.style.display = (ln === "Silvers") ? "none" : "flex";
@@ -2380,9 +2380,10 @@ function updateUI() {
     if (despEl) despEl.value = currentChar.substats.amiDesp ? currentChar.substats.amiDesp.toLocaleString("pt-BR") : "";
 
     let amiResPctVal = parseInt(i.amiResPct) || 0;
-    if (amiResPctVal > 0 && aDur > 0) {
-        let totalDurCalc = aDur + Math.floor(aDur * (amiResPctVal / 100));
-        document.getElementById('ami-res-total').textContent = `(${aDur.toLocaleString("pt-BR")} + ${amiResPctVal}% = ${totalDurCalc.toLocaleString("pt-BR")})`;
+    let calcAPotRes = Math.round((aPot + flatBonus.amiPot) * (1 + bonus.amiPot));
+    if (amiResPctVal > 0 && calcAPotRes > 0) {
+        let totalPotResCalc = calcAPotRes + Math.floor(calcAPotRes * (amiResPctVal / 100));
+        document.getElementById('ami-res-total').textContent = `(${calcAPotRes.toLocaleString("pt-BR")} + ${amiResPctVal}% = ${totalPotResCalc.toLocaleString("pt-BR")} de Resistência)`;
     } else { document.getElementById('ami-res-total').textContent = ""; }
 
     let baseCalcAttr = parseInt(i.calcUseAttr) || 0;
@@ -2649,7 +2650,17 @@ function updateUI() {
             let cenas = Math.floor(calcADur / 500);
             attrOut += `> _𝙳𝚞𝚛𝚊𝚋𝚒𝚕𝚒𝚍𝚊𝚍𝚎:_ ${strCalc(aDur, bonus.amiDur, flatBonus.amiDur)} (${cenas} cena${cenas !== 1 ? 's' : ''})\n`;
         }
-        if (i.hasAmiPot && aPot > 0) attrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${strCalc(aPot, bonus.amiPot, flatBonus.amiPot)}\n`;
+        if (i.hasAmiPot && aPot > 0) {
+            let calcAPotFinal = Math.round((aPot + flatBonus.amiPot) * (1 + bonus.amiPot));
+            let strPotFinal = strCalc(aPot, bonus.amiPot, flatBonus.amiPot);
+            let amiResPctValFicha = parseInt(i.amiResPct) || 0;
+            if (amiResPctValFicha > 0) {
+                let resCalcFinal = calcAPotFinal + Math.floor(calcAPotFinal * (amiResPctValFicha / 100));
+                attrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${strPotFinal} (${resCalcFinal.toLocaleString("pt-BR")} de Resistência)\n`;
+            } else {
+                attrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${strPotFinal}\n`;
+            }
+        }
         if (i.hasAmiVel && aVel > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${strCalc(aVel, bonus.amiVel, flatBonus.amiVel)}\n`;
         if (i.hasAmiDesp && aDesp > 0) attrOut += `> _𝙳𝚎𝚜𝚙𝚎𝚛𝚝𝚊𝚛:_ ${strCalc(aDesp, bonus.amiDesp, flatBonus.amiDesp)}\n`;
         if (activeAmiStats > 0) attrOut += `> _𝙲𝚘𝚗𝚝𝚛ᴏ𝚕𝚎:_ ${controlePct}%\n`;

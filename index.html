@@ -430,20 +430,22 @@
                         <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid #444;">
                             <label style="font-size: 11px; display:flex; align-items:center; gap:5px; color: #ddd; margin-bottom: 5px; width:fit-content;"><input type="checkbox" id="chk-amiDur" onchange="toggleAmi('amiDur', this.checked)"> Durabilidade</label>
                             <input type="text" id="sub-amiDur" placeholder="0" oninput="formatAndSave('substats', 'amiDur', this)" style="font-size: 14px; text-align: right; font-weight: bold;">
-                            <div style="display:flex; align-items:center; justify-content: space-between; margin-top:5px;">
-                              <label style="font-size:9px; margin:0; text-transform:none; color:#aaa;">Bônus Res (%):</label>
-                              <input type="text" id="info-amiResPct" placeholder="Ex: 50" oninput="formatAndSave('info', 'amiResPct', this)" style="width:45px; padding:2px; font-size:10px; text-align:center; background: #222; border: 1px solid #555;">
-                            </div>
-                            <span id="ami-res-total" style="font-size:10px; color:var(--warning); display:block; margin-top:3px; text-align:right;"></span>
                         </div>
 
                         <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid #444;">
                             <label style="font-size: 11px; display:flex; align-items:center; gap:5px; color: #ddd; margin-bottom: 5px; width:fit-content;"><input type="checkbox" id="chk-amiPot" onchange="toggleAmi('amiPot', this.checked)"> Potência</label>
                             <input type="text" id="sub-amiPot" placeholder="0" oninput="formatAndSave('substats', 'amiPot', this)" style="font-size: 14px; text-align: right; font-weight: bold;">
-                            <div id="box-amiPotBuff" style="display:none; align-items:center; justify-content: space-between; margin-top:5px;">
-                              <label style="font-size:9px; margin:0; text-transform:none; color:#aaa;">Dano Adicional (%):</label>
-                              <input type="text" id="info-amiPotBuff" placeholder="Ex: 50" oninput="formatAndSave('info', 'amiPotBuff', this)" style="width:45px; padding:2px; font-size:10px; text-align:center; background: #222; border: 1px solid #555;">
+                            <div id="box-amiPotBuff" style="display:none; flex-direction:column; gap:2px; margin-top:5px;">
+                              <div style="display:flex; align-items:center; justify-content: space-between;">
+                                <label style="font-size:9px; margin:0; text-transform:none; color:#aaa;">Dano Adicional (%):</label>
+                                <input type="text" id="info-amiPotBuff" placeholder="Ex: 50" oninput="formatAndSave('info', 'amiPotBuff', this)" style="width:45px; padding:2px; font-size:10px; text-align:center; background: #222; border: 1px solid #555;">
+                              </div>
+                              <div style="display:flex; align-items:center; justify-content: space-between;">
+                                <label style="font-size:9px; margin:0; text-transform:none; color:#aaa;">Resistência (%):</label>
+                                <input type="text" id="info-amiResPct" placeholder="Ex: 50" oninput="formatAndSave('info', 'amiResPct', this)" style="width:45px; padding:2px; font-size:10px; text-align:center; background: #222; border: 1px solid #555;">
+                              </div>
                             </div>
+                            <span id="ami-res-total" style="font-size:10px; color:var(--warning); display:block; margin-top:3px; text-align:right;"></span>
                         </div>
 
                         <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid #444;">
