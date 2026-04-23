@@ -440,6 +440,10 @@
                         <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid #444;">
                             <label style="font-size: 11px; display:flex; align-items:center; gap:5px; color: #ddd; margin-bottom: 5px; width:fit-content;"><input type="checkbox" id="chk-amiPot" onchange="toggleAmi('amiPot', this.checked)"> Potência</label>
                             <input type="text" id="sub-amiPot" placeholder="0" oninput="formatAndSave('substats', 'amiPot', this)" style="font-size: 14px; text-align: right; font-weight: bold;">
+                            <div id="box-amiPotBuff" style="display:none; align-items:center; justify-content: space-between; margin-top:5px;">
+                              <label style="font-size:9px; margin:0; text-transform:none; color:#aaa;">Dano Adicional (%):</label>
+                              <input type="text" id="info-amiPotBuff" placeholder="Ex: 50" oninput="formatAndSave('info', 'amiPotBuff', this)" style="width:45px; padding:2px; font-size:10px; text-align:center; background: #222; border: 1px solid #555;">
+                            </div>
                         </div>
 
                         <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid #444;">

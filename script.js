@@ -722,7 +722,7 @@ function runFallbackChecks() {
               telefone: "", orgTipo: "", tripulacao: "", patente: "", salario: "", estilo1: "", freestyle1: "", estilo2: "", freestyle2: "", 
               estilo3: "", freestyle3: "", estilo4: "", freestyle4: "", berries: 5000000, npcsComunsList: [], npcsEspeciaisList: [], akumaNome: "", 
               personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, hasAmiDesp: false,
-              amiResPct: "", amiAlcMult: "1", calcUseAttr: "", calcInimigoRes: "", calcResIgnorada: "", calcBuffFlat: "", calcBuffPct: "", calcBuffDanoFinalPct: "", calcUseAmi: "sim", calcUseHaki: "nao", sceneType: "Treino Padrão", sceneText: "", hpAtual: -1,
+              amiResPct: "", amiAlcMult: "1", calcUseAttr: "", calcInimigoRes: "", calcResIgnorada: "", calcBuffFlat: "", calcBuffPct: "", calcBuffDanoFinalPct: "", calcUseAmi: "sim", amiPotBuff: "", calcUseHaki: "nao", sceneType: "Treino Padrão", sceneText: "", hpAtual: -1,
               boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxEsp: false, boxAmi: false, boxHist: false, 
               boxInv: false, boxCalc: false, boxEstamina: false, estaminaAtual: -1, estaminaVelocidade: "", estaminaDano: "", estaminaBuffPct: "", estaminaHakiArm: "nao", estaminaHakiObs: "nao", boxScene: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0, ordemTecnicas: "alfabetica", hideHistoria: false, exaustaoCompleta: false, habilidadesExclusivas: [], habCaminhoAtiradorAtivo: false, habFavArmistaAtivo: "nenhum", habFavArmistaAttr: "d", habQIAvancadoAtivo: false, linhagemBeckmanArma: false, habRetornoUso: 1, merito: 0, aliadosEspiritoContagiante: 0,
               unlockHA1: false, unlockHA2: false, unlockHA3: false, unlockHA4: false, unlockHA5: false, unlockHA6: false,
@@ -1533,6 +1533,9 @@ function updateUI() {
     let calcBuffDanoFinalPctEl = document.getElementById('info-calcBuffDanoFinalPct');
     if(calcBuffDanoFinalPctEl) calcBuffDanoFinalPctEl.value = i.calcBuffDanoFinalPct ? i.calcBuffDanoFinalPct.toLocaleString("pt-BR") : "";
 
+    let amiPotBuffEl = document.getElementById('info-amiPotBuff');
+    if(amiPotBuffEl) amiPotBuffEl.value = i.amiPotBuff ? i.amiPotBuff.toLocaleString("pt-BR") : "";
+
     let estVelEl = document.getElementById('info-estaminaVelocidade');
     if(estVelEl) estVelEl.value = i.estaminaVelocidade ? i.estaminaVelocidade.toLocaleString("pt-BR") : "";
     let estDanoEl = document.getElementById('info-estaminaDano');
@@ -1877,6 +1880,9 @@ function updateUI() {
     
     let boxCalcAmi = document.getElementById('box-calcUseAmi');
     if (boxCalcAmi) boxCalcAmi.style.display = (temFruta && ln !== "Silvers") ? "block" : "none";
+
+    let boxAmiPotBuff = document.getElementById('box-amiPotBuff');
+    if (boxAmiPotBuff) boxAmiPotBuff.style.display = (temFruta && ln !== "Silvers" && i.hasAmiPot) ? "block" : "none";
     
     let containerBoxAmi = document.getElementById('container-boxAmi');
     if (containerBoxAmi) containerBoxAmi.style.display = (ln === "Silvers") ? "none" : "flex";
@@ -2396,8 +2402,14 @@ function updateUI() {
     
     let calcAPot = Math.round((aPot + flatBonus.amiPot) * (1 + bonus.amiPot));
     let danoAmi = 0;
+    let buffAmiVal = parseInt(i.amiPotBuff) || 0;
+    let baseDanoAmi = 0;
     if (i.calcUseAmi !== 'nao') {
-        danoAmi = Math.floor(calcAPot * (controlePct / 100));
+        baseDanoAmi = Math.floor(calcAPot * (controlePct / 100));
+        danoAmi = baseDanoAmi;
+        if (buffAmiVal > 0) {
+            danoAmi = Math.round(baseDanoAmi * (1 + buffAmiVal / 100));
+        }
     }
 
     let calcHA = Math.round((HA + flatBonus.ha) * (1 + bonus.ha));
@@ -2461,7 +2473,11 @@ function updateUI() {
         let somaAtual = calcAttrSemAmi;
         if (danoAmi > 0) {
             somaAtual += danoAmi;
-            calcFormTexto += ` <span style="color:#dc3545;">+ ${danoAmi.toLocaleString("pt-BR")} (Akuma no Mi: ${controlePct}% de ${aPot.toLocaleString("pt-BR")}) = ${somaAtual.toLocaleString("pt-BR")}</span>`;
+            if (buffAmiVal > 0) {
+                calcFormTexto += ` <span style="color:#dc3545;">+ ${danoAmi.toLocaleString("pt-BR")} (Akuma no Mi: ${controlePct}% de ${aPot.toLocaleString("pt-BR")} + ${buffAmiVal}%) = ${somaAtual.toLocaleString("pt-BR")}</span>`;
+            } else {
+                calcFormTexto += ` <span style="color:#dc3545;">+ ${danoAmi.toLocaleString("pt-BR")} (Akuma no Mi: ${controlePct}% de ${aPot.toLocaleString("pt-BR")}) = ${somaAtual.toLocaleString("pt-BR")}</span>`;
+            }
         }
         if (danoHaki > 0) {
             somaAtual += danoHaki;
