@@ -3138,7 +3138,7 @@ ${histPersOut}
 > ${i.aparencia || ''}
 
   : ᓩ _𝐈ᴅ:_ ${currentDocId || ''}
-
+${(parseInt(i.aliadosEspiritoContagiante) || 0) > 0 ? `\n  : ᓩ _𝐀ʟɪᴀᴅᴏs ᴄᴏᴍ 𝐄sᴘɪ́ʀɪᴛᴏ 𝐂ᴏɴᴛᴀɢɪᴀɴᴛᴇ:_\n> ${parseInt(i.aliadosEspiritoContagiante)}\n` : ''}
   : ᓩ _𝐍ᴀᴄɪᴏɴᴀʟɪᴅᴀᴅᴇ:_
 > ${i.nacionalidade || 'Desconhecida'}
 
