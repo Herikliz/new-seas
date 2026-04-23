@@ -1150,7 +1150,7 @@ function addAlcunhaBuffRow() {
             <optgroup label="Tudo"><option value="tudo">Todos os Atributos</option></optgroup>
             <optgroup label="Atributos"><option value="d">Destreza</option><option value="f">Força</option><option value="r">Resistência</option><option value="v">Velocidade</option><option value="refl">Reflexo</option><option value="vcorp">Vel. Corporal</option><option value="vAgua">Velocidade (Água)</option><option value="reflAgua">Reflexo (Água)</option><option value="vcorpAgua">Vel. Corporal (Água)</option></optgroup>
             <optgroup label="Espírito"><option value="esp">Espírito</option><option value="ha">Armamento</option><option value="ho">Observação</option><option value="hr">Rei</option></optgroup>
-            <optgroup label="Akuma no Mi"><option value="amiAlc">Alcance</option><option value="amiDur">Durabilidade</option><option value="amiPot">Potência</option><option value="amiVel">Velocidade</option></optgroup>
+            <optgroup label="Akuma no Mi"><option value="amiAlc">Alcance</option><option value="amiDur">Durabilidade</option><option value="amiPot">Potência</option><option value="amiVel">Velocidade</option><option value="amiDesp">Despertar</option></optgroup>
         </select>
         <select class="buff-type" style="flex:1; font-size:11px; padding:4px; background:#2a2a2a; border:1px solid #444; color:#fff; border-radius:4px;">
             <option value="flat">Pts (+X)</option>
@@ -1892,8 +1892,8 @@ function updateUI() {
         amiEl.placeholder = "0"; 
     }
 
-    let bonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0, refl:0, vcorp:0, amiAlc:0, amiDur:0, amiPot:0, amiVel:0, vAgua:0, reflAgua:0, vcorpAgua:0};
-    let flatBonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0, refl:0, vcorp:0, amiAlc:0, amiDur:0, amiPot:0, amiVel:0, vAgua:0, reflAgua:0, vcorpAgua:0};
+    let bonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0, refl:0, vcorp:0, amiAlc:0, amiDur:0, amiPot:0, amiVel:0, amiDesp:0, vAgua:0, reflAgua:0, vcorpAgua:0};
+    let flatBonus = {d:0, f:0, r:0, v:0, esp:0, ha:0, ho:0, hr:0, ami:0, refl:0, vcorp:0, amiAlc:0, amiDur:0, amiPot:0, amiVel:0, amiDesp:0, vAgua:0, reflAgua:0, vcorpAgua:0};
 
     if (i.alcunhasList && i.alcunhaAtiva) {
         let ativa = i.alcunhasList.find(a => a.nome === i.alcunhaAtiva);
@@ -2199,7 +2199,20 @@ function updateUI() {
         }
     }
 
-    let ESP = currentChar.stats.esp; let totalEsp = Math.round((ESP + flatBonus.esp) * (1 + bonus.esp)); document.getElementById('total-esp').innerText = "Total: " + totalEsp.toLocaleString("pt-BR");
+    let ESP = currentChar.stats.esp; 
+    
+    let maxEspInput = 30000;
+    if (temFruta) maxEspInput = 25000;
+    if (ln === "Silvers") maxEspInput = 40000;
+    
+    if (ESP > maxEspInput) {
+        ESP = maxEspInput;
+        currentChar.stats.esp = ESP;
+        let espElUpdate = document.getElementById('stat-esp');
+        if (espElUpdate) espElUpdate.value = ESP.toLocaleString("pt-BR");
+    }
+    
+    let totalEsp = Math.round((ESP + flatBonus.esp) * (1 + bonus.esp)); document.getElementById('total-esp').innerText = "Total: " + totalEsp.toLocaleString("pt-BR");
     
     let HA = currentChar.substats.hArm || 0, HO = currentChar.substats.hObs || 0, HR = currentChar.substats.hRei || 0;
     let totalHaki = HA + HO + HR;
@@ -2262,16 +2275,28 @@ function updateUI() {
         if (amiElUpdate) amiElUpdate.value = AMI.toLocaleString("pt-BR");
     }
 
-    let totalAmi = Math.round((AMI + flatBonus.ami) * (1 + bonus.ami)); document.getElementById('total-ami').innerText = "Total: " + totalAmi.toLocaleString("pt-BR");
+    bonus.amiAlc += bonus.ami;
+    bonus.amiDur += bonus.ami;
+    bonus.amiPot += bonus.ami;
+    bonus.amiVel += bonus.ami;
+    bonus.amiDesp += bonus.ami;
+    bonus.ami = 0;
+
+    flatBonus.amiAlc += flatBonus.ami;
+    flatBonus.amiDur += flatBonus.ami;
+    flatBonus.amiPot += flatBonus.ami;
+    flatBonus.amiVel += flatBonus.ami;
+    flatBonus.amiDesp += flatBonus.ami;
+    flatBonus.ami = 0;
+
+    let totalAmi = AMI; 
+    document.getElementById('total-ami').innerText = "Total: " + totalAmi.toLocaleString("pt-BR");
     document.getElementById('box-amiSub').style.display = AMI > 0 ? "block" : "none";
     if(AMI === 0) { currentChar.substats.amiAlc = 0; currentChar.substats.amiDur = 0; currentChar.substats.amiPot = 0; currentChar.substats.amiVel = 0; currentChar.substats.amiDesp = 0; }
     
     let activeAmiStats = baseAmiStats + (i.hasAmiDesp ? 1 : 0);
 
     let maxAmiPoints = 10000;
-    if (bonus.ami > 0 && activeAmiStats > 0) {
-        maxAmiPoints = Math.max(10000, Math.floor(totalAmi / activeAmiStats));
-    }
 
     let aAlc = currentChar.substats.amiAlc || 0, aDur = currentChar.substats.amiDur || 0, aPot = currentChar.substats.amiPot || 0, aVel = currentChar.substats.amiVel || 0, aDesp = currentChar.substats.amiDesp || 0;
     
@@ -2302,10 +2327,10 @@ function updateUI() {
                     currentChar.stats.ami = AMI;
                     let amiElUpdate = document.getElementById('stat-ami');
                     if (amiElUpdate) amiElUpdate.value = AMI.toLocaleString("pt-BR");
-                    totalAmi = Math.round((AMI + flatBonus.ami) * (1 + bonus.ami)); document.getElementById('total-ami').innerText = "Total: " + totalAmi.toLocaleString("pt-BR");
+                    totalAmi = AMI; document.getElementById('total-ami').innerText = "Total: " + totalAmi.toLocaleString("pt-BR");
                 }
                 activeAmiStats = baseAmiStats;
-                maxAmiPoints = Math.max(10000, Math.floor(totalAmi / activeAmiStats));
+                maxAmiPoints = 10000;
             }
         }
     }
@@ -2610,7 +2635,7 @@ function updateUI() {
         }
         if (i.hasAmiPot && aPot > 0) attrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${strCalc(aPot, bonus.amiPot, flatBonus.amiPot)}\n`;
         if (i.hasAmiVel && aVel > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${strCalc(aVel, bonus.amiVel, flatBonus.amiVel)}\n`;
-        if (i.hasAmiDesp && aDesp > 0) attrOut += `> _𝙳𝚎𝚜𝚙𝚎𝚛𝚝𝚊𝚛:_ ${aDesp.toLocaleString("pt-BR")}\n`;
+        if (i.hasAmiDesp && aDesp > 0) attrOut += `> _𝙳𝚎𝚜𝚙𝚎𝚛𝚝𝚊𝚛:_ ${strCalc(aDesp, bonus.amiDesp, flatBonus.amiDesp)}\n`;
         if (activeAmiStats > 0) attrOut += `> _𝙲𝚘𝚗𝚝𝚛ᴏ𝚕𝚎:_ ${controlePct}%\n`;
         attrOut += `\n`;
     }
@@ -2824,7 +2849,7 @@ function updateUI() {
         let ativa = i.alcunhasList.find(a => a.nome === i.alcunhaAtiva);
         if (ativa && ativa.buffs && ativa.buffs.length > 0) {
             let buffGroups = {};
-            let names = {tudo:"Todos os Atributos",d:"Destreza",f:"Força",r:"Resistência",v:"Velocidade",refl:"Reflexo",vcorp:"Vel. Corporal",vAgua:"Velocidade (Água)",reflAgua:"Reflexo (Água)",vcorpAgua:"Vel. Corporal (Água)",esp:"Espírito",ha:"Haki do Armamento",ho:"Haki da Observação",hr:"Haki do Rei",amiAlc:"Alcance",amiDur:"Durabilidade",amiPot:"Potência",amiVel:"Velocidade"};
+            let names = {tudo:"Todos os Atributos",d:"Destreza",f:"Força",r:"Resistência",v:"Velocidade",refl:"Reflexo",vcorp:"Vel. Corporal",vAgua:"Velocidade (Água)",reflAgua:"Reflexo (Água)",vcorpAgua:"Vel. Corporal (Água)",esp:"Espírito",ha:"Haki do Armamento",ho:"Haki da Observação",hr:"Haki do Rei",amiAlc:"Alcance",amiDur:"Durabilidade",amiPot:"Potência",amiVel:"Velocidade",amiDesp:"Despertar"};
             ativa.buffs.forEach(b => {
                 let key = (b.val >= 0 ? '+' : '') + b.val + (b.type === 'pct' ? '%' : '');
                 if(!buffGroups[key]) buffGroups[key] = [];
