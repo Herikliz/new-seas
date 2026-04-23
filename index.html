@@ -343,6 +343,17 @@
                     <div id="avisoVelAgua" class="avisoErro"></div>
                     <span class="attr-total" id="total-vAgua" style="display:block; text-align:right; margin-top:5px; color:var(--info); font-weight:bold;">Total na Água: 0</span>
                 </div>
+                <div id="container-boxVelAkuma" style="display:none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #444;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                        <span style="font-family:'Cinzel', serif; font-size:14px; font-weight:bold; color:var(--danger);">Velocidade Adicional (Akuma no Mi)</span>
+                    </div>
+                    <div style="display:flex; gap: 10px;">
+                        <div style="flex:1"><label style="font-size: 10px;">Reflexo Adicional</label><input type="text" id="sub-reflAkuma" placeholder="0" oninput="formatAndSave('substats', 'reflAkuma', this)"></div>
+                        <div style="flex:1"><label style="font-size: 10px;">Vel. Corp. Adicional</label><input type="text" id="sub-vcorpAkuma" placeholder="0" oninput="formatAndSave('substats', 'vcorpAkuma', this)"></div>
+                    </div>
+                    <div id="avisoVelAkuma" class="avisoErro"></div>
+                    <span class="attr-total" id="total-vAkuma" style="display:block; text-align:right; margin-top:5px; color:var(--danger); font-weight:bold;">Adicional: 0</span>
+                </div>
                 <div id="avisoBase" class="avisoErro"></div>
             </div>
         </div>
@@ -451,6 +462,15 @@
                         <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid #444;">
                             <label style="font-size: 11px; display:flex; align-items:center; gap:5px; color: #ddd; margin-bottom: 5px; width:fit-content;"><input type="checkbox" id="chk-amiVel" onchange="toggleAmi('amiVel', this.checked)"> Velocidade</label>
                             <input type="text" id="sub-amiVel" placeholder="0" oninput="formatAndSave('substats', 'amiVel', this)" style="font-size: 14px; text-align: right; font-weight: bold;">
+                            <div id="box-amiVelBuff" style="display:none; flex-direction:column; gap:2px; margin-top:5px;">
+                              <div style="display:flex; align-items:center; justify-content: space-between;">
+                                <label style="font-size:9px; margin:0; text-transform:none; color:#aaa; display:flex; align-items:center; gap:3px;">
+                                  <input type="checkbox" id="chk-amiVelAtivo" onchange="updateField('info', 'amiVelAtivo', this.checked)" style="width:auto; margin:0;"> Ativar (%)
+                                </label>
+                                <input type="text" id="info-amiVelBuff" placeholder="Ex: 75" oninput="formatAndSave('info', 'amiVelBuff', this)" style="width:45px; padding:2px; font-size:10px; text-align:center; background: #222; border: 1px solid #555;">
+                              </div>
+                            </div>
+                            <span id="ami-vel-total" style="font-size:10px; color:var(--warning); display:block; margin-top:3px; text-align:right;"></span>
                         </div>
                     </div>
 

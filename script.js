@@ -1535,6 +1535,12 @@ function updateUI() {
 
     let amiPotBuffEl = document.getElementById('info-amiPotBuff');
     if(amiPotBuffEl) amiPotBuffEl.value = i.amiPotBuff ? i.amiPotBuff.toLocaleString("pt-BR") : "";
+    let amiVelBuffEl = document.getElementById('info-amiVelBuff');
+    if(amiVelBuffEl) amiVelBuffEl.value = i.amiVelBuff ? i.amiVelBuff.toLocaleString("pt-BR") : "";
+    let chkAmiVelAtivo = document.getElementById('chk-amiVelAtivo');
+    if(chkAmiVelAtivo) chkAmiVelAtivo.checked = i.amiVelAtivo || false;
+    let amiResPctEl = document.getElementById('info-amiResPct');
+    if(amiResPctEl) amiResPctEl.value = i.amiResPct ? i.amiResPct.toLocaleString("pt-BR") : "";
 
     let estVelEl = document.getElementById('info-estaminaVelocidade');
     if(estVelEl) estVelEl.value = i.estaminaVelocidade ? i.estaminaVelocidade.toLocaleString("pt-BR") : "";
@@ -1883,6 +1889,8 @@ function updateUI() {
 
     let boxAmiPotBuff = document.getElementById('box-amiPotBuff');
     if (boxAmiPotBuff) boxAmiPotBuff.style.display = (temFruta && ln !== "Silvers" && i.hasAmiPot) ? "flex" : "none";
+    let boxAmiVelBuff = document.getElementById('box-amiVelBuff');
+    if (boxAmiVelBuff) boxAmiVelBuff.style.display = (temFruta && ln !== "Silvers" && i.hasAmiVel) ? "flex" : "none";
     
     let containerBoxAmi = document.getElementById('container-boxAmi');
     if (containerBoxAmi) containerBoxAmi.style.display = (ln === "Silvers") ? "none" : "flex";
@@ -2205,6 +2213,61 @@ function updateUI() {
         }
     }
 
+    let tempAAlc = currentChar.substats.amiAlc || 0, tempADur = currentChar.substats.amiDur || 0, tempAPot = currentChar.substats.amiPot || 0, tempAVel = currentChar.substats.amiVel || 0;
+    let tempBaseAmiStats = 0;
+    if(i.hasAmiAlc) tempBaseAmiStats++; if(i.hasAmiDur) tempBaseAmiStats++; if(i.hasAmiPot) tempBaseAmiStats++; if(i.hasAmiVel) tempBaseAmiStats++;
+    let tempControlePct = 0;
+    if(tempBaseAmiStats > 0) {
+        let currentBasePoints = tempAAlc + tempADur + tempAPot + tempAVel;
+        tempControlePct = Math.round((currentBasePoints / (tempBaseAmiStats * 10000)) * 100);
+    }
+    
+    let calcAVelFinalBox = Math.round(((currentChar.substats.amiVel || 0) + flatBonus.amiVel) * (1 + bonus.amiVel));
+    let finalAkumaVelBox = 0;
+    if (i.hasAmiVel && calcAVelFinalBox > 0) {
+        let baseAkumaVelBox = Math.floor(calcAVelFinalBox * (tempControlePct / 100));
+        let buffAmiVelValBox = parseInt(i.amiVelBuff) || 0;
+        if (buffAmiVelValBox > 0) finalAkumaVelBox = baseAkumaVelBox + Math.floor(baseAkumaVelBox * (buffAmiVelValBox / 100));
+        else finalAkumaVelBox = baseAkumaVelBox;
+    }
+
+    let elBoxVelAkuma = document.getElementById('container-boxVelAkuma');
+    if (elBoxVelAkuma) {
+        if (i.amiVelAtivo && finalAkumaVelBox > 0) {
+            elBoxVelAkuma.style.display = "block";
+            document.getElementById('total-vAkuma').innerText = "Adicional: " + finalAkumaVelBox.toLocaleString("pt-BR");
+            
+            if(typeof currentChar.substats.reflAkuma === 'undefined') currentChar.substats.reflAkuma = 0;
+            if(typeof currentChar.substats.vcorpAkuma === 'undefined') currentChar.substats.vcorpAkuma = 0;
+            
+            let REFAkuma = currentChar.substats.reflAkuma || 0;
+            let VCORPAkuma = currentChar.substats.vcorpAkuma || 0;
+            let totalVelSubAkuma = REFAkuma + VCORPAkuma;
+            
+            if(totalVelSubAkuma > finalAkumaVelBox) {
+                let diff = totalVelSubAkuma - finalAkumaVelBox;
+                let active = document.activeElement;
+                if(active && active.id === 'sub-reflAkuma') { REFAkuma -= diff; currentChar.substats.reflAkuma = Math.max(0, REFAkuma); }
+                else if(active && active.id === 'sub-vcorpAkuma') { VCORPAkuma -= diff; currentChar.substats.vcorpAkuma = Math.max(0, VCORPAkuma); }
+                else {
+                    if(VCORPAkuma >= diff) { VCORPAkuma -= diff; currentChar.substats.vcorpAkuma = Math.max(0, VCORPAkuma); }
+                    else if(REFAkuma >= diff) { REFAkuma -= diff; currentChar.substats.reflAkuma = Math.max(0, REFAkuma); }
+                }
+                document.getElementById('avisoVelAkuma').style.display = "block"; document.getElementById('avisoVelAkuma').textContent = `Limite atingido!\n Máx: ${finalAkumaVelBox.toLocaleString("pt-BR")}`;
+            } else if (totalVelSubAkuma < finalAkumaVelBox && finalAkumaVelBox > 0) {
+                let diff = finalAkumaVelBox - totalVelSubAkuma;
+                document.getElementById('avisoVelAkuma').style.display = "block"; document.getElementById('avisoVelAkuma').textContent = `Pontos não distribuídos no Adicional: ${diff.toLocaleString("pt-BR")}`;
+            } else { document.getElementById('avisoVelAkuma').style.display = "none"; }
+            
+            document.getElementById('sub-reflAkuma').value = currentChar.substats.reflAkuma ? currentChar.substats.reflAkuma.toLocaleString("pt-BR") : "";
+            document.getElementById('sub-vcorpAkuma').value = currentChar.substats.vcorpAkuma ? currentChar.substats.vcorpAkuma.toLocaleString("pt-BR") : "";
+        } else {
+            elBoxVelAkuma.style.display = "none";
+            if(currentChar.substats.reflAkuma) currentChar.substats.reflAkuma = 0; 
+            if(currentChar.substats.vcorpAkuma) currentChar.substats.vcorpAkuma = 0;
+        }
+    }
+
     let ESP = currentChar.stats.esp; 
     
     let maxEspInput = 30000;
@@ -2385,6 +2448,22 @@ function updateUI() {
         let totalPotResCalc = calcAPotRes + Math.floor(calcAPotRes * (amiResPctVal / 100));
         document.getElementById('ami-res-total').textContent = `(${calcAPotRes.toLocaleString("pt-BR")} + ${amiResPctVal}% = ${totalPotResCalc.toLocaleString("pt-BR")} de Resistência)`;
     } else { document.getElementById('ami-res-total').textContent = ""; }
+
+    let amiVelBuffVal = parseInt(i.amiVelBuff) || 0;
+    let calcAVelUI = Math.round((aVel + flatBonus.amiVel) * (1 + bonus.amiVel));
+    if (calcAVelUI > 0) {
+        let baseAkumaVelUI = Math.floor(calcAVelUI * (controlePct / 100));
+        let finalAkumaVelUI = baseAkumaVelUI;
+        if (amiVelBuffVal > 0) {
+            finalAkumaVelUI = baseAkumaVelUI + Math.floor(baseAkumaVelUI * (amiVelBuffVal / 100));
+            document.getElementById('ami-vel-total').textContent = `(${baseAkumaVelUI.toLocaleString("pt-BR")}+${amiVelBuffVal}% = ${finalAkumaVelUI.toLocaleString("pt-BR")} de Velocidade Adicional)`;
+        } else {
+            document.getElementById('ami-vel-total').textContent = `(+${baseAkumaVelUI.toLocaleString("pt-BR")} de Velocidade Adicional)`;
+        }
+    } else {
+        let elAmiVelTotal = document.getElementById('ami-vel-total');
+        if (elAmiVelTotal) elAmiVelTotal.textContent = "";
+    }
 
     let baseCalcAttr = parseInt(i.calcUseAttr) || 0;
     let buffFlat = parseInt(i.calcBuffFlat) || 0;
@@ -2569,41 +2648,114 @@ function updateUI() {
     if (D > 0) attrOut += `↠ *𝙳𝚎𝚜𝚝𝚛𝚎𝚣𝚊:* ${strCalc(D, bonus.d, flatBonus.d)}\n\n`;
     if (F > 0) attrOut += `↠ *𝙵𝚘𝚛𝚌̧𝚊:* ${strCalc(F, bonus.f, flatBonus.f)}\n\n`;
     if (R > 0) { attrOut += `↠ *𝚁𝚎𝚜𝚒𝚜𝚝𝚎̂𝚗𝚌𝚒𝚊:* ${strCalc(R, bonus.r, flatBonus.r)}\n> 𝙴𝚜𝚝𝚊𝚖𝚒𝚗𝚊: ${i.estaminaAtual.toLocaleString("pt-BR")} / ${estTotalVal.toLocaleString("pt-BR")}\n\n`; }
+    let aVelOut = currentChar.substats.amiVel || 0;
+    let calcAVelFinal = Math.round((aVelOut + flatBonus.amiVel) * (1 + bonus.amiVel));
+    let finalAkumaVel = 0;
+    if (i.hasAmiVel && calcAVelFinal > 0) {
+        let baseAkumaVel = Math.floor(calcAVelFinal * (controlePct / 100));
+        let buffAmiVelVal = parseInt(i.amiVelBuff) || 0;
+        if (buffAmiVelVal > 0) {
+            finalAkumaVel = baseAkumaVel + Math.floor(baseAkumaVel * (buffAmiVelVal / 100));
+        } else {
+            finalAkumaVel = baseAkumaVel;
+        }
+    }
+
     if (V > 0) {
         let velNormalStr = strCalc(V, bonus.v, flatBonus.v);
+        if (i.amiVelAtivo && finalAkumaVel > 0) {
+            let totalVBase = Math.round((V + flatBonus.v) * (1 + bonus.v));
+            velNormalStr += `+${finalAkumaVel.toLocaleString("pt-BR")} (Akuma no Mi) = ${(totalVBase + finalAkumaVel).toLocaleString("pt-BR")}`;
+        }
         let hasWaterDiff = (waterBuffV !== 0 || bonus.vAgua !== 0 || flatBonus.vAgua !== 0 || bonus.reflAgua !== 0 || flatBonus.reflAgua !== 0 || bonus.vcorpAgua !== 0 || flatBonus.vcorpAgua !== 0);
         
         if (hasWaterDiff) {
             let totalBonusVAgua = bonus.v + waterBuffV + bonus.vAgua;
             let totalFlatBonusVAgua = flatBonus.v + flatBonus.vAgua;
             let strTotalAgua = strCalc(V, totalBonusVAgua, totalFlatBonusVAgua);
+            if (i.amiVelAtivo && finalAkumaVel > 0) {
+                let totalVAguaBase = Math.round((V + totalFlatBonusVAgua) * (1 + totalBonusVAgua));
+                strTotalAgua += `+${finalAkumaVel.toLocaleString("pt-BR")} (Akuma no Mi) = ${(totalVAguaBase + finalAkumaVel).toLocaleString("pt-BR")}`;
+            }
             attrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${velNormalStr} | ${strTotalAgua} (dentro d'água)\n`;
             
             let REFAgua = currentChar.substats.reflAgua || 0;
             let VCORPAgua = currentChar.substats.vcorpAgua || 0;
+            let REFAkuma = (i.amiVelAtivo) ? (currentChar.substats.reflAkuma || 0) : 0;
+            let VCORPAkuma = (i.amiVelAtivo) ? (currentChar.substats.vcorpAkuma || 0) : 0;
             let totalBonusReflAgua = bonus.refl + bonus.reflAgua;
             let totalFlatBonusReflAgua = flatBonus.refl + flatBonus.reflAgua;
             let totalBonusVcorpAgua = bonus.vcorp + bonus.vcorpAgua;
             let totalFlatBonusVcorpAgua = flatBonus.vcorp + flatBonus.vcorpAgua;
 
-            if (REF > 0 || REFAgua > 0) {
-                let refNormStr = REF > 0 ? strCalc(REF, bonus.refl, flatBonus.refl) : "";
-                let refWaterStr = REFAgua > 0 ? strCalc(REFAgua, totalBonusReflAgua, totalFlatBonusReflAgua) : "";
-                if (REF > 0 && REFAgua > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${refNormStr} | ${refWaterStr} (dentro d'água)\n`;
-                else if (REF > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${refNormStr}\n`;
-                else if (REFAgua > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘 (𝙳𝚎𝚗𝚝𝚛𝚘 𝚍'𝚊́𝚐𝚞𝚊):_ ${refWaterStr}\n`;
+            if (REF > 0 || REFAgua > 0 || REFAkuma > 0) {
+                let refNormStr = "";
+                if (REF > 0 || REFAkuma > 0) {
+                    let totalBaseRef = Math.round((REF + flatBonus.refl) * (1 + bonus.refl));
+                    if (bonus.refl === 0 && flatBonus.refl === 0) refNormStr = (totalBaseRef + REFAkuma).toLocaleString("pt-BR");
+                    else {
+                        refNormStr = strCalc(REF, bonus.refl, flatBonus.refl);
+                        if (REFAkuma > 0) refNormStr = refNormStr.split(" = ")[0] + `+${REFAkuma.toLocaleString("pt-BR")} (Akuma) = ${(totalBaseRef + REFAkuma).toLocaleString("pt-BR")}`;
+                    }
+                }
+                let refWaterStr = "";
+                if (REFAgua > 0 || REFAkuma > 0) {
+                    let totalBaseRefAgua = Math.round((REFAgua + totalFlatBonusReflAgua) * (1 + totalBonusReflAgua));
+                    if (totalBonusReflAgua === 0 && totalFlatBonusReflAgua === 0) refWaterStr = (totalBaseRefAgua + REFAkuma).toLocaleString("pt-BR");
+                    else {
+                        refWaterStr = strCalc(REFAgua, totalBonusReflAgua, totalFlatBonusReflAgua);
+                        if (REFAkuma > 0) refWaterStr = refWaterStr.split(" = ")[0] + `+${REFAkuma.toLocaleString("pt-BR")} (Akuma) = ${(totalBaseRefAgua + REFAkuma).toLocaleString("pt-BR")}`;
+                    }
+                }
+                if ((REF > 0 || REFAkuma > 0) && (REFAgua > 0 || REFAkuma > 0)) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${refNormStr} | ${refWaterStr} (dentro d'água)\n`;
+                else if (REF > 0 || REFAkuma > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${refNormStr}\n`;
+                else if (REFAgua > 0 || REFAkuma > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘 (𝙳𝚎𝚗𝚝𝚛𝚘 𝚍'𝚊́𝚐𝚞𝚊):_ ${refWaterStr}\n`;
             }
-            if (VCORP > 0 || VCORPAgua > 0) {
-                let vcorpNormStr = VCORP > 0 ? strCalc(VCORP, bonus.vcorp, flatBonus.vcorp) : "";
-                let vcorpWaterStr = VCORPAgua > 0 ? strCalc(VCORPAgua, totalBonusVcorpAgua, totalFlatBonusVcorpAgua) : "";
-                if (VCORP > 0 && VCORPAgua > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${vcorpNormStr} | ${vcorpWaterStr} (dentro d'água)\n`;
-                else if (VCORP > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${vcorpNormStr}\n`;
-                else if (VCORPAgua > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕 (𝙳𝚎𝚗𝚝𝚛𝚘 𝚍'𝚊́𝚐𝚞𝚊):_ ${vcorpWaterStr}\n`;
+            if (VCORP > 0 || VCORPAgua > 0 || VCORPAkuma > 0) {
+                let vcorpNormStr = "";
+                if (VCORP > 0 || VCORPAkuma > 0) {
+                    let totalBaseVcorp = Math.round((VCORP + flatBonus.vcorp) * (1 + bonus.vcorp));
+                    if (bonus.vcorp === 0 && flatBonus.vcorp === 0) vcorpNormStr = (totalBaseVcorp + VCORPAkuma).toLocaleString("pt-BR");
+                    else {
+                        vcorpNormStr = strCalc(VCORP, bonus.vcorp, flatBonus.vcorp);
+                        if (VCORPAkuma > 0) vcorpNormStr = vcorpNormStr.split(" = ")[0] + `+${VCORPAkuma.toLocaleString("pt-BR")} (Akuma) = ${(totalBaseVcorp + VCORPAkuma).toLocaleString("pt-BR")}`;
+                    }
+                }
+                let vcorpWaterStr = "";
+                if (VCORPAgua > 0 || VCORPAkuma > 0) {
+                    let totalBaseVcorpAgua = Math.round((VCORPAgua + totalFlatBonusVcorpAgua) * (1 + totalBonusVcorpAgua));
+                    if (totalBonusVcorpAgua === 0 && totalFlatBonusVcorpAgua === 0) vcorpWaterStr = (totalBaseVcorpAgua + VCORPAkuma).toLocaleString("pt-BR");
+                    else {
+                        vcorpWaterStr = strCalc(VCORPAgua, totalBonusVcorpAgua, totalFlatBonusVcorpAgua);
+                        if (VCORPAkuma > 0) vcorpWaterStr = vcorpWaterStr.split(" = ")[0] + `+${VCORPAkuma.toLocaleString("pt-BR")} (Akuma) = ${(totalBaseVcorpAgua + VCORPAkuma).toLocaleString("pt-BR")}`;
+                    }
+                }
+                if ((VCORP > 0 || VCORPAkuma > 0) && (VCORPAgua > 0 || VCORPAkuma > 0)) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${vcorpNormStr} | ${vcorpWaterStr} (dentro d'água)\n`;
+                else if (VCORP > 0 || VCORPAkuma > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${vcorpNormStr}\n`;
+                else if (VCORPAgua > 0 || VCORPAkuma > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕 (𝙳𝚎𝚗𝚝𝚛𝚘 𝚍'𝚊́𝚐𝚞𝚊):_ ${vcorpWaterStr}\n`;
             }
         } else {
             attrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${velNormalStr}\n`;
-            if (REF > 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${strCalc(REF, bonus.refl, flatBonus.refl)}\n`;
-            if (VCORP > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${strCalc(VCORP, bonus.vcorp, flatBonus.vcorp)}\n`;
+            let REFAkuma = (i.amiVelAtivo) ? (currentChar.substats.reflAkuma || 0) : 0;
+            let VCORPAkuma = (i.amiVelAtivo) ? (currentChar.substats.vcorpAkuma || 0) : 0;
+            if (REF > 0 || REFAkuma > 0) {
+                let totalBaseRef = Math.round((REF + flatBonus.refl) * (1 + bonus.refl));
+                if (bonus.refl === 0 && flatBonus.refl === 0) attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${(totalBaseRef + REFAkuma).toLocaleString("pt-BR")}\n`;
+                else {
+                    let refNormStr = strCalc(REF, bonus.refl, flatBonus.refl);
+                    if (REFAkuma > 0) refNormStr = refNormStr.split(" = ")[0] + `+${REFAkuma.toLocaleString("pt-BR")} (Akuma) = ${(totalBaseRef + REFAkuma).toLocaleString("pt-BR")}`;
+                    attrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${refNormStr}\n`;
+                }
+            }
+            if (VCORP > 0 || VCORPAkuma > 0) {
+                let totalBaseVcorp = Math.round((VCORP + flatBonus.vcorp) * (1 + bonus.vcorp));
+                if (bonus.vcorp === 0 && flatBonus.vcorp === 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${(totalBaseVcorp + VCORPAkuma).toLocaleString("pt-BR")}\n`;
+                else {
+                    let vcorpNormStr = strCalc(VCORP, bonus.vcorp, flatBonus.vcorp);
+                    if (VCORPAkuma > 0) vcorpNormStr = vcorpNormStr.split(" = ")[0] + `+${VCORPAkuma.toLocaleString("pt-BR")} (Akuma) = ${(totalBaseVcorp + VCORPAkuma).toLocaleString("pt-BR")}`;
+                    attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${vcorpNormStr}\n`;
+                }
+            }
         }
         attrOut += `\n`;
     }
@@ -2661,7 +2813,18 @@ function updateUI() {
                 attrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${strPotFinal}\n`;
             }
         }
-        if (i.hasAmiVel && aVel > 0) attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${strCalc(aVel, bonus.amiVel, flatBonus.amiVel)}\n`;
+        if (i.hasAmiVel && aVel > 0) {
+            let calcAVelFinalOut = Math.round((aVel + flatBonus.amiVel) * (1 + bonus.amiVel));
+            let strVelFinal = strCalc(aVel, bonus.amiVel, flatBonus.amiVel);
+            let baseAkumaVelUIOut = Math.floor(calcAVelFinalOut * (controlePct / 100));
+            let amiVelBuffValOut = parseInt(i.amiVelBuff) || 0;
+            if (amiVelBuffValOut > 0) {
+                let finalAkumaVelUIOut = baseAkumaVelUIOut + Math.floor(baseAkumaVelUIOut * (amiVelBuffValOut / 100));
+                attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${strVelFinal} (${finalAkumaVelUIOut.toLocaleString("pt-BR")} de Velocidade Adicional)\n`;
+            } else {
+                attrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${strVelFinal} (${baseAkumaVelUIOut.toLocaleString("pt-BR")} de Velocidade Adicional)\n`;
+            }
+        }
         if (i.hasAmiDesp && aDesp > 0) attrOut += `> _𝙳𝚎𝚜𝚙𝚎𝚛𝚝𝚊𝚛:_ ${strCalc(aDesp, bonus.amiDesp, flatBonus.amiDesp)}\n`;
         if (activeAmiStats > 0) attrOut += `> _𝙲𝚘𝚗𝚝𝚛ᴏ𝚕𝚎:_ ${controlePct}%\n`;
         attrOut += `\n`;
