@@ -501,7 +501,7 @@ async function loadFromCloud() {
   document.getElementById('db-status').classList.add('syncing');
   document.getElementById('db-status').classList.remove('unsaved');
   let toast = document.getElementById('save-toast');
-  if (toast && toast.textContent === "Falta clicar em Salvar!") toast.style.opacity = "0";
+  if (toast && toast.textContent === "Salve as alterações!") toast.style.opacity = "0";
   try {
       const doc = await db.collection("fichas_op").doc(currentDocId).get();
       if (doc.exists) { 
@@ -542,12 +542,14 @@ function saveData(force = false) {
   if (isReadOnly) return;
   let saveMode = document.getElementById('save-mode');
   if (saveMode && saveMode.value === 'manual' && !force) {
-      document.getElementById('db-status').classList.add('unsaved');
-      let toast = document.getElementById('save-toast');
-      if (toast) {
-          toast.textContent = "Falta clicar em Salvar!";
-          toast.style.color = "#0dcaf0";
-          toast.style.opacity = "1";
+      if (currentDocId !== '') {
+          document.getElementById('db-status').classList.add('unsaved');
+          let toast = document.getElementById('save-toast');
+          if (toast) {
+              toast.textContent = "Salve as alterações!";
+              toast.style.color = "#0dcaf0";
+              toast.style.opacity = "1";
+          }
       }
       return;
   }
@@ -560,10 +562,10 @@ function saveData(force = false) {
       
       let dataToSave = JSON.parse(JSON.stringify(charData));
       dataToSave.pcs.forEach(p => {
-          if (p.pc && p.pc.info && p.pc.info.sceneType !== "Extra-Narrada") p.pc.info.sceneText = "";
+          if (p.pc && p.pc.info) { delete p.pc.info.sceneType; delete p.pc.info.sceneText; }
           if (p.npcs) {
               p.npcs.forEach(n => {
-                  if (n.info && n.info.sceneType !== "Extra-Narrada") n.info.sceneText = "";
+                  if (n.info) { delete n.info.sceneType; delete n.info.sceneText; }
               });
           }
       });
@@ -592,7 +594,7 @@ function updateSaveMode(mode) {
     if (mode === 'auto') {
         document.getElementById('db-status').classList.remove('unsaved');
         let toast = document.getElementById('save-toast');
-        if (toast && toast.textContent === "Falta clicar em Salvar!") {
+        if (toast && toast.textContent === "Salve as alterações!") {
             toast.style.opacity = "0";
         }
     }
@@ -726,7 +728,7 @@ function runFallbackChecks() {
               personalidade: "", historia: "", aparencia: "", inventario: "", hasAmiAlc: true, hasAmiDur: true, hasAmiPot: true, hasAmiVel: true, hasAmiDesp: false,
               amiResPct: "", amiAlcMult: "1", calcUseAttr: "", calcInimigoRes: "", calcResIgnorada: "", calcBuffFlat: "", calcBuffPct: "", calcBuffDanoFinalPct: "", calcUseAmi: "sim", amiPotBuff: "", calcUseHaki: "nao", sceneType: "Treino Padrão", sceneText: "", hpAtual: -1,
               boxIden: false, boxMec: false, boxSoc: false, boxBase: false, boxEsp: false, boxAmi: false, boxHist: false, 
-              boxInv: false, boxCalc: false, boxEstamina: false, estaminaAtual: -1, estaminaVelocidade: "", estaminaDano: "", estaminaBuffPct: "", estaminaHakiArm: "nao", estaminaHakiObs: "nao", boxScene: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0, ordemTecnicas: "alfabetica", hideHistoria: false, exaustaoCompleta: false, habilidadesExclusivas: [], habCaminhoAtiradorAtivo: false, habFavArmistaAtivo: "nenhum", habFavArmistaAttr: "d", habQIAvancadoAtivo: false, linhagemBeckmanArma: false, habRetornoUso: 1, merito: 0, aliadosEspiritoContagiante: 0,
+              boxInv: false, boxCalc: false, boxEstamina: false, estaminaAtual: -1, estaminaVelocidade: "", estaminaDano: "", estaminaBuffPct: "", estaminaHakiArm: "nao", estaminaHakiObs: "nao", boxScene: false, akumaId: "", selCharR1: "", selCharR2: "", treinosAcumulados: 0, ordemTecnicas: "alfabetica", hideHistoria: false, hidePersonality: false, exaustaoCompleta: false, habilidadesExclusivas: [], habCaminhoAtiradorAtivo: false, habFavArmistaAtivo: "nenhum", habFavArmistaAttr: "d", habQIAvancadoAtivo: false, linhagemBeckmanArma: false, habRetornoUso: 1, merito: 0, aliadosEspiritoContagiante: 0,
               unlockHA1: false, unlockHA2: false, unlockHA3: false, unlockHA4: false, unlockHA5: false, unlockHA6: false,
               unlockHO2: false, unlockHO3: false, unlockHO4: false,
               unlockHR1: false, unlockHR2: false, unlockHR3: false, unlockHR4: false, unlockHR5: false, unlockHR6: false
@@ -954,7 +956,7 @@ function renderNpcsEspeciais() {
 }
 
 function addTecnica() {
-    currentChar.tecnicasList.push({nome: "", desc: "", efeito: "", estilo: ""});
+    currentChar.tecnicasList.push({nome: "", desc: "", efeito: "", estilo: "", naoTreinada: false});
     saveData();
     renderTecnicas();
     updateUI();
@@ -1034,8 +1036,13 @@ function renderTecnicas() {
 
         container.innerHTML += `
             <div style="background: rgba(0,0,0,0.3); padding: 10px; border: 1px dashed #555; border-radius: 6px; margin-bottom: 10px;">
-                <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
-                    <label style="color:var(--info);">Técnica ${idx + 1}</label>
+                <div style="display:flex; justify-content:space-between; margin-bottom: 5px; align-items:center;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <label style="color:var(--info); margin:0;">Técnica ${idx + 1}</label>
+                        <label style="display:flex; align-items:center; gap:4px; font-size:10px; color:var(--danger); cursor:pointer; margin:0; text-transform:none; font-weight:normal;">
+                            <input type="checkbox" onchange="updateTecnica(${idx}, 'naoTreinada', this.checked)" ${t.naoTreinada ? 'checked' : ''} style="width:auto; margin:0; cursor:pointer;"> Não Treinada
+                        </label>
+                    </div>
                     <div style="display:flex; gap: 5px;">
                         <button type="button" class="btn btn-outline" style="font-size:10px; padding:2px 6px;" onclick="moveTecnica(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>⬆️</button>
                         <button type="button" class="btn btn-outline" style="font-size:10px; padding:2px 6px;" onclick="moveTecnica(${idx}, 1)" ${idx === currentChar.tecnicasList.length - 1 ? 'disabled' : ''}>⬇️</button>
@@ -1212,7 +1219,7 @@ function updateField(category, field, value) {
         currentChar[category][field] = value; 
     } 
     
-    if (field === 'sceneText' && currentChar.info.sceneType !== "Extra-Narrada") {
+    if (field === 'sceneText' || field === 'sceneType') {
         updateUI();
         return;
     }
@@ -1262,6 +1269,18 @@ function formatIdade(val) {
     updateField('info', 'idade', age + textoIdade);
 }
 
+function formatAmiAlcMult(el) {
+    let val = el.value.replace(',', '.').trim();
+    val = val.replace(/[^0-9.]/g, '');
+    if (val !== '') {
+        val = val + 'x';
+    }
+    el.value = val;
+    currentChar.info.amiAlcMult = val;
+    saveData();
+    updateUI();
+}
+
 async function handlePatenteChange(val) {
     currentChar.info.patente = val;
     if (val !== "" && typeof salarios[val] !== 'undefined') {
@@ -1293,6 +1312,10 @@ function formatCurrency(category, field, el) {
 
 function formatPhone(el) {
     let v = el.value.replace(/\D/g, "").substring(0, 11);
+    if (v.length > 2 && v[2] !== '9') {
+        v = v.substring(0, 2) + '9' + v.substring(2);
+        v = v.substring(0, 11);
+    }
     let res = v;
     if (v.length > 2) res = "(" + v.substring(0, 2) + ") " + v.substring(2);
     if (v.length > 7) res = res.substring(0, 10) + "-" + res.substring(10);
@@ -1356,10 +1379,12 @@ function updateUI() {
 
     if (charData.layoutMode === 'vertical') {
         container.classList.add('vertical-mode');
+        document.body.classList.remove('pc-mode');
         newMeta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0";
         if (btn) btn.textContent = "🖥️Modo PC";
     } else {
         container.classList.remove('vertical-mode');
+        document.body.classList.add('pc-mode');
         newMeta.content = "width=1400";
         if (btn) btn.textContent = "📱Modo Lista";
     }
@@ -1512,6 +1537,7 @@ function updateUI() {
     checkFields.forEach(f => { let el = document.getElementById('chk-'+f); if(el) el.checked = i[f] || false; });
     let elAliados = document.getElementById('info-aliadosEspiritoContagiante'); if (elAliados) elAliados.value = i.aliadosEspiritoContagiante || 0;
     let chkHideHist = document.getElementById('info-hideHistoria'); if (chkHideHist) chkHideHist.checked = i.hideHistoria || false;
+    let chkHidePers = document.getElementById('hide-personality'); if (chkHidePers) chkHidePers.checked = i.hidePersonality || false;
     let chkExaustao = document.getElementById('info-exaustaoCompleta'); if (chkExaustao) chkExaustao.checked = i.exaustaoCompleta || false;
 
     let selAlcunha = document.getElementById('info-alcunha');
@@ -2643,7 +2669,7 @@ function updateUI() {
 
     let formatHistPers = (text) => { return text.split('\n').map(l => { let trimL = l.trim(); if (trimL === "") return ""; return '> ' + trimL.replace(/^>\s*/, ''); }).join('\n'); };
     let histPersOut = "";
-    if(i.personalidade && i.personalidade.trim() !== "") { histPersOut += `\n  : ᓩ _𝐏ᴇʀsᴏɴᴀʟɪᴅᴀᴅᴇ:_\n${formatHistPers(i.personalidade)}\n`; }
+    if(!i.hidePersonality && i.personalidade && i.personalidade.trim() !== "") { histPersOut += `\n  : ᓩ _𝐏ᴇʀsᴏɴᴀʟɪᴅᴀᴅᴇ:_\n${formatHistPers(i.personalidade)}\n`; }
     if(!i.hideHistoria && i.historia && i.historia.trim() !== "") { histPersOut += `\n  : ᓩ _𝐇ɪsᴛᴏ́ʀɪᴀ:_\n${formatHistPers(i.historia)}\n`; }
 
     let attrOut = "";
@@ -2986,9 +3012,10 @@ function updateUI() {
         estilosKeys.forEach(stKey => {
             tecnicasOut += `« ${stKey} »\n`;
             agrupado[stKey].forEach(t => {
-                if (t.nome) tecnicasOut += `* ${t.nome}\n`;
-                if (t.desc) { t.desc.split('\n').forEach(line => { let trimLine = line.trim(); if(trimLine !== "") tecnicasOut += `> ${trimLine.replace(/^>\s*/, '')}\n`; }); }
-                if (t.efeito) { t.efeito.split('\n').forEach((line, idx) => { let trimLine = line.trim(); if(trimLine !== "") { if (idx === 0) tecnicasOut += `> Efeito: ${trimLine.replace(/^>\s*/, '')}\n`; else tecnicasOut += `> ${trimLine.replace(/^>\s*/, '')}\n`; } }); }
+                let unt = t.naoTreinada ? "~" : "";
+                if (t.nome) tecnicasOut += `* ${unt}${t.nome}${unt}\n`;
+                if (t.desc) { t.desc.split('\n').forEach(line => { let trimLine = line.trim(); if(trimLine !== "") tecnicasOut += `> ${unt}${trimLine.replace(/^>\s*/, '')}${unt}\n`; }); }
+                if (t.efeito) { t.efeito.split('\n').forEach((line, idx) => { let trimLine = line.trim(); if(trimLine !== "") { if (idx === 0) tecnicasOut += `> ${unt}Efeito: ${trimLine.replace(/^>\s*/, '')}${unt}\n`; else tecnicasOut += `> ${unt}${trimLine.replace(/^>\s*/, '')}${unt}\n`; } }); }
                 tecnicasOut += `\n`;
             });
         });
@@ -3022,10 +3049,10 @@ function updateUI() {
     if (totalBase >= 10000) { let e4 = formatStyle(4); if (e4) estilosText += `* ${e4}\n`; else estilosText += `* (Vazio)\n`; } else { estilosText += `* 🔒 (Libera com 10.000)\n`; }
 
     let c1Out = i.classe ? getClassDisplayName(i.classe, i.sexo) : '𝙸𝚗𝚒𝚌𝚒𝚊𝚕';
-    let c2Out = i.classe2 ? getClassDisplayName(i.classe2, i.sexo) : '5.000';
+    let c2Out = i.classe2 ? getClassDisplayName(i.classe2, i.sexo) : (isSp ? '𝙸𝚗𝚒𝚌𝚒𝚊𝚕' : '5.000');
     let c3Out = i.classe3 ? getClassDisplayName(i.classe3, i.sexo) : '10.000';
-    let c4Out = i.classe4 ? getClassDisplayName(i.classe4, i.sexo) : '20.000';
-    let c5Out = i.classe5 ? getClassDisplayName(i.classe5, i.sexo) : '35.000';
+    let c4Out = i.classe4 ? getClassDisplayName(i.classe4, i.sexo) : (isSp ? '15.000' : '20.000');
+    let c5Out = i.classe5 ? getClassDisplayName(i.classe5, i.sexo) : (isSp ? '30.000' : '35.000');
 
     let racaOutput = (isNPC && i.raca === 'Outra') ? (i.racaNomeCustom || 'Raça Custom') : (formatRaceStr(i.raca, i.animal, i.sexo === "Feminino") || '');
     if (i.linhagem === "Charlotte") { 
@@ -3325,10 +3352,10 @@ async function saveBackup() {
     document.getElementById('db-status').classList.add('syncing');
     let dataToSave = JSON.parse(JSON.stringify(charData));
     dataToSave.pcs.forEach(p => {
-        if (p.pc && p.pc.info && p.pc.info.sceneType !== "Extra-Narrada") p.pc.info.sceneText = "";
+        if (p.pc && p.pc.info) { delete p.pc.info.sceneType; delete p.pc.info.sceneText; }
         if (p.npcs) {
             p.npcs.forEach(n => {
-                if (n.info && n.info.sceneType !== "Extra-Narrada") n.info.sceneText = "";
+                if (n.info) { delete n.info.sceneType; delete n.info.sceneText; }
             });
         }
     });
@@ -3380,7 +3407,13 @@ async function loadBackup() {
     await customAlert("Backup carregado e restaurado com sucesso!");
 }
 
-window.onload = init;
+window.onload = () => {
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+    init();
+};
 
 window.puxarVelocidade = function() {
     if(isReadOnly) return;

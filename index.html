@@ -43,7 +43,7 @@
   <div class="three-col-grid">
       <div class="box">
           <div class="box-title" id="title-boxIden" style="color: var(--info);" onclick="toggleBox('boxIden')">
-              <span>Identidade <span onclick="openInfoModal('Identidade', 'Defina o básico: Nome, Alcunha, Idade (mínimo 15), Sexo, Sangue, Altura e Nacionalidade. A Localização Atual serve para guiar em qual ilha do mapa você se encontra. Estes dados não afetam atributos, mas são a base da sua interpretação e do seu Roleplay.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px;">ⓘ</span></span><span id="icon-boxIden" class="toggle-icon">▼</span>
+              <span>Identidade <span onclick="openInfoModal('Identidade', 'Preencha os campos básicos do personagem. Para a alcunha, clique no botão + para adicionar e na engrenagem ou lápis para editar e aplicar buffs globais. A Localização Atual deve ser sincronizada com a ilha em que você está narrando no momento. Não deixe os campos obrigatórios vazios para evitar falhas na contagem da ficha.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px;">ⓘ</span></span><span id="icon-boxIden" class="toggle-icon">▼</span>
           </div>
           <div id="wrapper-boxIden" class="box-content">
               <div class="input-group"><label>Nome do Personagem</label><input type="text" id="pc-name" oninput="updateField('name', null, this.value)"></div>
@@ -98,7 +98,7 @@
 
       <div class="box">
           <div class="box-title" id="title-boxMec" style="color: var(--warning);" onclick="toggleBox('boxMec')">
-              <span>Mecânicas Principais <span onclick="openInfoModal('Mecânicas Principais', 'Essencial para calcular seus bônus! 1. Escolha sua Classe inicial (novas abrem aos 5k, 10k, 20k e 35k). 2. Defina sua Raça e Linhagem; elas aplicam multiplicadores nos seus Atributos. 3. Linhagens como Charlotte exigem uma 2ª Raça e a escolha de qual status cada raça vai fortalecer.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px;">ⓘ</span></span><span id="icon-boxMec" class="toggle-icon">▼</span>
+              <span>Mecânicas Principais <span onclick="openInfoModal('Mecânicas Principais', 'Selecione primeiro sua Raça e Linhagem, pois elas modificam seus multiplicadores automaticamente. Ao escolher uma raça híbrida ou linhagem Charlotte, selecione nos campos que aparecerão qual atributo receberá o foco do buff. As classes são liberadas pelos seus Pontos Totais. Você deve trocar para a próxima classe correspondente ao seu nível assim que a ficha acusar o alcance de 5.000, 10.000, 20.000 ou 35.000 pontos.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px;">ⓘ</span></span><span id="icon-boxMec" class="toggle-icon">▼</span>
           </div>
           <div id="wrapper-boxMec" class="box-content">
               <div class="input-row">
@@ -173,7 +173,7 @@
 
       <div class="box">
           <div class="box-title" id="title-boxSoc" style="color: var(--success);" onclick="toggleBox('boxSoc')">
-              <span>Social e Estilos <span onclick="openInfoModal('Social e Estilos', '1. Escolha se é Pirata, Marinha ou Governo. Patentes governamentais preenchem o seu salário automaticamente. 2. Atualize Recompensa e Berries. 3. Estilos de Luta: Você começa com 2 slots. Aos 5.000 e 10.000 pontos, libera o 3º e 4º. O estilo Freestyle permite customizar o nome da sua arte marcial.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px;">ⓘ</span></span><span id="icon-boxSoc" class="toggle-icon">▼</span>
+              <span>Social e Estilos <span onclick="openInfoModal('Social e Estilos', 'Selecione a sua Organização no menu. Se escolher Marinha ou Governo, o campo de Patente irá atualizar e travar baseado nos seus pontos totais, preenchendo seu salário sozinho. Para Estilos de Luta, você pode selecionar Estilos base ou Freestyle. O terceiro e quarto slots são travados até que a ficha chegue nos marcos de poder, não tente forçar a escolha antes da hora.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px;">ⓘ</span></span><span id="icon-boxSoc" class="toggle-icon">▼</span>
           </div>
           <div id="wrapper-boxSoc" class="box-content">
               <div class="input-row">
@@ -246,7 +246,7 @@
     <div>
         <div class="box">
             <div class="box-title" id="title-boxHab" style="color: var(--primary);" onclick="toggleBox('boxHab')">
-                <span>Habilidades Únicas <span onclick="openInfoModal('Habilidades Únicas', 'Aqui você gerencia passivas e ativas únicas. Algumas linhagens dão habilidades automaticamente (você não pode remover). Outras você adquire via sistema e adiciona clicando no sinal de +. Se uma habilidade pedir ativação em combate, marque a caixa correspondente abaixo da lista para que o buff seja aplicado na mesma hora.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px;">ⓘ</span></span><span id="icon-boxHab" class="toggle-icon">▼</span>
+                <span>Habilidades Únicas <span onclick="openInfoModal('Habilidades Únicas', 'Clique no botão com o sinal de soma para buscar as habilidades que seu personagem comprou ou conquistou. Habilidades ligadas à sua Raça ou Linhagem aparecerão sozinhas e não podem ser apagadas. Abaixo da lista, surgirão caixas de seleção. Use-as DURANTE o combate para ligar ou desligar buffs dinâmicos que modificam seus status na mesma hora.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px;">ⓘ</span></span><span id="icon-boxHab" class="toggle-icon">▼</span>
             </div>
             <div id="wrapper-boxHab" class="box-content">
                 <div class="input-group">
@@ -304,7 +304,7 @@
 
         <div class="box">
             <div class="box-title" id="title-boxBase" onclick="toggleBox('boxBase')">
-                <span>Atributos Base <span onclick="openInfoModal('Atributos Base', 'Distribua seu limite de pontos iniciais ou de treinos entre Força, Destreza, Resistência e Velocidade. O Total exibido já inclui os multiplicadores de bônus. IMPORTANTE: Se você tiver pontos de Velocidade Totais, os sub-atributos (Reflexo e Vel. Corporal) devem ser preenchidos manualmente dividindo aquele total exato. O sistema avisará em vermelho se faltar ou sobrar.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px; color: var(--info);">ⓘ</span></span><span id="icon-boxBase" class="toggle-icon">▼</span>
+                <span>Atributos Base <span onclick="openInfoModal('Atributos Base', 'Digite os pontos brutos que você ganhou em Força, Destreza, Resistência e Velocidade nas caixas de input. O sistema calcula o Total ao lado baseado nos seus buffs. Se o seu total de Velocidade for maior que zero, um painel inferior abrirá. Você precisa dividir EXATAMENTE o valor Total da Velocidade entre Reflexos e Velocidade Corporal, ou o sistema bloqueará com um aviso vermelho.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px; color: var(--info);">ⓘ</span></span><span id="icon-boxBase" class="toggle-icon">▼</span>
             </div>
             <div id="wrapper-boxBase" class="box-content">
                 <div id="totalBaseDisplay" style="text-align: center; font-size: 22px; font-weight: bold; font-family: 'Cinzel', serif; color: var(--info); margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid var(--info);">Total: 0</div>
@@ -360,7 +360,7 @@
 
         <div class="box">
             <div class="box-title" id="title-boxEsp" style="color: #a461ff;" onclick="toggleBox('boxEsp')">
-                <span>Espírito <span onclick="openInfoModal('Espírito', 'Desbloqueado aos 15.000 pontos (ou 12.000 em casos raros). Primeiro invista no status principal Espírito. O valor total resultante dele deve ser distribuído manualmente nos sub-atributos de Haki (Armamento, Observação e Rei). Acompanhe os alertas na tela para garantir que a soma bate exatamente.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px;">ⓘ</span></span><span id="icon-boxEsp" class="toggle-icon">▼</span>
+                <span>Espírito <span onclick="openInfoModal('Espírito', 'A caixa só abre quando você atinge o mínimo de pontos totais. Coloque os pontos no campo Espírito Base. Em seguida, desça para as caixas de Armamento, Observação e Rei. Você precisa pegar o Total do seu Espírito e fragmentar ele nestes três Hakis. Ao colocar pontos neles, caixas de marcação aparecerão abaixo; clique para ligar a capacidade de usar níveis avançados quando você obtiver a aprovação.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px;">ⓘ</span></span><span id="icon-boxEsp" class="toggle-icon">▼</span>
             </div>
             <div id="wrapper-boxEsp" class="box-content">
                 <div style="margin-bottom: 10px;">
@@ -410,7 +410,7 @@
 
         <div class="box" id="container-boxAmi">
             <div class="box-title" id="title-boxAmi" style="color: var(--danger);" onclick="toggleBox('boxAmi')">
-                <span>Akuma no Mi <span onclick="openInfoModal('Akuma no Mi', 'Só ativada se escolher uma Fruta na lista. Distribua seu atributo principal de Akuma até o limite que seus Atributos Base permitirem. A pontuação Total de Akuma deve ser subdividida entre Alcance, Durabilidade, Potência e Velocidade (máx. 10.000 por atributo). Se todos alcançarem o máximo, o Despertar é liberado.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px;">ⓘ</span></span><span id="icon-boxAmi" class="toggle-icon">▼</span>
+                <span>Akuma no Mi <span onclick="openInfoModal('Akuma no Mi', 'Este campo é vinculado com a Fruta selecionada. Deposite seus pontos na caixa principal. Embaixo, ative apenas as caixas que sua fruta engloba. O sistema vai pegar o valor Total e te obrigar a dividir com perfeição entre as capacidades. Se a barra de Controle de Habilidade chegar em cem por cento, o painel do Despertar vai acender indicando a liberação.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px;">ⓘ</span></span><span id="icon-boxAmi" class="toggle-icon">▼</span>
             </div>
             <div id="wrapper-boxAmi" class="box-content">
                 <div class="input-group">
@@ -434,7 +434,7 @@
                             <input type="text" id="sub-amiAlc" placeholder="0" oninput="formatAndSave('substats', 'amiAlc', this)" style="font-size: 14px; text-align: right; font-weight: bold;">
                             <div style="display:flex; align-items:center; justify-content: space-between; margin-top:5px;">
                               <label style="font-size:9px; margin:0; text-transform:none; color:#aaa;">Multiplicador (m):</label>
-                              <input type="text" id="info-amiAlcMult" placeholder="Ex: 1.8" oninput="updateField('info', 'amiAlcMult', this.value)" style="width:45px; padding:2px; font-size:10px; text-align:center; background: #222; border: 1px solid #555;">
+                              <input type="text" id="info-amiAlcMult" placeholder="Ex: 1.8x" onchange="formatAmiAlcMult(this)" style="width:45px; padding:2px; font-size:10px; text-align:center; background: #222; border: 1px solid #555;">
                             </div>
                         </div>
 
@@ -489,7 +489,7 @@
 
         <div class="box">
             <div class="box-title" id="title-boxEstamina" onclick="toggleBox('boxEstamina')">
-                <span>Calculadora de Estamina <span onclick="openInfoModal('Calculadora de Estamina', 'Controle sua energia. A Estamina Total deriva de (Resistência×2). Ao atacar, preencha as caixas com os buffs que ativou: Velocidade e Dano gastam 10 porcento do valor; Buffs percentuais e Hakis têm custos tabelados. Clique em Gastar e o valor será abatido da Estamina Atual. Use os Repousos para recuperar energia quando permitido.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px; color: var(--info);">ⓘ</span></span><span id="icon-boxEstamina" class="toggle-icon">▼</span>
+                <span>Calculadora de Estamina <span onclick="openInfoModal('Calculadora de Estamina', 'Na hora do turno de combate, não diminua sua estamina de cabeça. Puxe os dados usando os botões Puxar. O sistema calcula a dedução correta automaticamente com base nos seus multiplicadores e buffs engatilhados. Quando o gasto total estiver certo, clique em Gastar Estamina para reduzir a barra vermelha. Use os botões de Repouso quando o mestre liberar turnos de descanso.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px; color: var(--info);">ⓘ</span></span><span id="icon-boxEstamina" class="toggle-icon">▼</span>
             </div>
             <div id="wrapper-boxEstamina" class="box-content">
                 <div style="text-align: center; margin-bottom: 15px;">
@@ -553,7 +553,7 @@
 
         <div class="box">
             <div class="box-title" id="title-boxCalc" onclick="toggleBox('boxCalc')">
-                <span>Calculadora de Dano <span onclick="openInfoModal('Calculadora de Dano', 'Para uso em turnos de combate. 1. Insira a Resistência do Inimigo. 2. Escolha se ataca com Força ou Destreza. 3. Preencha os Buffs gerados por suas técnicas na rodada. 4. Selecione o nível do Haki e uso de Paramecia. O sistema pegará sua Potência e mostrará a fórmula completa, entregando o Dano Físico exato que você causará.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px; color: var(--info);">ⓘ</span></span><span id="icon-boxCalc" class="toggle-icon">▼</span>
+                <span>Calculadora de Dano <span onclick="openInfoModal('Calculadora de Dano', 'Durante o embate, coloque a resistência adversária no primeiro campo. Selecione se seu golpe foi de Destreza ou Força, e adicione bônus brutos ou porcentagens ativas que declarou. O sistema puxará sua Potência de Fruta e seu nível de Haki marcado, formulando a matemática de dano físico embaixo. Clique no botão de Receber Dano só se você for o alvo do ataque.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px; color: var(--info);">ⓘ</span></span><span id="icon-boxCalc" class="toggle-icon">▼</span>
             </div>
             <div id="wrapper-boxCalc" class="box-content">
                 <div style="text-align: center; margin-bottom: 15px;">
@@ -628,10 +628,18 @@
         
         <div class="box">
             <div class="box-title" id="title-boxHist" onclick="toggleBox('boxHist')">
-                <span>História e Personalidade <span onclick="openInfoModal('História e Personalidade', 'Escreva com o máximo de detalhes como seu personagem pensa, age, e qual foi a trajetória dele até o presente momento. Caso a História seja um segredo para os outros jogadores, marque a caixa de Ocultar para não exibi-la no resumo final copiado.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px; color: var(--info);">ⓘ</span></span><span id="icon-boxHist" class="toggle-icon">▼</span>
+                <span>História e Personalidade <span onclick="openInfoModal('História e Personalidade', 'Digite sua biografia e comportamento nessas caixas. Caso seu passado envolva dados sigilosos na trama do RPG que não podem ser vistos por metagaming em resumos, deixe marcada a opção Ocultar na Ficha. Dessa forma o texto é salvo no banco, mas ignorado ao pressionar o botão Copiar Ficha.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px; color: var(--info);">ⓘ</span></span><span id="icon-boxHist" class="toggle-icon">▼</span>
             </div>
             <div id="wrapper-boxHist" class="box-content">
-                <div class="input-group"><label>Personalidade</label><textarea id="info-personalidade" oninput="updateField('info', 'personalidade', this.value)"></textarea></div>
+                <div class="input-group">
+    <label style="display:flex; justify-content:space-between; align-items:center;">
+        Personalidade
+        <label style="margin:0; font-size:10px; color:var(--warning); text-transform:none; cursor:pointer; display:flex; gap:5px; align-items:center; width:fit-content;">
+            <input type="checkbox" id="hide-personality" onchange="updateField('info', 'hidePersonality', this.checked)" style="width:auto; margin:0;"> Ocultar na Ficha
+        </label>
+    </label>
+    <textarea id="info-personalidade" oninput="updateField('info', 'personalidade', this.value)"></textarea>
+</div>
                 <div class="input-group">
                     <label style="display:flex; justify-content:space-between; align-items:center;">
                         História
@@ -641,7 +649,7 @@
                     </label>
                     <textarea id="info-historia" style="min-height: 120px;" oninput="updateField('info', 'historia', this.value)"></textarea>
                 </div>
-                <div class="input-group"><label>Aparência</label><textarea id="info-aparencia" oninput="updateField('info', 'aparencia', this.value)"></textarea></div>
+                <div class="input-group"><label>Referência de Aparência</label><input type="text" id="info-aparencia" placeholder="Ex: Roronoa Zoro (One Piece)" oninput="updateField('info', 'aparencia', this.value)"></div>
             </div>
         </div>
     </div>
@@ -649,7 +657,7 @@
     <div>
         <div class="box">
             <div class="box-title" id="title-boxScene" onclick="toggleBox('boxScene')">
-                <span style="color: var(--info);">Escritor de Cenas <span onclick="openInfoModal('Escritor de Cenas', 'Esta ferramenta serve para redigir seus treinos e missões. Basta selecionar a categoria no menu, começar a digitar o seu Roleplay e as métricas contarão automaticamente. Assim que atingir o Mínimo de Palavras do sistema para o tipo de cena escolhido, a barra de status vai ficar Verde indicando o sucesso!'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px;">ⓘ</span></span><span id="icon-boxScene" class="toggle-icon">▼</span>
+                <span style="color: var(--info);">Escritor de Cenas <span onclick="openInfoModal('Escritor de Cenas', 'Use a área de texto para realizar a contagem simultânea do seu roleplay. Selecione na aba que tipo de cena está produzindo. Acompanhe a marcação na parte inferior. Enquanto estiver em vermelho, seu texto ainda não atingiu o limite estipulado pelo sistema. Lembre-se que este campo serve somente de bloco de notas e apagará seus rascunhos caso feche a aba sem copiar.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px;">ⓘ</span></span><span id="icon-boxScene" class="toggle-icon">▼</span>
             </div>
             <div id="wrapper-boxScene" class="box-content">
                 <div class="input-group">
@@ -678,7 +686,7 @@
 
         <div class="box">
             <div class="box-title" id="title-boxLog" style="color: var(--warning);" onclick="toggleBox('boxLog')">
-                <span>Log de Atualizações <span onclick="openInfoModal('Log de Atualizações', 'O seu diário de progressão! Cada bloco deve representar uma semana ou encerramento de evento. Nele, anote os berries ganhos, pontos adquiridos, técnicas treinadas e gastos. É obrigatório manter isso organizado, pois é a prova que os Avaliadores usam para conferir os números exatos da sua ficha.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px;">ⓘ</span></span><span id="icon-boxLog" class="toggle-icon">▼</span>
+                <span>Log de Atualizações <span onclick="openInfoModal('Log de Atualizações', 'Ao final de toda semana, clique em Adicionar Entrada. Use o título para indicar a numeração da semana e a caixa maior para listar os treinos feitos, dinheiro conquistado e NPCs recrutados. Para aprovação da sua ficha com os ADMs, não mande prints, use o botão Copiar Tudo para exportar perfeitamente a lista de evolução.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px;">ⓘ</span></span><span id="icon-boxLog" class="toggle-icon">▼</span>
             </div>
             <div id="wrapper-boxLog" class="box-content">
                 <div class="input-group">
@@ -703,7 +711,7 @@
 
         <div class="box">
             <div class="box-title" id="title-boxInv" onclick="toggleBox('boxInv')">
-                <span>Inventário e NPCs <span onclick="openInfoModal('Inventário e NPCs', '1. Inventário: Liste suas armas, itens e roupas livremente. 2. NPCs Comuns: Usado para multidões de capangas, bastando colocar a quantia e a raça (ex: 50 Minks). 3. Especiais: Aliados de Evento ou Dominação. Cada NPC tem um limite de atributos. Preencha Nome, Origem e distribua suas classes respeitando os bloqueios numéricos.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px; color: var(--info);">ⓘ</span></span><span id="icon-boxInv" class="toggle-icon">▼</span>
+                <span>Inventário e NPCs <span onclick="openInfoModal('Inventário e NPCs', 'Para capangas sem ficha complexa, preencha a quantidade em NPCs Comuns. Para recrutamentos importantes e de poder elevado, adicione em NPCs Especiais. Modifique a Origem e adicione o nome da raça. O menu das cinco classes de NPC será destrancado apenas se você designar a quantidade mínima de pontos requisitados para aquela classe nas caixas de texto.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px; color: var(--info);">ⓘ</span></span><span id="icon-boxInv" class="toggle-icon">▼</span>
             </div>
             <div id="wrapper-boxInv" class="box-content">
                 <div class="input-group">
@@ -730,7 +738,7 @@
 
         <div class="box">
             <div class="box-title" id="title-boxTec" onclick="toggleBox('boxTec')">
-                <span>Técnicas <span onclick="openInfoModal('Técnicas', 'Cadastre cada um de seus golpes. O campo Treinos Acumulados serve para organizar criações pendentes. Crie uma técnica nova e associe ela a um de seus Estilos de Luta (Freestyle, Electro, etc). Preencha o nome, explique a parte visual na Descrição e diga na parte de Efeitos o que ela dá de Bônus em números de sistema.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px; color: var(--info);">ⓘ</span></span><span id="icon-boxTec" class="toggle-icon">▼</span>
+                <span>Técnicas <span onclick="openInfoModal('Técnicas', 'Clique em Adicionar Técnica. É imperativo que selecione o Estilo de Luta correspondente no menu. Em Nome, apenas insira o título do golpe. Em Descrição, detalhe puramente as ações narrativas da movimentação. O espaço de Efeitos é estritamente mecânico: escreva o debuff ou buff com exatidão matemática para que os avaliadores validem sem erros de interpretação.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px; color: var(--info);">ⓘ</span></span><span id="icon-boxTec" class="toggle-icon">▼</span>
             </div>
             <div id="wrapper-boxTec" class="box-content">
                 <div class="input-group">
@@ -755,7 +763,7 @@
 
         <div class="box">
             <div class="box-title" id="title-boxRes" onclick="toggleBox('boxRes')">
-                <span>Ficha Pronta <span onclick="openInfoModal('Ficha Pronta', 'Este é o seu código final, gerado em tempo real e já formatado para o WhatsApp. NUNCA digite nada diretamente aqui. Sempre que alterar os painéis acima, este texto se refaz. Use os botões de Copiar localizados acima dele para puxar a aba completa ou apenas o Log e os Atributos que você atualizou.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px; color: var(--info);">ⓘ</span></span><span id="icon-boxRes" class="toggle-icon">▼</span>
+                <span>Ficha Pronta <span onclick="openInfoModal('Ficha Pronta', 'Este visor exibe o código bruto do WhatsApp formatado sem margem de erros de recuo. É bloqueado contra cliques. Use sempre os três botões principais acima da caixa de visualização para exportar as partes de código isoladas. Copie as Técnicas se adicionou um novo golpe, ou copie apenas a Ficha completa caso tenha upado de nível base.'); event.stopPropagation();" style="cursor: pointer; font-size: 0.9em; opacity: 0.8; margin-left: 5px; color: var(--info);">ⓘ</span></span><span id="icon-boxRes" class="toggle-icon">▼</span>
             </div>
             <div id="wrapper-boxRes" class="box-content">
                 <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
