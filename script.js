@@ -2793,26 +2793,26 @@ function updateUI() {
         if (HA > 0) {
             attrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚘 𝙰𝚛𝚖𝚊𝚖𝚎𝚗𝚝𝚘:_ ${strCalc(HA, bonus.ha, flatBonus.ha)}\n`;
             let hasHigherHA = (i.unlockHA3 || i.unlockHA4 || i.unlockHA5 || i.unlockHA6);
-            if (i.unlockHA1 && !i.unlockHA2 && !hasHigherHA) attrOut += `- 𝙸𝚗𝚟𝚒𝚜𝚒́𝚟𝚎𝚕\n`;
-            if (i.unlockHA2 && !hasHigherHA) attrOut += `- 𝚅𝚒𝚜𝚒́𝚟𝚎𝚕\n`;
-            if (i.unlockHA3) attrOut += `- 𝙸𝚖𝚋𝚞𝚒𝚌̧𝚊̃𝚘\n`;
-            if (i.unlockHA4) attrOut += `- 𝙵𝚞𝚕𝚕 𝙱𝚘𝚍𝚢\n`;
-            if (i.unlockHA5) attrOut += `- 𝙴𝚖𝚒𝚜𝚜𝚊̃𝚘\n`;
-            if (i.unlockHA6) attrOut += `- 𝙰𝚟𝚊𝚗𝚌̧𝚊𝚍𝚘\n`;
+            if (i.unlockHA1 && !i.unlockHA2 && !hasHigherHA) attrOut += `- 𝙸𝚗𝚟𝚒𝚜𝚒́𝚟𝚎𝚕✓\n`;
+            if (i.unlockHA2 && !hasHigherHA) attrOut += `- 𝚅𝚒𝚜𝚒́𝚟𝚎𝚕✓\n`;
+            if (i.unlockHA3) attrOut += `- 𝙸𝚖𝚋𝚞𝚒𝚌̧𝚊̃𝚘✓\n`;
+            if (i.unlockHA4) attrOut += `- 𝙵𝚞𝚕𝚕 𝙱𝚘𝚍𝚢✓\n`;
+            if (i.unlockHA5) attrOut += `- 𝙴𝚖𝚒𝚜𝚜𝚊̃𝚘✓\n`;
+            if (i.unlockHA6) attrOut += `- 𝙰𝚟𝚊𝚗𝚌̧𝚊𝚍𝚘✓\n`;
         }
         if (HO > 0) {
             attrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚊 𝙾𝚋𝚜𝚎𝚛𝚟𝚊𝚌̧𝚊̃𝚘:_ ${strCalc(HO, bonus.ho, flatBonus.ho)}\n`;
-            if (i.unlockHO2) attrOut += `- 𝙸𝚗𝚝𝚎𝚗𝚌̧𝚊̃𝚘\n`;
-            if (i.unlockHO3) attrOut += `- 𝙿𝚛𝚎𝚖𝚘𝚗𝚒𝚌̧𝚊̃𝚘\n`;
-            if (i.unlockHO4) attrOut += `- 𝙰𝚟𝚊𝚗𝚌̧𝚊𝚍𝚘\n`;
+            if (i.unlockHO2) attrOut += `- 𝙸𝚗𝚝𝚎𝚗𝚌̧𝚊̃𝚘✓\n`;
+            if (i.unlockHO3) attrOut += `- 𝙿𝚛𝚎𝚖𝚘𝚗𝚒𝚌̧𝚊̃𝚘✓\n`;
+            if (i.unlockHO4) attrOut += `- 𝙰𝚟𝚊𝚗𝚌̧𝚊𝚍𝚘✓\n`;
         }
         if (HR > 0) {
             attrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚘 𝚁𝚎𝚒:_ ${strCalc(HR, bonus.hr, flatBonus.hr)}\n`;
-            if (i.unlockHR2) attrOut += `- 𝙳𝚘𝚖𝚒𝚗𝚊𝚌̧𝚊̃𝚘\n`;
-            if (i.unlockHR3) attrOut += `- 𝙸𝚗𝚌𝚊𝚙𝚊𝚌𝚒𝚝𝚊𝚌̧𝚊̃𝚘\n`;
-            if (i.unlockHR4) attrOut += `- 𝙿𝚛𝚎𝚜𝚜𝚊̃𝚘\n`;
-            if (i.unlockHR5) attrOut += `- 𝙰𝚜𝚜𝚊𝚜𝚜𝚒𝚗𝚊𝚝𝚘 𝚍𝚎 𝙾𝚋𝚜𝚎𝚛𝚟𝚊𝚌̧𝚊̃𝚘\n`;
-            if (i.unlockHR6) attrOut += `- 𝙸𝚗𝚏𝚞𝚜𝚊̃𝚘\n`;
+            if (i.unlockHR2) attrOut += `- 𝙳𝚘𝚖𝚒𝚗𝚊𝚌̧𝚊̃𝚘✓\n`;
+            if (i.unlockHR3) attrOut += `- 𝙸𝚗𝚌𝚊𝚙𝚊𝚌𝚒𝚝𝚊𝚌̧𝚊̃𝚘✓\n`;
+            if (i.unlockHR4) attrOut += `- 𝙿𝚛𝚎𝚜𝚜𝚊̃𝚘✓\n`;
+            if (i.unlockHR5) attrOut += `- 𝙰𝚜𝚜𝚊𝚜𝚜𝚒𝚗𝚊𝚝𝚘 𝚍𝚎 𝙾𝚋𝚜𝚎𝚛𝚟𝚊𝚌̧𝚊̃𝚘✓\n`;
+            if (i.unlockHR6) attrOut += `- 𝙸𝚗𝚏𝚞𝚜𝚊̃𝚘✓\n`;
         }
         attrOut += `\n`;
     }
@@ -3135,6 +3135,150 @@ function updateUI() {
     while (invLines.length < 3) { invLines.push("* "); }
     inventarioFormatado = invLines.join('\n');
 
+    let manualAttrOut = "";
+    manualAttrOut += `↠ *𝙳𝚎𝚜𝚝𝚛𝚎𝚣𝚊:* ${strCalc(D, bonus.d, flatBonus.d)}\n\n`;
+    manualAttrOut += `↠ *𝙵𝚘𝚛𝚌̧𝚊:* ${strCalc(F, bonus.f, flatBonus.f)}\n\n`;
+    manualAttrOut += `↠ *𝚁𝚎𝚜𝚒𝚜𝚝𝚎̂𝚗𝚌𝚒𝚊:* ${strCalc(R, bonus.r, flatBonus.r)}\n> 𝙴𝚜𝚝𝚊𝚖𝚒𝚗𝚊: ${i.estaminaAtual.toLocaleString("pt-BR")} / ${estTotalVal.toLocaleString("pt-BR")}\n\n`;
+
+    let velNormalStrMan = strCalc(V, bonus.v, flatBonus.v);
+    if (i.amiVelAtivo && finalAkumaVel > 0) {
+        let totalVBase = Math.round((V + flatBonus.v) * (1 + bonus.v));
+        velNormalStrMan += `+${finalAkumaVel.toLocaleString("pt-BR")} (Akuma no Mi) = ${(totalVBase + finalAkumaVel).toLocaleString("pt-BR")}`;
+    }
+    
+    let REFAkumaMan = (i.amiVelAtivo) ? (currentChar.substats.reflAkuma || 0) : 0;
+    let VCORPAkumaMan = (i.amiVelAtivo) ? (currentChar.substats.vcorpAkuma || 0) : 0;
+    let hasWaterDiffMan = (waterBuffV !== 0 || bonus.vAgua !== 0 || flatBonus.vAgua !== 0 || bonus.reflAgua !== 0 || flatBonus.reflAgua !== 0 || bonus.vcorpAgua !== 0 || flatBonus.vcorpAgua !== 0);
+
+    if (hasWaterDiffMan) {
+        let totalBonusVAgua = bonus.v + waterBuffV + bonus.vAgua;
+        let totalFlatBonusVAgua = flatBonus.v + flatBonus.vAgua;
+        let strTotalAgua = strCalc(V, totalBonusVAgua, totalFlatBonusVAgua);
+        if (i.amiVelAtivo && finalAkumaVel > 0) {
+            let totalVAguaBase = Math.round((V + totalFlatBonusVAgua) * (1 + totalBonusVAgua));
+            strTotalAgua += `+${finalAkumaVel.toLocaleString("pt-BR")} (Akuma no Mi) = ${(totalVAguaBase + finalAkumaVel).toLocaleString("pt-BR")}`;
+        }
+        manualAttrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${velNormalStrMan} | ${strTotalAgua} (dentro d'água)\n`;
+        
+        let REFAgua = currentChar.substats.reflAgua || 0;
+        let VCORPAgua = currentChar.substats.vcorpAgua || 0;
+        let totalBonusReflAgua = bonus.refl + bonus.reflAgua;
+        let totalFlatBonusReflAgua = flatBonus.refl + flatBonus.reflAgua;
+        let totalBonusVcorpAgua = bonus.vcorp + bonus.vcorpAgua;
+        let totalFlatBonusVcorpAgua = flatBonus.vcorp + flatBonus.vcorpAgua;
+
+        let refNormStr = "";
+        let totalBaseRef = Math.round((REF + flatBonus.refl) * (1 + bonus.refl));
+        if (bonus.refl === 0 && flatBonus.refl === 0) refNormStr = (totalBaseRef + REFAkumaMan).toLocaleString("pt-BR");
+        else {
+            refNormStr = strCalc(REF, bonus.refl, flatBonus.refl);
+            if (REFAkumaMan > 0) refNormStr = refNormStr.split(" = ")[0] + `+${REFAkumaMan.toLocaleString("pt-BR")} (Akuma) = ${(totalBaseRef + REFAkumaMan).toLocaleString("pt-BR")}`;
+        }
+
+        let refWaterStr = "";
+        let totalBaseRefAgua = Math.round((REFAgua + totalFlatBonusReflAgua) * (1 + totalBonusReflAgua));
+        if (totalBonusReflAgua === 0 && totalFlatBonusReflAgua === 0) refWaterStr = (totalBaseRefAgua + REFAkumaMan).toLocaleString("pt-BR");
+        else {
+            refWaterStr = strCalc(REFAgua, totalBonusReflAgua, totalFlatBonusReflAgua);
+            if (REFAkumaMan > 0) refWaterStr = refWaterStr.split(" = ")[0] + `+${REFAkumaMan.toLocaleString("pt-BR")} (Akuma) = ${(totalBaseRefAgua + REFAkumaMan).toLocaleString("pt-BR")}`;
+        }
+
+        manualAttrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${refNormStr} | ${refWaterStr} (dentro d'água)\n`;
+
+        let vcorpNormStr = "";
+        let totalBaseVcorp = Math.round((VCORP + flatBonus.vcorp) * (1 + bonus.vcorp));
+        if (bonus.vcorp === 0 && flatBonus.vcorp === 0) vcorpNormStr = (totalBaseVcorp + VCORPAkumaMan).toLocaleString("pt-BR");
+        else {
+            vcorpNormStr = strCalc(VCORP, bonus.vcorp, flatBonus.vcorp);
+            if (VCORPAkumaMan > 0) vcorpNormStr = vcorpNormStr.split(" = ")[0] + `+${VCORPAkumaMan.toLocaleString("pt-BR")} (Akuma) = ${(totalBaseVcorp + VCORPAkumaMan).toLocaleString("pt-BR")}`;
+        }
+
+        let vcorpWaterStr = "";
+        let totalBaseVcorpAgua = Math.round((VCORPAgua + totalFlatBonusVcorpAgua) * (1 + totalBonusVcorpAgua));
+        if (totalBonusVcorpAgua === 0 && totalFlatBonusVcorpAgua === 0) vcorpWaterStr = (totalBaseVcorpAgua + VCORPAkumaMan).toLocaleString("pt-BR");
+        else {
+            vcorpWaterStr = strCalc(VCORPAgua, totalBonusVcorpAgua, totalFlatBonusVcorpAgua);
+            if (VCORPAkumaMan > 0) vcorpWaterStr = vcorpWaterStr.split(" = ")[0] + `+${VCORPAkumaMan.toLocaleString("pt-BR")} (Akuma) = ${(totalBaseVcorpAgua + VCORPAkumaMan).toLocaleString("pt-BR")}`;
+        }
+
+        manualAttrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${vcorpNormStr} | ${vcorpWaterStr} (dentro d'água)\n`;
+
+    } else {
+        manualAttrOut += `↠ *𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:* ${velNormalStrMan}\n`;
+        
+        let totalBaseRef = Math.round((REF + flatBonus.refl) * (1 + bonus.refl));
+        if (bonus.refl === 0 && flatBonus.refl === 0) manualAttrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${(totalBaseRef + REFAkumaMan).toLocaleString("pt-BR")}\n`;
+        else {
+            let refNormStr = strCalc(REF, bonus.refl, flatBonus.refl);
+            if (REFAkumaMan > 0) refNormStr = refNormStr.split(" = ")[0] + `+${REFAkumaMan.toLocaleString("pt-BR")} (Akuma) = ${(totalBaseRef + REFAkumaMan).toLocaleString("pt-BR")}`;
+            manualAttrOut += `> _𝚁𝚎𝚏𝚕𝚎𝚡𝚘:_ ${refNormStr}\n`;
+        }
+        
+        let totalBaseVcorp = Math.round((VCORP + flatBonus.vcorp) * (1 + bonus.vcorp));
+        if (bonus.vcorp === 0 && flatBonus.vcorp === 0) manualAttrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${(totalBaseVcorp + VCORPAkumaMan).toLocaleString("pt-BR")}\n`;
+        else {
+            let vcorpNormStr = strCalc(VCORP, bonus.vcorp, flatBonus.vcorp);
+            if (VCORPAkumaMan > 0) vcorpNormStr = vcorpNormStr.split(" = ")[0] + `+${VCORPAkumaMan.toLocaleString("pt-BR")} (Akuma) = ${(totalBaseVcorp + VCORPAkumaMan).toLocaleString("pt-BR")}`;
+            manualAttrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎 𝙲𝚘𝚛𝚙𝚘𝚛𝚊𝚕:_ ${vcorpNormStr}\n`;
+        }
+    }
+    manualAttrOut += `\n`;
+
+    manualAttrOut += `↠ *𝙴𝚜𝚙𝚒́𝚛𝚒𝚝𝚘:* ${strCalc(ESP, bonus.esp, flatBonus.esp)}\n`;
+    manualAttrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚘 𝙰𝚛𝚖𝚊𝚖𝚎𝚗𝚝𝚘:_ ${strCalc(HA, bonus.ha, flatBonus.ha)}\n`;
+    manualAttrOut += `- 𝙸𝚗𝚟𝚒𝚜𝚒́𝚟𝚎𝚕${i.unlockHA1 ? '✓' : '✘'}\n`;
+    manualAttrOut += `- 𝚅𝚒𝚜𝚒́𝚟𝚎𝚕${i.unlockHA2 ? '✓' : '✘'}\n`;
+    manualAttrOut += `- 𝙸𝚖𝚋𝚞𝚒𝚌̧𝚊̃𝚘${i.unlockHA3 ? '✓' : '✘'}\n`;
+    manualAttrOut += `- 𝙵𝚞𝚕𝚕 𝙱𝚘𝚍𝚢${i.unlockHA4 ? '✓' : '✘'}\n`;
+    manualAttrOut += `- 𝙴𝚖𝚒𝚜𝚜𝚊̃𝚘${i.unlockHA5 ? '✓' : '✘'}\n`;
+    manualAttrOut += `- 𝙰𝚟𝚊𝚗𝚌̧𝚊𝚍𝚘${i.unlockHA6 ? '✓' : '✘'}\n`;
+
+    manualAttrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚊 𝙾𝚋𝚜𝚎𝚛𝚟𝚊𝚌̧𝚊̃𝚘:_ ${strCalc(HO, bonus.ho, flatBonus.ho)}\n`;
+    manualAttrOut += `- 𝙸𝚗𝚝𝚎𝚗𝚌̧𝚊̃𝚘${i.unlockHO2 ? '✓' : '✘'}\n`;
+    manualAttrOut += `- 𝙿𝚛𝚎𝚖𝚘𝚗𝚒𝚌̧𝚊̃𝚘${i.unlockHO3 ? '✓' : '✘'}\n`;
+    manualAttrOut += `- 𝙰𝚟𝚊𝚗𝚌̧𝚊𝚍𝚘${i.unlockHO4 ? '✓' : '✘'}\n`;
+
+    manualAttrOut += `> _𝙷𝚊𝚔𝚒 𝚍𝚘 𝚁𝚎𝚒:_ ${strCalc(HR, bonus.hr, flatBonus.hr)}\n`;
+    manualAttrOut += `- 𝙳𝚘𝚖𝚒𝚗𝚊𝚌̧𝚊̃𝚘${i.unlockHR2 ? '✓' : '✘'}\n`;
+    manualAttrOut += `- 𝙸𝚗𝚌𝚊𝚙𝚊𝚌𝚒𝚝𝚊𝚌̧𝚊̃𝚘${i.unlockHR3 ? '✓' : '✘'}\n`;
+    manualAttrOut += `- 𝙿𝚛𝚎𝚜𝚜𝚊̃𝚘${i.unlockHR4 ? '✓' : '✘'}\n`;
+    manualAttrOut += `- 𝙰𝚜𝚜𝚊𝚜𝚜𝚒𝚗𝚊𝚝𝚘 𝚍𝚎 𝙾𝚋𝚜𝚎𝚛𝚟𝚊𝚌̧𝚊̃𝚘${i.unlockHR5 ? '✓' : '✘'}\n`;
+    manualAttrOut += `- 𝙸𝚗𝚏𝚞𝚜𝚊̃𝚘${i.unlockHR6 ? '✓' : '✘'}\n\n`;
+
+    manualAttrOut += `↠ *𝙰𝚔𝚞𝚖𝚊 𝚗𝚘 𝙼𝚒:* ${strCalc(AMI, bonus.ami, flatBonus.ami)}\n`;
+    let calcAAlcMan = Math.round((aAlc + flatBonus.amiAlc) * (1 + bonus.amiAlc));
+    let multMan = parseFloat((i.amiAlcMult || "1").toString().replace(',', '.')) || 1;
+    let metrosMan = (calcAAlcMan / 20) * multMan;
+    manualAttrOut += `> _𝙰𝚕𝚌𝚊𝚗𝚌𝚎:_ ${strCalc(aAlc, bonus.amiAlc, flatBonus.amiAlc)} (${metrosMan.toLocaleString("pt-BR", {maximumFractionDigits: 1})}m)\n`;
+
+    let calcADurMan = Math.round((aDur + flatBonus.amiDur) * (1 + bonus.amiDur));
+    let cenasMan = Math.floor(calcADurMan / 500);
+    manualAttrOut += `> _𝙳𝚞𝚛𝚊𝚋𝚒𝚕𝚒𝚍𝚊𝚍𝚎:_ ${strCalc(aDur, bonus.amiDur, flatBonus.amiDur)} (${cenasMan} cena${cenasMan !== 1 ? 's' : ''})\n`;
+
+    let calcAPotFinalMan = Math.round((aPot + flatBonus.amiPot) * (1 + bonus.amiPot));
+    let strPotFinalMan = strCalc(aPot, bonus.amiPot, flatBonus.amiPot);
+    let amiResPctValFichaMan = parseInt(i.amiResPct) || 0;
+    if (amiResPctValFichaMan > 0) {
+        let resCalcFinalMan = calcAPotFinalMan + Math.floor(calcAPotFinalMan * (amiResPctValFichaMan / 100));
+        manualAttrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${strPotFinalMan} (${resCalcFinalMan.toLocaleString("pt-BR")} de Resistência)\n`;
+    } else {
+        manualAttrOut += `> _𝙿𝚘𝚝𝚎̂𝚗𝚌𝚒𝚊:_ ${strPotFinalMan}\n`;
+    }
+
+    let calcAVelFinalOutMan = Math.round((aVel + flatBonus.amiVel) * (1 + bonus.amiVel));
+    let strVelFinalMan = strCalc(aVel, bonus.amiVel, flatBonus.amiVel);
+    let baseAkumaVelUIOutMan = Math.floor(calcAVelFinalOutMan * (controlePct / 100));
+    let amiVelBuffValOutMan = parseInt(i.amiVelBuff) || 0;
+    if (amiVelBuffValOutMan > 0) {
+        let finalAkumaVelUIOutMan = baseAkumaVelUIOutMan + Math.floor(baseAkumaVelUIOutMan * (amiVelBuffValOutMan / 100));
+        manualAttrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${strVelFinalMan} (${finalAkumaVelUIOutMan.toLocaleString("pt-BR")} de Velocidade Adicional)\n`;
+    } else {
+        manualAttrOut += `> _𝚅𝚎𝚕𝚘𝚌𝚒𝚍𝚊𝚍𝚎:_ ${strVelFinalMan} (${baseAkumaVelUIOutMan.toLocaleString("pt-BR")} de Velocidade Adicional)\n`;
+    }
+
+    manualAttrOut += `> _𝙳𝚎𝚜𝚙𝚎𝚛𝚝𝚊𝚛:_ ${strCalc(aDesp, bonus.amiDesp, flatBonus.amiDesp)}\n`;
+    manualAttrOut += `> _𝙲𝚘𝚗𝚝𝚛ᴏ𝚕𝚎:_ ${controlePct}%\n\n`;
+
     let out = `*Nᴇᴡ sᴇᴀs*
 — ロールプレイングゲーム - 𝚁𝙿𝙶 [𝙾𝙽𝙴 𝙿𝙸𝙴𝙲𝙴]
      — 新しい海 - 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 ~*ɴꜱ*~
@@ -3199,6 +3343,71 @@ HP: ${i.hpAtual.toLocaleString("pt-BR")} / ${totalHP.toLocaleString("pt-BR")}
 
 ${attrOut}${tecnicasOut}`;
 
+    let outManual = `*Nᴇᴡ sᴇᴀs*
+— ロールプレイングゲーム - 𝚁𝙿𝙶 [𝙾𝙽𝙴 𝙿𝙸𝙴𝙲𝙴]
+     — 新しい海 - 𝙽𝚎𝚠 𝚂𝚎𝚊𝚜 ~*ɴꜱ*~
+                          ${isNPC ? 'ᖴIᑕᕼᗩ ᗞᕮ ᘉᑭᑕ' : 'ᖴIᑕᕼᗩ'}
+Iີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີີ່້ິູຸູິິ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊໊ີ້ີ້ີ້ີ້ີ້ິ້ິີີີີີີ່່່່່່້້້່ີ໌ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້ິ້໌໌໌ີ້ຼຼຼຼຼຼຼຼຼຼຼຼ໋໋໋໋໋໋໋໊໊໊໊໊
+  : ᓩ _𝐍ᴏᴍᴇ:_
+> ${currentChar.name || ''}
+
+  : ᓩ _𝐀ʟᴄᴜɴʜᴀ:_
+> ${alcunhaOut}
+${recompensaOutText}
+  : ᓩ _𝐀ʟᴛᴜʀᴀ:_
+> ${i.altura || ''}
+
+  : ᓩ _𝐈ᴅᴀᴅᴇ:_
+> ${i.idade || '(Mínimo: 15)'}
+
+  : ᓩ _${(i.linhagem && i.linhagem !== "Nenhuma") ? "𝐑ᴀᴄ̧ᴀ | 𝐋ɪɴʜᴀɢᴇᴍ" : "𝐑ᴀᴄ̧ᴀ"}:_
+> ${(i.linhagem && i.linhagem !== "Nenhuma") ? racaOutput + " | " + displayLinhagem : racaOutput}
+
+  : ᓩ _𝐒ᴇxᴏ:_
+> ${i.sexo || '🔒'}
+
+  : ᓩ _𝐒ᴀɴɢᴜᴇ:_
+> ${i.sangue || ''}
+${histPersOut}
+  : ᓩ _𝐀ᴘᴀʀᴇ̂ɴᴄɪᴀ:_
+> ${i.aparencia || ''}
+
+  : ᓩ _𝐈ᴅ:_ ${currentDocId || ''}
+${(parseInt(i.aliadosEspiritoContagiante) || 0) > 0 ? `\n  : ᓩ _𝐀ʟɪᴀᴅᴏs ᴄᴏᴍ 𝐄sᴘɪ́ʀɪᴛᴏ 𝐂ᴏɴᴛᴀɢɪᴀɴᴛᴇ:_\n> ${parseInt(i.aliadosEspiritoContagiante)}\n` : ''}
+  : ᓩ _𝐍ᴀᴄɪᴏɴᴀʟɪᴅᴀᴅᴇ:_
+> ${i.nacionalidade || 'Desconhecida'}
+
+  : ᓩ _𝐋ᴏᴄᴀʟɪᴢᴀᴄ̧ᴀ̃ᴏ ᴀᴛᴜᴀʟ:_
+> ${i.localizacao || '(Local presente no mapa do RPG)'}
+
+▬▬▬▬▬▬▬▬▬▬▬▬
+
+  : ᓩ _Cʟᴀssᴇ(s):_
+1. *${c1Out}*
+2. *${c2Out}*
+3. *${c3Out}*
+4. *${c4Out}*
+5. *${c5Out}*
+
+${orgOut}
+  : ᓩ _𝐄sᴛɪʟᴏs ᴅᴇ ʟᴜᴛᴀ:_
+${estilosText.trim()}
+${berriesOutText}${npcsOutText}
+> _𝐈ɴᴠᴇɴᴛᴀ́ʀɪᴏ:_
+${inventarioFormatado}
+
+${habilidadesOut}  : ᓩ _𝐀ᴋᴜᴍᴀ ɴᴏ ᴍɪ:_
+> ${i.akumaNome || '🔒'}
+
+▬▬▬▬  [ 𝐒ᴛᴀᴛᴜs ]  ▬▬▬▬
+HP: ${i.hpAtual.toLocaleString("pt-BR")} / ${totalHP.toLocaleString("pt-BR")}
+
+↠  *𝐀ᴛʀɪʙᴜᴛᴏs*
+* ${totalBase.toLocaleString("pt-BR")}
+
+${manualAttrOut}${tecnicasOut}`;
+
+    window.copyDataFichaManual = outManual.trim();
     window.copyDataAtributos = `▬▬▬▬  [ 𝐒ᴛᴀᴛᴜs ]  ▬▬▬▬\nHP: ${i.hpAtual.toLocaleString("pt-BR")} / ${totalHP.toLocaleString("pt-BR")}\n\n↠  *𝐀ᴛʀɪʙᴜᴛᴏs*\n* ${totalBase.toLocaleString("pt-BR")}\n\n${attrOut}`.trim();
     window.copyDataTecnicas = tecnicasOut.trim();
     document.getElementById('resBox').textContent = out.trim();
@@ -3221,6 +3430,14 @@ async function copyFicha() {
     let tempArea = document.createElement("textarea"); tempArea.value = text;
     document.body.appendChild(tempArea); tempArea.select(); document.execCommand("copy"); document.body.removeChild(tempArea);
     await customAlert("Ficha copiada para a área de transferência!");
+}
+
+async function copyFichaManual() {
+    let text = window.copyDataFichaManual || "";
+    if(!text) { await customAlert("Nada para copiar!"); return; }
+    let tempArea = document.createElement("textarea"); tempArea.value = text;
+    document.body.appendChild(tempArea); tempArea.select(); document.execCommand("copy"); document.body.removeChild(tempArea);
+    await customAlert("Ficha Manual copiada para a área de transferência!");
 }
 
 async function copyAtributos() {
